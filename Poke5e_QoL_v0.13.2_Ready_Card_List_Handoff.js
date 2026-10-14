@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Pokemon 5e QOL - v0.12.31 Decoded Image Handoff
-// @namespace    yofi.poke5e.qol.v01231
-// @version      0.12.31
-// @description  Core navigation and controls; canonical universal Scarlet/Violet type palette; Species Card presentation remains separate.
+// @name         Pokemon 5e QOL - v0.13.2 Ready Card List Handoff
+// @namespace    yofi.poke5e.qol.v01239
+// @version      0.13.2
+// @description  Core navigation and controls; canonical universal Scarlet/Violet type palette; neighbor data warmup and decoded pre-paint portrait synchronization.
 // @match        https://poke5e.app/*
 // @run-at       document-start
 // @grant        none
@@ -10,16 +10,157 @@
 
 (() => {
   "use strict";
+  // Shared startup protocol, independent of module release versions. Each
+  // userscript carries this small bootstrap; only the first copy installs it.
+  const modules = window.__yofiUserscripts || (window.__yofiUserscripts = (() => {
+    const records = new Map();
+    const waiting = new Map();
+    const reportedConflicts = new Set();
+    let reportQueued = false;
+    let ready = false;
+    const readyEvent = 'yofi:qol-ready';
+    function notice(id, message) {
+      const show = () => {
+        let node = document.getElementById(id);
+        if (!node) {
+          node = document.createElement('div');
+          node.id = id;
+          node.setAttribute('role','alert');
+          node.style.cssText = 'position:fixed;z-index:2147483647;left:50%;top:50%;transform:translate(-50%,-50%);box-sizing:border-box;width:max-content;max-width:calc(100vw - 32px);padding:16px 20px;background:#451c20;color:white;font:600 14px/1.4 system-ui;border:2px solid #ffc0c0;border-radius:9px;box-shadow:0 3px 12px #0006;text-align:center';
+          document.body.appendChild(node);
+        }
+        node.textContent = message;
+      };
+      if (document.body) show();
+      else document.addEventListener('DOMContentLoaded',show,{once:true});
+    }
+    function report() {
+      discover();
+      conflicts();
+      console.info('[Poké5e userscripts] Versions detected on this page:');
+      console.table([...records.values()].map(({module,version,status}) => ({module,version,status})));
+    }
+    function scheduleReport() {
+      if (reportQueued) return;
+      reportQueued = true;
+      setTimeout(() => { reportQueued = false; report(); },0);
+    }
+    function discover() {
+      const core = window.__yofiQolBootstrapStatus;
+      const add = (module,version,status = 'running') => {
+        const key = `${module}:${version}`;
+        if (!records.has(key)) records.set(key,{module,version,status});
+      };
+      if (core && core.phase !== 'failed') add('QoL',core.version || 'unknown legacy version',core.phase === 'running' ? 'running' : core.phase);
+      else if (window.__yofiPoke5eQol01020) add('QoL','unknown legacy version');
+      const species = window.__yofiSpeciesCard || window.__yofiHeroLayoutLab;
+      if (typeof species === 'string') add('Species Card',species);
+      for (const key of Object.getOwnPropertyNames(window).filter(name => /^__p5ThemeOverlay\d+$/.test(name))) {
+        const overlay = window[key];
+        let version = overlay?.version;
+        if (!version) { try { version = overlay?.diagnose?.().version; } catch (_) {} }
+        if (version) add('Theme Overlay',version);
+      }
+    }
+    function conflicts() {
+      const groups = new Map();
+      for (const {module,version} of records.values()) {
+        if (!groups.has(module)) groups.set(module,[]);
+        groups.get(module).push(version);
+      }
+      const duplicates = [...groups].filter(([,versions]) => versions.length > 1);
+      if (!duplicates.length) return;
+      const details = duplicates.map(([module,versions]) => `${module}: ${versions.join(', ')}`).join('; ');
+      if (!reportedConflicts.has(details)) {
+        reportedConflicts.add(details);
+        const message = `Multiple userscript versions detected. ${details}. Disable the extra copies and reload this page.`;
+        console.error('[Poké5e userscripts]',message);
+        notice('yofi-userscript-version-conflict',message);
+      }
+    }
+    function register(module, version) {
+      discover();
+      const key = `${module}:${version}`;
+      let record = records.get(key);
+      if (!record) {
+        record = {module,version,status:'starting'};
+        records.set(key,record);
+      }
+      conflicts();
+      scheduleReport();
+      return record;
+    }
+    function status(record, value) { record.status = value; scheduleReport(); }
+    function publishReady() {
+      ready = true;
+      for (const [record,start] of waiting) {
+        waiting.delete(record);
+        document.getElementById(`yofi-${record.module.replace(/\s+/g,'-').toLowerCase()}-missing-qol`)?.remove();
+        queueMicrotask(() => {
+          if (record.module === 'Species Card' && window.__yofiSpeciesCard === record.version) {
+            status(record,'running'); return;
+          }
+          const active = [...records.values()].find(row => row.module === record.module && row.version !== record.version && row.status === 'running');
+          if (active) { status(record,'blocked: another copy is active'); return; }
+          try { status(record,start() === false ? 'blocked' : 'running'); }
+          catch (error) { status(record,'failed'); console.error(`[Poké5e ${record.module}] Startup failed:`,error); }
+        });
+      }
+    }
+    function detectQol() {
+      const core = window.__yofiQolBootstrapStatus;
+      // Legacy names are presence signals, not release-version requirements.
+      if (core?.phase === 'running' || (!core && window.__yofiPoke5eQol01020 && window.__yofiQolRecover)) {
+        const record = register('QoL',core?.version || 'unknown legacy version');
+        status(record,'running');
+        publishReady();
+      }
+      return ready;
+    }
+    function requireQol(record, start) {
+      status(record,'waiting for QoL');
+      waiting.set(record,start);
+      if (ready || detectQol()) { publishReady(); return; }
+      const check = () => {
+        if (!waiting.has(record) || detectQol()) return;
+        if (record.status === 'missing QoL') return;
+        status(record,'missing QoL');
+        const message = `${record.module} requires QoL. Enable one QoL userscript and reload this page.`;
+        console.error(`[Poké5e ${record.module}]`,message);
+        notice(`yofi-${record.module.replace(/\s+/g,'-').toLowerCase()}-missing-qol`,message);
+      };
+      // A task after DOMContentLoaded lets document-end scripts register too.
+      if (document.readyState === 'loading')
+        document.addEventListener('DOMContentLoaded',() => setTimeout(check,0),{once:true});
+      else setTimeout(check,0);
+    }
+    document.addEventListener(readyEvent,publishReady);
+    window.addEventListener('load',detectQol,{once:true});
+    return {register,status,requireQol,report,notice,ready:publishReady};
+  })());
   const previous = window.__yofiQolBootstrapStatus;
-  if (previous?.version === '0.12.31' && previous.phase !== 'failed') {
+  if (previous && previous.version !== '0.13.2' && previous.phase !== 'failed') {
+    modules.register('QoL',previous.version || 'unknown legacy version');
+  } else if (!previous && window.__yofiPoke5eQol01020) {
+    modules.register('QoL','unknown legacy version');
+  }
+  const registration = modules.register('QoL','0.13.2');
+  if ((previous && previous.version !== '0.13.2' && previous.phase !== 'failed') ||
+      (!previous && window.__yofiPoke5eQol01020)) {
+    modules.status(registration,'blocked: another QoL copy is active');
+    return;
+  }
+
+  if (previous?.version === '0.13.2' && previous.phase !== 'failed') {
     previous.reinjections = (previous.reinjections || 0) + 1;
+    modules.status(registration,previous.phase);
     const repair = () => {
       if (!document.head || !document.body ||
           typeof window.__yofiQolRecover !== 'function') return false;
       try { window.__yofiQolRecover(); }
       catch (error) {
         previous.lastRecoveryError = String(error?.stack || error);
-        console.error('[Poké5e QOL v0.12.31] Same-tab recovery failed:',error);
+        console.error('[Poké5e QOL v0.13.2] Same-tab recovery failed:',error);
       }
       return true;
     };
@@ -35,9 +176,179 @@
     return;
   }
   const bootstrap = window.__yofiQolBootstrapStatus = {
-    version: '0.12.31', phase: 'waiting-for-head', attempts: 0,
+    version: '0.13.2', phase: 'waiting-for-head', attempts: 0,
     error: null, startedAt: Date.now()
   };
+
+  // Share only short-lived neighbor data responses with the site's own fetch.
+  // This lets a warmed Fakémon row satisfy the route's normal RPC request,
+  // without constructing a hidden card or retaining a second DOM tree.
+  const NEIGHBOR_RESPONSE_CACHE_KEY = '__yofiNeighborResponseCacheV1';
+  const neighborResponseCache = (() => {
+    const existing = window[NEIGHBOR_RESPONSE_CACHE_KEY];
+    if (existing?.installed && existing.originalFetch && existing.prefetch) return existing;
+
+    const originalFetch = window.fetch.bind(window);
+    const records = new Map();
+    const maxEntries = 12;
+    const lifetime = 30000;
+
+    const fakemonKey = value => {
+      const key = String(value || '').replace(/^F\./i, '').trim();
+      return key ? `fakemon:${key}` : null;
+    };
+
+    const cleanExpired = () => {
+      const now = Date.now();
+      for (const [key, record] of records) {
+        if (record.expiresAt <= now) records.delete(key);
+      }
+    };
+
+    const trim = () => {
+      cleanExpired();
+      while (records.size > maxEntries) records.delete(records.keys().next().value);
+    };
+
+    const getRequestKey = (input, init) => {
+      let url;
+      try {
+        const raw = input instanceof Request ? input.url
+          : input instanceof URL ? input.href : String(input);
+        url = new URL(raw, location.href);
+      } catch (_) { return null; }
+
+      const request = input instanceof Request ? input : null;
+      const method = String(init?.method || request?.method || 'GET').toUpperCase();
+      if (url.href === 'https://api.poke5e.app/rest/v1/rpc/get_fakemon') {
+        if (method !== 'POST') return null;
+        const fromBody = body => {
+          if (typeof body === 'string') {
+            try { return fakemonKey(JSON.parse(body)?._read_key); } catch (_) { return null; }
+          }
+          if (body instanceof URLSearchParams) return fakemonKey(body.get('_read_key'));
+          return null;
+        };
+        if (init && Object.prototype.hasOwnProperty.call(init, 'body')) {
+          return fromBody(init.body);
+        }
+        return request ? request.clone().text().then(fromBody) : null;
+      }
+
+      if (method === 'GET' && /\/srd\/v1\/(?:2018|2024)\/pokemon\/[^/]+\.json$/i.test(url.pathname)) {
+        return `pokemon-json:${url.href}`;
+      }
+      return null;
+    };
+
+    const withCallerSignal = (promise, input, init) => {
+      const signal = init?.signal ?? (input instanceof Request ? input.signal : null);
+      if (!signal) return promise;
+      const abortReason = () => signal.reason !== undefined ? signal.reason
+        : new DOMException('The operation was aborted.', 'AbortError');
+      if (signal.aborted) {
+        promise.catch(() => {});
+        return Promise.reject(abortReason());
+      }
+      return new Promise((resolve, reject) => {
+        const abort = () => { signal.removeEventListener('abort', abort); reject(abortReason()); };
+        signal.addEventListener('abort', abort, { once:true });
+        promise.then(value => {
+          signal.removeEventListener('abort', abort);
+          resolve(value);
+        }, error => {
+          signal.removeEventListener('abort', abort);
+          reject(error);
+        });
+      });
+    };
+
+    const useWarmedResponse = (key, input, init) => {
+      if (!key) return originalFetch(input, init);
+      cleanExpired();
+      const record = records.get(key);
+      if (record) {
+        records.delete(key);
+        records.set(key, record);
+        const response = record.promise.then(response => response.clone()).catch(() => {
+          if (records.get(key) === record) records.delete(key);
+          return useWarmedResponse(key, input, init);
+        });
+        return withCallerSignal(response, input, init);
+      }
+
+      // The Fakémon list fetches complete records before a row is selected.
+      // Keep a short, capped response copy so a later detail-route get() can
+      // reuse that exact native request instead of repeating the RPC.
+      const responsePromise = originalFetch(input, init);
+      const captured = { expiresAt: Date.now() + lifetime, promise: null };
+      captured.promise = responsePromise.then(response => {
+        if (!response.ok) throw new Error(`Neighbor data request returned HTTP ${response.status}.`);
+        return response.clone();
+      }).catch(error => {
+        if (records.get(key) === captured) records.delete(key);
+        throw error;
+      });
+      // The native caller owns responsePromise. The separate cache copy can
+      // fail independently (including a non-OK response), so observe its
+      // rejection even when nobody subsequently consumes that cached copy.
+      captured.promise.catch(() => {});
+      records.set(key, captured);
+      trim();
+      return responsePromise;
+    };
+
+    const state = {
+      installed: false,
+      originalFetch,
+      prefetch(key, input, init) {
+        cleanExpired();
+        const old = records.get(key);
+        if (old) {
+          records.delete(key);
+          records.set(key, old);
+          return old.promise;
+        }
+        const record = { expiresAt: Date.now() + lifetime, promise: null };
+        record.promise = originalFetch(input, init).then(response => {
+          if (!response.ok) throw new Error(`Neighbor data request returned HTTP ${response.status}.`);
+          return response;
+        }).catch(error => {
+          if (records.get(key) === record) records.delete(key);
+          throw error;
+        });
+        records.set(key, record);
+        trim();
+        return record.promise;
+      },
+      clearFakemon() {
+        for (const key of records.keys()) {
+          if (key.startsWith('fakemon:')) records.delete(key);
+        }
+      },
+    };
+
+    try {
+      const wrappedFetch = function(input, init) {
+        const key = getRequestKey(input, init);
+        if (key && typeof key.then === 'function') {
+          return key.then(value => useWarmedResponse(value, input, init),
+            () => originalFetch(input, init));
+        }
+        return useWarmedResponse(key, input, init);
+      };
+      window.fetch = wrappedFetch;
+      state.installed = window.fetch === wrappedFetch;
+    } catch (_) { /* Portrait warmup still works without sharing app responses. */ }
+
+    try {
+      Object.defineProperty(window, NEIGHBOR_RESPONSE_CACHE_KEY, {
+        configurable: true, value: state,
+      });
+    } catch (_) { window[NEIGHBOR_RESPONSE_CACHE_KEY] = state; }
+    return state;
+  })();
+
   let invoked = false;
   let headWatcher = null;
   function invokeWithHead() {
@@ -52,16 +363,19 @@
       if (otherQolAlreadyRunning) {
         bootstrap.phase = 'blocked-by-existing-qol';
         bootstrap.error = 'An earlier QOL version has already installed its shared guard. Disable older QOL versions and reopen this tab.';
-        console.warn('[Poké5e QOL v0.12.31]',bootstrap.error);
+        modules.status(registration,'blocked: another QoL copy is active');
+        console.error('[Poké5e QOL v0.13.2]',bootstrap.error);
+        modules.notice('yofi-userscript-version-conflict',bootstrap.error);
       } else if (bootstrap.phase === 'initializing') bootstrap.phase = 'waiting-for-body';
     } catch (error) {
       bootstrap.phase = 'failed';
+      modules.status(registration,'failed');
       bootstrap.error = String(error?.stack || error);
       // A failed partial boot must not permanently suppress a later retry.
       // Do not delete the guard of an unrelated, already running QOL instance.
       if (window.__yofiPoke5eQol01020 === true)
         delete window.__yofiPoke5eQol01020;
-      console.error('[Poké5e QOL v0.12.31] Startup failed:', error);
+      console.error('[Poké5e QOL v0.13.2] Startup failed:', error);
     }
   }
   if (document.head) invokeWithHead();
@@ -73,7 +387,7 @@
   }
   function runQol() {
 
-  const VERSION = "0.12.31";
+  const VERSION = "0.13.2";
   // The browser controls site/navigation layout; the detail card controls
   // all entry-specific presentation. Do not confuse these two arenas.
   const RESPONSIVE_WIDTHS = Object.freeze({ compact: 600, wide: 800 });
@@ -115,6 +429,7 @@
   const EXCLUDED_ROOTS = new Set(["resources"]);
   const GLOBAL_COLLAPSED_CLASS = "yofi-side-collapsed-global";
   let pendingSelectionExpiresAt = 0;
+  let pendingListSelection = null;
   const NAV_COLLAPSE_KEY = "yofi-poke5e-qol-collapse-next-url";
   const FULLSCREEN_VIEW_KEY = "yofi-poke5e-qol-v069-fullscreen-view";
   const FULLSCREEN_DEFAULT_KEY = "yofi-poke5e-qol-fullscreen-default";
@@ -174,6 +489,8 @@
 
   // Portrait selection and shimmer are retained; the hero layout is rebuilt in v0.8.5.
   const portraitRecords = new Map();
+  const portraitPreloads = new Map();
+  const decodedPortraitUrls = new Set();
   const portraitHostStates = new WeakMap();
   let openPortraitMenu = null;
   let portraitMenuSequence = 0;
@@ -322,6 +639,52 @@
     return { kind: root, id, edition, prefix, key: `pokemon:${edition}:${id}` };
   }
 
+  function portraitContextFromHref(href) {
+    let url;
+    try { url = new URL(href, location.href); } catch (_) { return null; }
+    if (url.origin !== location.origin) return null;
+    const segments = url.pathname.split('/').filter(Boolean);
+    const rootIndex = segments.findIndex(part => part === 'pokemon' || part === 'fakemon');
+    if (rootIndex < 0) return null;
+    const root = segments[rootIndex];
+    const prefix = rootIndex ? '/' + segments.slice(0, rootIndex).join('/') : '';
+    if (root === 'fakemon') {
+      if (segments.length !== rootIndex + 1) return null;
+      const action = url.searchParams.get('action');
+      if (action && action !== 'info') return null;
+      const id = (url.searchParams.get('id') || '').replace(/^F\./i, '').trim();
+      return id ? { kind: 'fakemon', id, prefix, key: `fakemon:${id}` } : null;
+    }
+    if (segments.length !== rootIndex + 2) return null;
+    let id;
+    try { id = decodeURIComponent(segments[rootIndex + 1]); } catch (_) { return null; }
+    const edition = document.documentElement.dataset.edition === '2024' ? '2024' : '2018';
+    return { kind: 'pokemon', id, edition, prefix, key: `pokemon:${edition}:${id}` };
+  }
+
+  function touchPortraitRecord(key) {
+    const record = portraitRecords.get(key);
+    if (!record) return;
+    portraitRecords.delete(key);
+    portraitRecords.set(key, record);
+  }
+
+  function trimPortraitRecords() {
+    const currentKey = portraitContext()?.key;
+    const protectedKeys = new Set([currentKey, openPortraitMenu?.key].filter(Boolean));
+    while (portraitRecords.size > 8) {
+      const candidate = Array.from(portraitRecords.keys()).find(key => !protectedKeys.has(key));
+      if (!candidate) break;
+      portraitRecords.delete(candidate);
+    }
+  }
+
+  function clearFakemonPortraitRecords() {
+    for (const key of portraitRecords.keys()) {
+      if (key.startsWith('fakemon:')) portraitRecords.delete(key);
+    }
+  }
+
   function portraitUrl(raw, base = location.origin + "/") {
     if (typeof raw !== "string" || !raw.trim()) return null;
     try {
@@ -397,22 +760,28 @@
   function requestPortraitEntries(context, retry = false) {
     const old = portraitRecords.get(context.key);
     if (old?.status === "loading" || (!retry && old)) {
+      touchPortraitRecord(context.key);
       return old?.promise || Promise.resolve(old?.entries || []);
     }
     const record = { status: "loading", entries: [], error: "" };
     portraitRecords.set(context.key, record);
+    trimPortraitRecords();
     record.promise = loadPortraitEntries(context).then((entries) => {
       if (!entries.some((entry) => entry.key === "normal")) {
         throw new Error("No usable normal portrait URL was returned.");
       }
       record.status = "ready";
       record.entries = entries;
+      touchPortraitRecord(context.key);
+      trimPortraitRecords();
       queueInstall();
       return entries;
     }).catch((error) => {
       // Failure is NOT cached as a successful 'no alternate artwork' result.
       record.status = "error";
       record.error = error?.message || "Artwork lookup failed.";
+      touchPortraitRecord(context.key);
+      trimPortraitRecords();
       console.warn("[Pokemon 5e QOL portraits]", record.error);
       queueInstall();
       return [];
@@ -470,22 +839,106 @@
   }
 
   function preloadPortrait(src) {
-    return new Promise((resolve, reject) => {
+    const cached = portraitPreloads.get(src);
+    if (cached) {
+      portraitPreloads.delete(src);
+      portraitPreloads.set(src, cached);
+      return cached;
+    }
+    const promise = new Promise((resolve, reject) => {
       const probe = new Image();
-      const timer = setTimeout(() => finish(false), PORTRAIT_SOURCE.timeout);
+      probe.decoding = 'async';
       let settled = false;
+      let decodeStarted = false;
+      const timer = setTimeout(() => finish(false), PORTRAIT_SOURCE.timeout);
       function finish(ok) {
         if (settled) return;
         settled = true;
         clearTimeout(timer);
         probe.onload = probe.onerror = null;
-        ok ? resolve() : reject(new Error("The selected portrait could not be loaded."));
+        if (ok) {
+          decodedPortraitUrls.add(src);
+          while (decodedPortraitUrls.size > 32)
+            decodedPortraitUrls.delete(decodedPortraitUrls.values().next().value);
+          resolve();
+        } else reject(new Error("The selected portrait could not be loaded."));
       }
-      probe.onload = () => finish(true);
+      const loaded = () => {
+        if (settled || decodeStarted) return;
+        if (!(probe.naturalWidth > 0)) { finish(false); return; }
+        decodeStarted = true;
+        if (typeof probe.decode === 'function') {
+          probe.decode().then(() => finish(true), () => finish(probe.naturalWidth > 0));
+        } else finish(true);
+      };
+      probe.onload = loaded;
       probe.onerror = () => finish(false);
       probe.src = src;
-      if (probe.complete && probe.naturalWidth) finish(true);
+      if (probe.complete) loaded();
     });
+    portraitPreloads.set(src, promise);
+    while (portraitPreloads.size > 8) portraitPreloads.delete(portraitPreloads.keys().next().value);
+    promise.catch(() => {
+      if (portraitPreloads.get(src) === promise) portraitPreloads.delete(src);
+    });
+    return promise;
+  }
+
+  function neighborDataRequest(context, priority = 'low') {
+    if (context.kind === 'fakemon') {
+      return {
+        key: `fakemon:${context.id}`,
+        input: PORTRAIT_SOURCE.endpoint,
+        init: {
+          method: 'POST', mode: 'cors', credentials: 'omit', priority,
+          headers: {
+            apikey: PORTRAIT_SOURCE.publicKey,
+            Authorization: `Bearer ${PORTRAIT_SOURCE.publicKey}`,
+            'Content-Type': 'application/json', Accept: 'application/vnd.pgrst.object+json',
+          },
+          body: JSON.stringify({ _read_key: context.id }),
+        },
+      };
+    }
+    const url = `${context.prefix}/srd/v1/${context.edition}/pokemon/${encodeURIComponent(context.id)}.json`;
+    return { key: `pokemon-json:${new URL(url, location.origin).href}`, input: url,
+      init: { credentials: 'same-origin', priority } };
+  }
+
+  function warmNeighborPortrait(anchor, priority = 'low') {
+    if (!(anchor instanceof HTMLAnchorElement)) return;
+    const context = portraitContextFromHref(anchor.href);
+    if (!context) return;
+    const editions = context.kind === 'pokemon' ? ['2018','2024'] : [context.edition];
+    if (neighborResponseCache.installed) {
+      for (const edition of editions) {
+        const request = neighborDataRequest({...context,edition},priority);
+        void neighborResponseCache.prefetch(request.key, request.input, request.init).catch(() => {});
+      }
+    }
+    void requestPortraitEntries(context).then(entries => {
+      const preferredKey = globalShinyPreference ? 'shiny' : 'normal';
+      const preferred = entries.find(entry => entry.key === preferredKey)
+        || entries.find(entry => entry.key === 'normal');
+      if (preferred) void preloadPortrait(preferred.src).then(() => {
+        if (portraitContext()?.key === context.key) queueInstall();
+      }).catch(() => {});
+    });
+  }
+
+  const warmedNeighborhoods = new Map();
+  function warmResultNeighbors(previous, next, signature) {
+    const old = warmedNeighborhoods.get(signature);
+    if (old && old > Date.now()) return;
+    warmedNeighborhoods.set(signature, Date.now() + 30000);
+    while (warmedNeighborhoods.size > 16)
+      warmedNeighborhoods.delete(warmedNeighborhoods.keys().next().value);
+    const currentKey = portraitContext()?.key;
+    for (const anchor of [previous, next]) {
+      const context = anchor && portraitContextFromHref(anchor.href);
+      if (!context || context.key === currentKey) continue;
+      warmNeighborPortrait(anchor);
+    }
   }
 
   // Mirror the native Art shimmer on manually switched shiny portraits.
@@ -533,38 +986,6 @@
     } else startPortraitShimmerNow(img);
   }
 
-  // Light-touch lookup of the next/previous official entry. Never iterate all
-  // Pokemon, and never initiate Fakemon or TM requests from this code.
-  const warmedOfficialImageUrls = new Set();
-  function warmOfficialPortrait(href, warmImage = false) {
-    if (!globalShinyPreference) return;
-    let url;
-    try { url = new URL(href, location.href); } catch (_) { return; }
-    if (url.origin !== location.origin) return;
-    const parts = url.pathname.split('/').filter(Boolean);
-    const index = parts.indexOf('pokemon');
-    if (index < 0 || parts.length !== index + 2) return;
-    const prefix = index ? '/' + parts.slice(0, index).join('/') : '';
-    let id;
-    try { id = decodeURIComponent(parts[index + 1]); } catch (_) { return; }
-    const edition = document.documentElement.dataset.edition === '2024' ? '2024' : '2018';
-    const key = `pokemon:${edition}:${id}`;
-    const pending = requestPortraitEntries({kind:'pokemon',id,edition,prefix,key});
-    if (warmImage) void pending.then(entries => {
-      if (!globalShinyPreference) return;
-      const shiny = entries.find(entry => entry.key === 'shiny');
-      if (!shiny || warmedOfficialImageUrls.has(shiny.src)) return;
-      warmedOfficialImageUrls.add(shiny.src);
-      // The browser's image cache can then satisfy the next navigation;
-      // only the immediate next neighbor and an explicitly touched row get
-      // artwork preloads. Unvisited thousands of list rows do not.
-      void preloadPortrait(shiny.src).catch(() => warmedOfficialImageUrls.delete(shiny.src));
-      if (warmedOfficialImageUrls.size > 48) {
-        warmedOfficialImageUrls.delete(warmedOfficialImageUrls.values().next().value);
-      }
-    });
-  }
-
   function updateVariantButton(host, state) {
     const button = portraitControlSlot(host).querySelector(":scope > .yofi-portrait-sparkle");
     if (!button) return;
@@ -599,17 +1020,15 @@
       if (!(img instanceof HTMLImageElement)) return;
       // Set only the existing portrait source, never the record or its metadata.
       img.removeAttribute("srcset");
-      img.src = entry.src;
+      if (portraitUrl(img.getAttribute('src')) !== entry.src) img.src = entry.src;
       playPortraitShimmer(img, entry.key);
       state.img = img;
       state.selected = entry.key;
       state.failedPreferred = false;
       host.dataset.yofiPortraitVariant = entry.key;
-      if (state.key.startsWith('pokemon:')) {
-        if (entry.key === 'shiny' || entry.key === 'shinyFemale') {
-          failedOfficialShinyCandidates.delete(state.key);
-          state.shimmerFor = img; // playPortraitShimmer already ran above.
-        }
+      if (entry.key === 'shiny' || entry.key === 'shinyFemale') {
+        failedOfficialShinyCandidates.delete(state.key);
+        state.shimmerFor = img; // playPortraitShimmer already ran above.
       }
       if (!inherited) setGlobalShinyPreference(entry.key === "shiny" || entry.key === "shinyFemale");
     } catch (error) {
@@ -720,110 +1139,62 @@
     updateVariantButton(host, state);
   }
 
-  // Poke5e's official asset localizer writes main.png and main-shiny.png in
-  // the same species directory. This is used ONLY as a provisional URL when
-  // the exact shiny entry has not yet reached our metadata cache; the SRD
-  // record supersedes it as soon as it arrives. In particular, require that
-  // the native normal path matches the species in the CURRENT route.
-  function inferredOfficialShinyUrl(context, normalUrl) {
-    let url;
-    try { url = new URL(normalUrl, location.href); } catch (_) { return null; }
-    if (url.origin !== location.origin) return null;
-    const match = /^\/assets\/pokemon\/([^/]+)\/main\.(png|webp|jpe?g)$/i.exec(url.pathname);
-    if (!match) return null;
-    let id;
-    try { id = decodeURIComponent(match[1]); } catch (_) { return null; }
-    if (id !== context.id) return null;
-    url.pathname = url.pathname.replace(/\/main\.[^.]+$/i, `/main-shiny.${match[2]}`);
-    return url.href;
+  function currentPortraitImage(article) {
+    return article?.querySelector('section.info .square-image img');
   }
-
-  // Called in the existing childList and src MutationObserver microtasks,
-  // BEFORE the browser paints a new native Svelte image. The incoming img's
-  // single visible load must point at THIS species' shiny, not the previous
-  // shiny followed by the real destination, and not its native normal art.
-  // Art's <img-zoom> and the native {#key src} behavior are left untouched.
-  function syncOfficialShinyBeforePaint() {
-    if (!globalShinyPreference) return;
-    const context = portraitContext();
-    if (context?.kind !== 'pokemon') return;
-    const article = activeRoutePage()?.querySelector(':scope > main article')
-      || document.querySelector('.page > main article');
-    const img = article?.querySelector('section.info .square-image img');
-    if (!(img instanceof HTMLImageElement)) return;
-    const actual = portraitUrl(img.getAttribute('src'));
-    if (!actual) return;
-
-    const record = portraitRecords.get(context.key);
-    const knownNormal = record?.entries?.find(e => e.key === 'normal')?.src || null;
-    const preferred = record?.status === 'ready'
-      ? record.entries.find(e => e.key === 'shiny')?.src || null : null;
+  function portraitMatchesRecord(article, context, record) {
+    const img = currentPortraitImage(article);
+    return !!img && record?.status === 'ready' &&
+      record.entries.some(entry => entry.src === portraitUrl(img.getAttribute('src')));
+  }
+  function applyPreferredPortrait(article, context, record) {
+    if (!portraitMatchesRecord(article, context, record)) return;
+    const img = currentPortraitImage(article);
     const host = img.closest('.square-image');
-    const control = host && portraitHostStates.get(host);
+    const state = portraitHostStates.get(host);
     const failed = failedOfficialShinyCandidates.has(context.key) ||
-      (control?.key === context.key && control.failedPreferred);
-    const retained = earlyOfficialShinySources.get(img);
-    const ownRetained = retained?.key === context.key ? retained : null;
-
-    // Metadata fetching can fail after the actual image was already found.
-    // Keep that successful single-load attempt; image.onerror still restores
-    // the native normal source if the asset itself is missing.
-    if (record?.status === 'error' && !failed && ownRetained?.shiny === actual) return;
-    // Only the genuine normal art is suitable fallback. On an unsupported
-    // shiny or an image error, switch back to it once, never retry blindly.
-    if (failed || record?.status === 'error' ||
-        (record?.status === 'ready' && !preferred)) {
-      if (ownRetained && actual === ownRetained.shiny) {
-        if (img.hasAttribute('srcset')) img.removeAttribute('srcset');
-        img.src = ownRetained.normal;
-      }
-      return;
-    }
-
-    const inferred = inferredOfficialShinyUrl(context, actual);
-    // An eligible original must belong to the CURRENT species. A route's
-    // location may change before Svelte replaces the previous card; do not
-    // retarget that previous species' image by accident.
-    const original = inferred || (knownNormal === actual ? actual : null) ||
-      (ownRetained?.normal === actual ? actual : null);
-    const target = preferred || inferred || ownRetained?.shiny || null;
-    if (!target || (!original && actual !== ownRetained?.shiny)) return;
-    if (actual === target) {
-      if (img.hasAttribute('srcset')) img.removeAttribute('srcset');
-      return;
-    }
-
-    if (original) {
-      // Preserve the normal URL strictly as an error fallback, not a visible
-      // intermediate image. This reference does not create a DOM node.
-      const fallback = (knownNormal === actual ? actual : null) || actual;
-      earlyOfficialShinySources.set(img, {
-        key: context.key, normal: fallback, shiny: target,
-      });
-    }
-    const state = earlyOfficialShinySources.get(img);
-    if (state?.key === context.key && state.shiny !== target) state.shiny = target;
-    if (img.hasAttribute('srcset')) img.removeAttribute('srcset');
-    img.src = target;
-    // A speculative canonical URL can be missing for unusual species. Keep
-    // the native image healthy without a second attempt on a failed URL.
-    if (state?.key === context.key && !officialShinyErrorWatched.has(img)) {
+      (state?.key === context.key && state.failedPreferred);
+    const preferred = globalShinyPreference && !failed &&
+      record.entries.find(entry => entry.key === 'shiny');
+    if (!preferred || !decodedPortraitUrls.has(preferred.src)) return;
+    const actual = portraitUrl(img.getAttribute('src'));
+    if (actual === preferred.src) return;
+    // One source writer for inherited shiny preference, for both categories.
+    // The surrounding native Art/IMG-ZOOM nodes are retained.
+    earlyOfficialShinySources.set(img, { key: context.key, normal: actual, shiny: preferred.src });
+    img.removeAttribute('srcset');
+    img.src = preferred.src;
+    if (!officialShinyErrorWatched.has(img)) {
       officialShinyErrorWatched.add(img);
       img.addEventListener('error', () => {
-        const latest = earlyOfficialShinySources.get(img);
-        if (!latest || portraitContext()?.key !== latest.key ||
-            portraitUrl(img.getAttribute('src')) !== latest.shiny) return;
-        failedOfficialShinyCandidates.add(latest.key);
-        img.src = latest.normal;
-        // This also lets the normal path drop the shiny-only animation.
-        playPortraitShimmer(img, 'normal');
+        const saved = earlyOfficialShinySources.get(img);
+        if (!saved || portraitContext()?.key !== saved.key ||
+            portraitUrl(img.getAttribute('src')) !== saved.shiny) return;
+        failedOfficialShinyCandidates.add(saved.key);
+        img.src = saved.normal;
         queueInstall();
       }, { passive: true });
     }
   }
+  function syncPreferredPortraitBeforePaint() {
+    const context = portraitContext();
+    if (!context) return;
+    const article = detailArticle(activeRoutePage()) || visibleDetailArticle();
+    applyPreferredPortrait(article, context, portraitRecords.get(context.key));
+  }
+
+  // Shared species identity check for the pre-paint header and theme passes.
+  // Exact metadata URLs prevent an outgoing image identifying a new route.
+  window.__yofiPortraitReadiness = {
+    matches(article, routeKey) {
+      const context = portraitContext();
+      return !!context && routeKey === `${context.kind}:${context.id}` &&
+        portraitMatchesRecord(article, context, portraitRecords.get(context.key));
+    }
+  };
 
   function installPortraitControl(page) {
-    syncOfficialShinyBeforePaint();
+    syncPreferredPortraitBeforePaint();
     const context = portraitContext();
     if (!context) return;
     if (openPortraitMenu && (!openPortraitMenu.host.isConnected || openPortraitMenu.key !== context.key)) {
@@ -850,7 +1221,7 @@
     const earlyShiny = earlyOfficialShinySources.get(img);
     const chosenShiny = record?.status === 'ready'
       ? record.entries.find(e => e.key === 'shiny')?.src : null;
-    if (context.kind === 'pokemon' && globalShinyPreference &&
+    if (globalShinyPreference &&
         !failedOfficialShinyCandidates.has(context.key) &&
         (actualImageUrl === chosenShiny ||
           (earlyShiny?.key === context.key && actualImageUrl === earlyShiny.shiny)) &&
@@ -877,6 +1248,7 @@
       });
       return;
     }
+    if (!portraitMatchesRecord(img.closest('article'), context, record)) return;
     state.entries = record.entries;
     // Reflect Svelte replacing the image rather than retaining stale handlers.
     const actual = portraitUrl(img.getAttribute("src"));
@@ -1003,6 +1375,13 @@
   }
 
   function clearCollapsedDestination() {
+    if (pendingListSelection) {
+      pendingListSelection.article?.removeAttribute('data-yofi-fullscreen-handoff');
+      const restoreSplit = !!pendingListSelection.article;
+      pendingListSelection = null;
+      document.documentElement.classList.remove('yofi-list-selection-pending');
+      if (restoreSplit) setCollapsed(false);
+    }
     try {
       sessionStorage.removeItem(NAV_COLLAPSE_KEY);
     } catch (_) {}
@@ -1142,6 +1521,13 @@
         flex: 1 1 100% !important;
         height: 100% !important;
       }
+    }
+
+    html.${GLOBAL_COLLAPSED_CLASS}.yofi-list-selection-pending .page > .side,
+    html.${GLOBAL_COLLAPSED_CLASS}.yofi-list-selection-pending .page.yofi-search-list-page:not(.side-empty) > .side {
+      display: block !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
     }
 
     /* Fakemon shares the native SortableTable/BubbleRow markup and CSS.
@@ -2299,8 +2685,6 @@
       stroke-width: 1.5;
     }
 
-
-
     /* v0.10.6: three-zone species header. Only type and the name/nav group
        exchange positions. The action group still owns the right third, with
        Edit, Key, Remove, X in their original four fixed slots. */
@@ -2733,46 +3117,9 @@
       font-size: .48em !important;
     }
 
-    /* A removed Fakemon card stays painted in an inert, fixed-position layer
-       ONLY while native route data is unresolved. This is not a second card
-       in .page > main; native Svelte can load its next card normally. */
-    .yofi-fakemon-route-hold {
-      position: fixed !important;
-      z-index: 2147482000 !important;
-      box-sizing: border-box !important;
-      pointer-events: none !important;
-      overflow: hidden !important;
-      contain: layout paint;
-    }
-    .yofi-fakemon-route-hold > article {
-      box-sizing: border-box !important;
-      width: 100% !important;
-      height: 100% !important;
-      margin: 0 !important;
-      pointer-events: none !important;
-    }
-    /* The inert snapshot needs no live image-zoom custom element. Its
-       ordinary IMG follows exactly the same fitted width and aspect ratio. */
-    .yofi-fakemon-route-hold .yofi-fakemon-hold-portrait {
-      display: block !important;
-      width: var(--yofi-hero-art-width, 100%) !important;
-      max-width: 100% !important;
-      aspect-ratio: var(--yofi-hero-art-ratio, 1) !important;
-      height: auto !important;
-      margin: 0 0 0 auto !important;
-      border: none !important;
-    }
-    .yofi-fakemon-route-hold .yofi-fakemon-hold-portrait > img {
-      display: block !important;
-      width: 100% !important;
-      height: auto !important;
-      object-fit: contain !important;
-      outline: 0 !important;
-      border: 0 !important;
-    }
 `;
 
-  // v0.12.31: the outer bootstrap waits for document.head to exist.
+  // v0.13.2: restore direct activation of the site-owned navigation link.
   // Use a legitimate HEAD child; appending a STYLE directly to <html> at
   // document-start could throw before <html> exists, or get reparsed away.
   document.head.appendChild(style);
@@ -2853,8 +3200,58 @@
     queueInstall();
   }
 
+  function nativeSelectionLabel(node) {
+    if (!node) return '';
+    const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+    let text = '';
+    while (walker.nextNode()) {
+      const current = walker.currentNode;
+      if (!current.parentElement?.closest('svg,button,.yofi-header-id,.yofi-result-nav-placeholder'))
+        text += current.nodeValue;
+    }
+    return text.replace(/\s+/g,' ').trim();
+  }
+
+  function pendingListCardMatches(article) {
+    const pending = pendingListSelection;
+    if (!pending || !article?.isConnected || !article.querySelector('section.stats') ||
+        normalizeUrl(location.href) !== pending.url) return false;
+    if (pending.context.kind === 'fakemon') {
+      const metadata = article.querySelector('section.info > div:first-child > dl');
+      const id = [...(metadata?.children || [])].find(node => node.tagName === 'DD')
+        ?.textContent?.trim().replace(/^F\./i,'');
+      return id === pending.context.id;
+    }
+    const title = article.querySelector(':scope > header > .title, :scope > header > h1');
+    return nativeSelectionLabel(title) === pending.label;
+  }
+
+  function preparePendingListCard(article) {
+    if (!pendingListCardMatches(article)) return false;
+    if (pendingListSelection.article === article) return true;
+    pendingListSelection.article = article;
+    // Final card width first; retain the original list until presentation ends.
+    document.documentElement.classList.add('yofi-list-selection-pending');
+    article.setAttribute('data-yofi-fullscreen-handoff',pendingListSelection.url);
+    setCollapsed(true);
+    return true;
+  }
+
+  function completePendingListCard(article) {
+    if (!pendingListCardMatches(article) || pendingListSelection.article !== article) return;
+    pendingListSelection.article.removeAttribute('data-yofi-fullscreen-handoff');
+    pendingListSelection = null;
+    document.documentElement.classList.remove('yofi-list-selection-pending');
+    pendingSelectionExpiresAt = 0;
+    clearCollapsedDestination();
+    queueInstall();
+  }
+  document.addEventListener('yofi:species-card-presentation-ready',event => {
+    completePendingListCard(event.detail?.article);
+  });
+
   function consumeCollapsedDestinationIfHere() {
-    if (!pendingCollapseMatchesCurrentUrl()) return;
+    if (pendingListSelection || !pendingCollapseMatchesCurrentUrl()) return;
     setCollapsed(true);
     pendingSelectionExpiresAt = 0;
     clearCollapsedDestination();
@@ -3044,9 +3441,6 @@
 
   /* Browse/navigation changes are read-only. All action links remain native. */
   const BROWSE_ROOTS = new Set(["pokemon", "fakemon", "moves", "items", "tms", "rules", "trainers"]);
-  let pendingDefaultCategory = categoryIndexKey(new URL(location.href));
-  let observedCategoryLanding = pendingDefaultCategory;
-  let firstEntryAttempt = null;
   let navUI = null;
   let openPokedex = null;
   let observedDetailCard = null;
@@ -3081,83 +3475,6 @@
     // to decide button visibility: Svelte may unmount or delay its content
     // during client-side navigation, including while the list is collapsed.
     return BROWSE_ROOTS.has(currentRoot());
-  }
-
-  let pendingSidebarFocus = false;
-
-  let sidebarFocusRetry = 0;
-  function focusSidebarSearch(page) {
-    const side = page?.querySelector(":scope > .side");
-    const input = side?.querySelector('input[type="search"]');
-    if (input instanceof HTMLInputElement && !input.disabled) {
-      // Styling must be recalculated BEFORE focusing. This matters in WebKit,
-      // where the input was display:none one moment before this click.
-      void side.getBoundingClientRect().width;
-      void input.getBoundingClientRect().width;
-      try { input.focus({ preventScroll: true }); }
-      catch (_) { input.focus(); }
-      pendingSidebarFocus = document.activeElement !== input;
-      if (!pendingSidebarFocus) {
-        sidebarFocusRetry = 0;
-        input.setAttribute("data-yofi-last-search-focus", "true");
-      }
-      return !pendingSidebarFocus;
-    }
-    pendingSidebarFocus = true;
-    return false;
-  }
-
-  function retrySidebarSearchFocus() {
-    if (!pendingSidebarFocus) return;
-    if (focusSidebarSearch(document.querySelector(PAGE_SELECTOR))) return;
-    if (++sidebarFocusRetry < 20) {
-      setTimeout(retrySidebarSearchFocus, 75);
-    } else {
-      pendingSidebarFocus = false;
-      sidebarFocusRetry = 0;
-    }
-  }
-
-  function firstCategoryEntry(page) {
-    const root = currentRoot();
-    return getCandidateAnchors(page).find((anchor) => {
-      const url = new URL(anchor.href, location.href);
-      if (url.searchParams.has("action")) return false;
-      const segments = url.pathname.split("/").filter(Boolean);
-      const index = segments.indexOf(root);
-      if (index < 0) return false;
-      return root === "fakemon" || root === "trainers"
-        ? !!url.searchParams.get("id")
-        : segments.length > index + 1;
-    });
-  }
-
-  function defaultFirstEntry(page) {
-    const current = categoryIndexKey(new URL(location.href));
-    if (!current || pendingDefaultCategory !== current || !searchableCategory(page)) return;
-    const first = firstCategoryEntry(page);
-    if (!first) return; // Wait for the Svelte sidebar to mount.
-    if (firstEntryAttempt?.category === current) return; // Already navigating.
-    const destination = first.href;
-    firstEntryAttempt = { category: current, destination };
-    setCollapsed(false);
-    clearCollapsedDestination();
-    // Use the site's own anchor first. A SvelteKit route can be in the middle
-    // of hydration; in that case a synthetic click may never complete.
-    navigateViaOriginalListLink(first);
-    setTimeout(() => {
-      if (firstEntryAttempt?.category !== current) return;
-      if (categoryIndexKey(new URL(location.href)) !== current) {
-        pendingDefaultCategory = null;
-        firstEntryAttempt = null;
-        return;
-      }
-      // A normal browser navigation is a safe, one-time fallback. It avoids
-      // leaving a blank detail panel in Safari if client routing missed click.
-      pendingDefaultCategory = null;
-      firstEntryAttempt = null;
-      location.assign(destination);
-    }, 800);
   }
 
   function svgIcon(kind) {
@@ -3920,7 +4237,6 @@
     }
     const root = currentRoot();
     if (nav.dataset.yofiSection !== root) nav.dataset.yofiSection = root;
-    const mobile = browserTier() !== 'wide';
     const inFakemon = root === 'fakemon';
     const inPokemon = root === 'pokemon';
     const showDex = !inFakemon && !inPokemon;
@@ -4001,7 +4317,7 @@
       page?.querySelectorAll(".yofi-find-cancel").forEach((el) => el.remove());
       return;
     }
-    const header = page?.querySelector(":scope > main article > header");
+    const header = detailArticle(page)?.querySelector(":scope > header");
     if (!(header instanceof HTMLElement)) return;
     // If the app begins providing its own functional X, defer to the native UI.
     const nativeX = header.querySelector(":scope > .dismiss:not(.yofi-find-cancel)");
@@ -4137,7 +4453,7 @@
 
   function installSpeciesTitlebar(page) {
     if (!isSpeciesRoot()) return;
-    const header = page.querySelector(":scope > main article > header");
+    const header = detailArticle(page)?.querySelector(":scope > header");
     if (!header?.querySelector(":scope > .type-tag")) return;
     header.parentElement.classList.add("yofi-species-titlebar");
     header.parentElement.classList.toggle("yofi-tight-titlebar", header.parentElement.classList.contains("yofi-entry-compact"));
@@ -4190,8 +4506,6 @@
       if (anchor.closest(".page > main")) return;
       const key = categoryIndexKey(new URL(anchor.href, location.href));
       if (key) {
-        pendingDefaultCategory = key;
-        firstEntryAttempt = null;
         setCollapsed(false); clearCollapsedDestination(); queueInstall();
       }
     }, true);
@@ -4217,9 +4531,8 @@
     });
     window.addEventListener("resize", () => { closePokedex(); closeQuickMenu(); }, { passive: true });
     window.addEventListener("popstate", () => {
-      pendingDefaultCategory = categoryIndexKey(new URL(location.href));
-      firstEntryAttempt = null;
-      if (pendingDefaultCategory && !fakemonUtilityPanelHere()) {
+      const landing = categoryIndexKey(new URL(location.href));
+      if (landing && !fakemonUtilityPanelHere()) {
         setCollapsed(false); clearCollapsedDestination();
       }
       closePokedex();
@@ -4875,6 +5188,12 @@
   // while the application is still hydrating.
   let lastRenderedDetailRoute = null;
   function applyStateForCurrentUrl(page) {
+    if (pendingListSelection) {
+      const current = normalizeUrl(location.href);
+      if (current !== pendingListSelection.url && current !== pendingListSelection.from) {
+        clearCollapsedDestination();
+      } else return; // Keep the real list visible throughout this navigation.
+    }
     // Add and Find are valid full-screen forms even though their URLs lack ID.
     // Crucially, do not reset them during the brief Svelte unmount/remount.
     if (fakemonUtilityPanelHere()) {
@@ -4928,6 +5247,13 @@
   }
 
   function navigateViaOriginalListLink(anchor) {
+    // The site-owned anchor is the authoritative route action. Requiring a
+    // particular list wrapper or a second live-neighbor lookup can reject
+    // valid links during Svelte/Safari updates and leave the chevron inert.
+    if (!(anchor instanceof HTMLAnchorElement) || !anchor.isConnected) {
+      queueInstall();
+      return false;
+    }
     const keepCollapsed = collapsed;
 
     /*
@@ -4959,6 +5285,7 @@
      * retain exactly the state we had before the prev/next click.
      */
     setCollapsed(keepCollapsed);
+    return true;
   }
 
   function makeNavButton(kind, anchor) {
@@ -4978,7 +5305,13 @@
     button.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
-      navigateViaOriginalListLink(anchor);
+      // Use the exact native link this button represents while it is live.
+      // If Svelte replaced the list, resolve the same direction from the new
+      // list instead of attempting to activate a detached anchor.
+      const target = anchor?.isConnected
+        ? anchor
+        : liveNeighborForPage(button.closest(PAGE_SELECTOR), kind);
+      navigateViaOriginalListLink(target);
     });
 
     return button;
@@ -5003,8 +5336,13 @@
         normalizeUrl(selected.href) !== normalizeUrl(location.href)) {
       return { previous: null, next: null, found: false };
     }
+    return listNeighborsForAnchor(selected);
+  }
+
+  function listNeighborsForAnchor(selected) {
     const row = selected.closest('tr');
-    if (!row || row.parentElement !== tbody) return null;
+    const tbody = row?.parentElement;
+    if (!row || tbody?.tagName !== 'TBODY') return null;
     const neighbor = (direction) => {
       let sibling = row[direction];
       while (sibling) {
@@ -5014,24 +5352,42 @@
       }
       return null;
     };
-    return {
-      previous: neighbor('previousElementSibling'),
-      next: neighbor('nextElementSibling'),
-      found: true,
-    };
+    return {previous:neighbor('previousElementSibling'),next:neighbor('nextElementSibling'),found:true};
+  }
+
+  function liveNeighborForPage(page, kind) {
+    if (!(page instanceof HTMLElement)) return null;
+    if (currentRoot() === 'pokemon') {
+      // Pokémon's native SortableTable can be between mounts during a route
+      // update. Never fall back to its prior cached anchors in that interval.
+      const direct = livePokemonNeighbors(page);
+      return direct?.[kind] || null;
+    }
+    const items = getCandidateAnchors(page);
+    if (!items.length) return null;
+    const side = page.querySelector(':scope > .side');
+    const scan = side && sideListScans.get(side);
+    const index = scan?.urlToIndex.get(normalizeUrl(location.href)) ?? -1;
+    if (index < 0) return null;
+    return kind === 'prev'
+      ? (index > 0 ? items[index - 1] : null)
+      : (index + 1 < items.length ? items[index + 1] : null);
+  }
+
+  function navigationHrefKey(anchor) {
+    try {
+      const url = new URL(anchor.href, location.href);
+      url.hash = '';
+      const path = url.pathname.replace(/\/+$/, '') || '/';
+      return `${url.origin}${path}${url.search}`;
+    } catch (_) { return ''; }
   }
 
   function syncResultChevronButtons(title, previous, next) {
     const current = normalizeUrl(location.href);
-    const signature = `${current}|${previous ? normalizedAnchorKey(previous) : ''}`
-      + `|${next ? normalizedAnchorKey(next) : ''}`;
-    if (currentRoot() === 'pokemon' && globalShinyPreference &&
-        title.dataset.yofiPortraitWarmSignature !== signature) {
-      title.dataset.yofiPortraitWarmSignature = signature;
-      // Both chevrons are navigable; prewarm both directions equally.
-      if (previous) warmOfficialPortrait(previous.href, true);
-      if (next) warmOfficialPortrait(next.href, true);
-    }
+    const signature = `${current}|${previous ? navigationHrefKey(previous) : ''}`
+      + `|${next ? navigationHrefKey(next) : ''}`;
+    warmResultNeighbors(previous, next, signature);
     if (title.dataset.yofiNavSignature === signature) return;
     title.querySelectorAll(':scope > .yofi-result-nav, :scope > .yofi-result-nav-placeholder')
       .forEach(node => node.remove());
@@ -5051,7 +5407,7 @@
     // Never navigate between species while Add/Edit is open.
     const form = fakemonHeaderActionContext();
     if (form && (form.action === 'add' || form.action === 'edit')) {
-      const title = page.querySelector(':scope > main article > header > .title');
+      const title = detailArticle(page)?.querySelector(':scope > header > .title');
       if (title instanceof HTMLElement) {
         title.querySelectorAll(':scope > .yofi-result-nav, :scope > .yofi-result-nav-placeholder')
           .forEach(node => node.remove());
@@ -5071,14 +5427,26 @@
       syncResultChevronButtons(title, direct.previous, direct.next);
       return;
     }
+    if (currentRoot() === 'pokemon') {
+      // A missing native tbody means the list is remounting. Clear any prior
+      // Pokémon links now; cached anchors are not safe destinations here.
+      syncResultChevronButtons(title, null, null);
+      return;
+    }
     // Preserve the established shared index for Moves, TMs, Fakemon and
     // other list shapes that do not use Pokemon's native SortableTable.
     const items = getCandidateAnchors(page);
-    if (!items.length) return;
+    if (!items.length) {
+      syncResultChevronButtons(title, null, null);
+      return;
+    }
     const side = page.querySelector(':scope > .side');
     const scan = side && sideListScans.get(side);
     const index = scan?.urlToIndex.get(normalizeUrl(location.href)) ?? -1;
-    if (index < 0) return;
+    if (index < 0) {
+      syncResultChevronButtons(title, null, null);
+      return;
+    }
     syncResultChevronButtons(title,
       index > 0 ? items[index - 1] : null,
       index + 1 < items.length ? items[index + 1] : null);
@@ -5092,7 +5460,7 @@
   const entrySwipeControllers = new WeakMap();
   function installEntrySwipe(page) {
     if (!isDetailRoute()) return;
-    const article = page.querySelector(":scope > main article");
+    const article = detailArticle(page);
     if (!(article instanceof HTMLElement) || entrySwipeControllers.has(article)) return;
     const state = { touchId: null, startX: 0, startY: 0,
       horizontal: false, abandoned: false, startAt: 0 };
@@ -5253,7 +5621,7 @@
     const root = currentRoot();
     if (isSpeciesRoot()) return;
     if (!['moves', 'tms', 'items', 'trainers', 'rules', 'encounter-tool', 'backups'].includes(root)) return;
-    const article = page.querySelector(':scope > main article');
+    const article = detailArticle(page);
     const header = article?.querySelector(':scope > header');
     const title = header?.querySelector(':scope > .title');
     if (!(article instanceof HTMLElement) || !(header instanceof HTMLElement) ||
@@ -5349,7 +5717,7 @@
   });
 
   function installFullscreenToggle(page) {
-    const header = page.querySelector(':scope > main article > header');
+    const header = detailArticle(page)?.querySelector(':scope > header');
     const article = header?.closest('article');
     if (!(header instanceof HTMLElement) || !(article instanceof HTMLElement)) return;
     const eligible = isDetailRoute() && !fakemonUtilityPanelHere();
@@ -5392,7 +5760,7 @@
   }
 
   function installFakemonFormHeading(page) {
-    const article = page.querySelector(':scope > main article');
+    const article = detailArticle(page);
     if (!(article instanceof HTMLElement)) return;
     const context = fakemonHeaderActionContext();
     const editing = !!context && (context.action === 'add' || context.action === 'edit');
@@ -5501,15 +5869,21 @@
     }
     syncSearchListContainment(side);
     installNativeSearchControls(side);
+    if (currentRoot() === 'pokemon') {
+      const table = side.querySelector('table');
+      if (table && table.getAttribute('data-sveltekit-preload-data') !== 'hover')
+        table.setAttribute('data-sveltekit-preload-data','hover');
+    }
 
     // Card.svelte nests the article inside main > .container. A direct-child
     // selector silently skipped ALL card-width tiers, including the scores edge.
+    preparePendingListCard(detailArticle(page));
     syncEntryTier(main.querySelector(":scope > .container > article")
       ?? main.querySelector("article"));
     consumeCollapsedDestinationIfHere();
     applyStateForCurrentUrl(page);
     // Other entry routes restore their last focus state during full reload.
-    if (isDetailRoute() && rememberedFullscreenHere() && !collapsed) setCollapsed(true);
+    if (!pendingListSelection && isDetailRoute() && rememberedFullscreenHere() && !collapsed) setCollapsed(true);
     decorateSpeciesListSexNames(page);
     refreshTitleNavigation(page);
     installEntrySwipe(page);
@@ -5519,7 +5893,7 @@
     installFakemonFormHeading(page);
     installFindByIdCancel(page);
     installSpeciesTitlebar(page);
-    if (isSpeciesRoot()) renderHeaderTypePictograms(page.querySelector(":scope > main article > header"));
+    if (isSpeciesRoot()) renderHeaderTypePictograms(detailArticle(page)?.querySelector(":scope > header"));
     else installUniversalEntryTitlebar(page);
     installFullscreenToggle(page);
     // The native metadata supplies the card ID directly; no hero dependency.
@@ -5527,6 +5901,16 @@
     syncSpeciesHeaderId(speciesArticle);
     centerPokemonDexId(speciesArticle?.querySelector(':scope > header'));
     const detailCard = main.querySelector("article");
+    if (pendingListCardMatches(detailCard) && pendingListSelection.article === detailCard) {
+      const presentation = window.__yofiSpeciesCardPresentation;
+      if (typeof presentation?.prepare === 'function') presentation.prepare();
+      else {
+        document.dispatchEvent(new CustomEvent('yofi:species-card-before-reveal', {
+          detail: {article:detailCard,routeKey:`${pendingListSelection.context.kind}:${pendingListSelection.context.id}`}
+        }));
+        completePendingListCard(detailCard);
+      }
+    }
     if (detailWidthObserver && observedDetailCard !== detailCard) {
       detailWidthObserver.disconnect();
       observedDetailCard = detailCard;
@@ -6131,7 +6515,7 @@
     return { kind, id: decodeURIComponent(parts[index + 1]) };
   }
   function installTypedLowerLinks(page) {
-    const article = page?.querySelector(':scope > main article');
+    const article = detailArticle(page);
     if (!(article instanceof HTMLElement) || !article.querySelector(':scope > .scrollable')) return;
     // A viewed Fakemon remains an authoritative local source; other targets
     // are resolved asynchronously by read key without opening their cards.
@@ -6419,117 +6803,27 @@
     return pages[pages.length - 1];
   }
 
-  // First-time Fakemon routes may unmount the entire native detail card
-  // while Svelte fetches its new data. Cached revisits skip that gap. Keep
-  // a frozen copy of the rendered article in a noninteractive paint layer
-  // only when Svelte has DETACHED it. Never take ownership of its native node.
-  let lastStableFakemonArticle = null;
-  let pendingFakemonHold = null;
-  const FAKEMON_HOLD_LIMIT = 12000; // Safety cutoff for failed fetches.
-
-  function clearFakemonHold() {
-    if (!pendingFakemonHold) return;
-    clearTimeout(pendingFakemonHold.timer);
-    pendingFakemonHold.node.remove();
-    pendingFakemonHold = null;
+  function detailArticle(page) {
+    const articles = Array.from(page?.querySelectorAll?.(':scope > main article') || []);
+    return articles.find(article => article.getClientRects().length > 0) || articles[0] || null;
   }
-
-  function currentFakemonDetail() {
-    const context = portraitContext();
-    return context?.kind === "fakemon" ? context : null;
-  }
-
-  function rememberStableFakemonArticle(page) {
-    const context = currentFakemonDetail();
-    if (!context) { clearFakemonHold(); lastStableFakemonArticle = null; return; }
-    const article = page?.querySelector(":scope > main article");
-    if (!(article instanceof HTMLElement) ||
-        !article.querySelector("section.stats") ||
-        !article.querySelector("section.info .square-image")) return;
-    // Svelte may update the URL before the old native article is detached.
-    // A stale article must never be indexed under the incoming Fakemon ID.
-    const renderedId = article.querySelector(".yofi-header-fakemon-id")?.textContent?.trim();
-    if (renderedId !== `F.${context.id}`) return;
-    // New article has been fully processed by installOnPage, so the old
-    // frozen surface may now be removed without exposing a blank frame.
-    clearFakemonHold();
-    const rect = article.getBoundingClientRect();
-    if (!rect.width || !rect.height) return;
-    const style = getComputedStyle(article);
-    const vars = {};
-    for (const prop of ["--skin-content", "--skin-content-text", "--skin-bg",
-      "--skin-bg-text", "--skin-none-bg", "--font-sz-venus", "--font-sz-neptune"]) {
-      vars[prop] = style.getPropertyValue(prop);
-    }
-    lastStableFakemonArticle = { key: context.key, article, rect, vars };
-  }
-
-  function handlePendingFakemonDetail() {
-    // The Species Card companion owns the all-species prepared handoff. Avoid
-    // making a second Fakémon-only clone while that companion is active.
-    if (window.__yofiSpeciesCard) {
-      clearFakemonHold();
-      return;
-    }
-    const context = currentFakemonDetail();
-    if (!context) { clearFakemonHold(); lastStableFakemonArticle = null; return; }
-    const page = activeRoutePage();
-    const main = page?.querySelector(":scope > main");
-    // If Svelte has already supplied the new card, no backup is required.
-    // Do not paint any ghost on ordinary cached navigations.
-    if (main?.querySelector("article")) return;
-    if (pendingFakemonHold || !lastStableFakemonArticle) return;
-    const { key, article, rect, vars } = lastStableFakemonArticle;
-    if (key === context.key || article.isConnected || !rect.width || !rect.height) return;
-    const hold = document.createElement("div");
-    hold.className = "yofi-fakemon-route-hold";
-    hold.setAttribute("aria-hidden", "true");
-    hold.inert = true;
-    for (const [prop, value] of Object.entries(vars)) if (value) hold.style.setProperty(prop, value);
-    hold.style.left = `${rect.left}px`;
-    hold.style.top = `${rect.top}px`;
-    hold.style.width = `${rect.width}px`;
-    hold.style.height = `${rect.height}px`;
-    // Never reparent a Svelte-owned node, even after detachment: its destroy
-    // lifecycle may still be running. Copy only a frozen, noninteractive view.
-    const snapshot = article.cloneNode(true);
-    snapshot.removeAttribute("id");
-    snapshot.querySelectorAll("[id]").forEach(node => node.removeAttribute("id"));
-    // Cloning the image-zoom custom element can independently initialize its
-    // loading frame. Replace it with a simple image sized by our hero vars.
-    for (const zoom of snapshot.querySelectorAll("img-zoom")) {
-      const still = document.createElement("div");
-      still.className = "yofi-fakemon-hold-portrait";
-      const image = zoom.querySelector("img");
-      if (image) still.appendChild(image.cloneNode(true));
-      zoom.replaceWith(still);
-    }
-    const nativeScrollable = article.querySelector(":scope > .scrollable");
-    const copyScrollable = snapshot.querySelector(":scope > .scrollable");
-    hold.appendChild(snapshot);
-    document.body.appendChild(hold);
-    if (copyScrollable) copyScrollable.scrollTop = nativeScrollable?.scrollTop || 0;
-    const timer = setTimeout(() => {
-      if (pendingFakemonHold?.node === hold) clearFakemonHold();
-    }, FAKEMON_HOLD_LIMIT);
-    pendingFakemonHold = { node: hold, timer };
+  function visibleDetailArticle() {
+    return Array.from(document.querySelectorAll('.page > main article'))
+      .find(article => article.getClientRects().length > 0) || null;
   }
 
   function install() {
     syncBrowserTier();
     syncSpeciesRouteClass();
-    const landing = categoryIndexKey(new URL(location.href));
-    if (!landing && firstEntryAttempt) {
-      pendingDefaultCategory = null;
-      firstEntryAttempt = null;
+    if (currentRoot() === 'fakemon') {
+      const action = new URL(location.href).searchParams.get('action');
+      if (action && action !== 'info') {
+        neighborResponseCache.clearFakemon();
+        clearFakemonPortraitRecords();
+      }
     }
-    // The site may swap routes without a detectable click (e.g. its own
-    // client-side navigation, browser history, or view transitions).
-    // Seeing a NEW category landing always schedules its default entry.
-    if (landing && landing !== observedCategoryLanding) pendingDefaultCategory = landing;
-    observedCategoryLanding = landing;
     const page = activeRoutePage();
-    syncOfficialShinyBeforePaint();
+    syncPreferredPortraitBeforePaint();
     syncOfficialAvailabilityForRoute();
     installSidebarAddById(page);
     if (page) installOnPage(page);
@@ -6538,14 +6832,9 @@
     installSettingsPage(page);
     if (currentRoot() === 'fakemon') hydrateSavedFakemonTypes();
     if (page) installTypedLowerLinks(page);
-    if (page) decorateEvolutionSexNames(page.querySelector(':scope > main article'));
+    if (page) decorateEvolutionSexNames(detailArticle(page));
     if (page) installFakemonListTypes(page);
     restoreCompactFooterOnEntry();
-    rememberStableFakemonArticle(page);
-    if (page) {
-      // Disabled: automatic first-entry selection was unreliable in live Safari.
-      // Native Search still opens the list; do not assume Safari keyboard focus.
-    }
   }
 
   function safeInstall(reason) {
@@ -6583,13 +6872,36 @@
     if (bootstrap?.version === VERSION) bootstrap.phase = 'running';
     startPortraitEvents();
     startBrowseEvents();
-    for (const eventName of ['pointerdown','focusin']) {
-      document.addEventListener(eventName, event => {
-        if (!globalShinyPreference || currentRoot() !== 'pokemon') return;
-        const anchor = event.target instanceof Element ? event.target.closest('a[href]') : null;
-        if (anchor && anchor.closest('.page > .side')) warmOfficialPortrait(anchor.href, true);
-      }, {capture:true, passive:true});
-    }
+
+    let listWarmIntentTimer = null;
+    let listWarmIntentAnchor = null;
+    const cancelListWarmIntent = () => {
+      clearTimeout(listWarmIntentTimer);
+      listWarmIntentTimer = null;
+      listWarmIntentAnchor = null;
+    };
+    const warmListIntent = event => {
+      const anchor = event.target instanceof Element ? event.target.closest('td.primary > a[href]') : null;
+      if (!anchor?.closest('.page > .side') || currentRoot() !== 'pokemon') return;
+      const context = portraitContextFromHref(anchor.href);
+      if (!context || navigator.connection?.saveData) return;
+      if (event.type === 'pointerover' && anchor.contains(event.relatedTarget)) return;
+      anchor.setAttribute('data-sveltekit-preload-data','hover');
+      cancelListWarmIntent();
+      if (event.type === 'pointerover') {
+        listWarmIntentAnchor = anchor;
+        listWarmIntentTimer = setTimeout(() => {
+          cancelListWarmIntent();
+          if (anchor.isConnected && currentRoot() === 'pokemon') warmNeighborPortrait(anchor,'auto');
+        },100);
+      } else warmNeighborPortrait(anchor,'auto');
+    };
+    document.addEventListener('pointerout',event => {
+      if (listWarmIntentAnchor?.contains(event.target) && !listWarmIntentAnchor.contains(event.relatedTarget))
+        cancelListWarmIntent();
+    },{capture:true,passive:true});
+    for (const type of ['pointerover','focusin','touchstart','mousedown'])
+      document.addEventListener(type,warmListIntent,{capture:true,passive:true});
 
     document.addEventListener("click", (event) => {
       if (!(event.target instanceof Element)) return;
@@ -6612,14 +6924,30 @@
         + '.trainer-list a[href], reorder-list a[href], li a[href], reorder-item a[href]') ||
         !isVisibleCandidate(anchor) || !isDetailRoute(anchor.href)) return;
 
+      if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey ||
+          event.shiftKey || event.altKey) return;
       if (!preservingSyntheticNavigation) {
-        if (fullscreenDefault) {
+        cancelListWarmIntent();
+        const context = portraitContextFromHref(anchor.href);
+        if (context && !navigator.connection?.saveData) {
+          warmNeighborPortrait(anchor,'auto'); // Selected requests start first.
+          const neighbors = listNeighborsForAnchor(anchor);
+          if (neighbors) queueMicrotask(() => warmResultNeighbors(neighbors.previous,neighbors.next,
+            `${normalizeUrl(anchor.href)}|${neighbors.previous ? navigationHrefKey(neighbors.previous) : ''}|${neighbors.next ? navigationHrefKey(neighbors.next) : ''}`));
+        }
+        clearCollapsedDestination();
+        if (fullscreenDefault && context && !collapsed) {
+          pendingSelectionExpiresAt = 0;
+          pendingListSelection = {url:normalizeUrl(anchor.href),from:normalizeUrl(location.href),
+            context,label:nativeSelectionLabel(anchor),article:null};
+          rememberCollapsedDestination(anchor.href);
+          if (pendingListSelection.url === normalizeUrl(location.href)) queueInstall();
+        } else if (fullscreenDefault) {
           pendingSelectionExpiresAt = Date.now() + 2500;
           rememberCollapsedDestination(anchor.href);
           setCollapsed(true);
         } else {
           pendingSelectionExpiresAt = 0;
-          clearCollapsedDestination();
           setCollapsed(false);
         }
       }
@@ -6641,6 +6969,16 @@
           + 'reorder-item, .trainer-list');
     };
     const observer = new MutationObserver((changes) => {
+      const detailHrefOnly = changes.length > 0 && changes.every(change => {
+        if (change.type !== 'attributes' || change.attributeName !== 'href') return false;
+        const target = change.target instanceof Element ? change.target : change.target.parentElement;
+        return !!target?.closest('.page > main article');
+      });
+      if (detailHrefOnly) {
+        const page = activeRoutePage();
+        if (page) installTypedLowerLinks(page);
+        return;
+      }
       let sideRowsChanged = false;
       let otherChange = false;
       for (const change of changes) {
@@ -6650,8 +6988,7 @@
       if (otherChange) {
         // Native new card/image insertions must be corrected BEFORE paint;
         // the expensive hero layout still happens in the ordinary rAF.
-        syncOfficialShinyBeforePaint();
-        handlePendingFakemonDetail();
+        syncPreferredPortraitBeforePaint();
         queueInstall();
       } else if (sideRowsChanged) {
         // Debounce only native row churn, never the native list itself.
@@ -6666,7 +7003,9 @@
 
     observer.observe(document.body, {
       childList: true,
-      subtree: true
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['href']
     });
     runtimeObserver = observer;
     observedRuntimeBody = document.body;
@@ -6684,6 +7023,8 @@
     });
     window.addEventListener("popstate", queueInstall);
     window.addEventListener("resize", queueInstall, { passive: true });
+    modules.status(registration,'running');
+    modules.ready();
   }
 
   function reconcileAfterPageShow() {
@@ -6696,7 +7037,7 @@
     if (observerStarted && runtimeObserver && document.body &&
         observedRuntimeBody !== document.body) {
       runtimeObserver.disconnect();
-      runtimeObserver.observe(document.body, {childList:true,subtree:true});
+      runtimeObserver.observe(document.body, {childList:true,subtree:true,attributes:true,attributeFilter:['href']});
       observedRuntimeBody = document.body;
     }
     if (!observerStarted && document.body) startRuntime();
@@ -6710,8 +7051,14 @@
   document.addEventListener('yofi:species-card-prepare-before-reveal', (event) => {
     const article = event.detail?.article;
     if (!(article instanceof HTMLElement) || !article.querySelector('section.stats')) return;
+    if (preparePendingListCard(article)) syncEntryTier(article);
     syncSpeciesHeaderId(article);
     renderHeaderTypePictograms(article.querySelector(':scope > header'));
+    // Publish ready portrait controls alongside the current species header.
+    if (window.__yofiPortraitReadiness.matches(article, event.detail?.routeKey)) {
+      const page = activeRoutePage();
+      if (detailArticle(page) === article) installPortraitControl(page);
+    }
   });
 
   if (document.body) {

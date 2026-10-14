@@ -1,15 +1,146 @@
 // ==UserScript==
-// @name         Poke5e Species Card v0.1.5 (Decoded Portrait Hold)
+// @name         Poke5e Species Card v0.1.18 (Ready Card List Handoff)
 // @namespace    yofi.poke5e.species.card
-// @version      0.1.5
-// @description  Pokemon/Fakemon card presentation with prepared species changes, adaptive hero/stats, abilities, evolution and measured TM columns.
+// @version      0.1.18
+// @description  Pokemon/Fakemon adaptive card presentation with direct native navigation.
 // @match        https://poke5e.app/*
-// @run-at       document-idle
+// @run-at       document-start
 // @grant        none
 // ==/UserScript==
 
 (() => {
   'use strict';
+  // Shared startup protocol, independent of module release versions. Each
+  // userscript carries this small bootstrap; only the first copy installs it.
+  const modules = window.__yofiUserscripts || (window.__yofiUserscripts = (() => {
+    const records = new Map();
+    const waiting = new Map();
+    const reportedConflicts = new Set();
+    let reportQueued = false;
+    let ready = false;
+    const readyEvent = 'yofi:qol-ready';
+    function notice(id, message) {
+      const show = () => {
+        let node = document.getElementById(id);
+        if (!node) {
+          node = document.createElement('div');
+          node.id = id;
+          node.setAttribute('role','alert');
+          node.style.cssText = 'position:fixed;z-index:2147483647;left:50%;top:50%;transform:translate(-50%,-50%);box-sizing:border-box;width:max-content;max-width:calc(100vw - 32px);padding:16px 20px;background:#451c20;color:white;font:600 14px/1.4 system-ui;border:2px solid #ffc0c0;border-radius:9px;box-shadow:0 3px 12px #0006;text-align:center';
+          document.body.appendChild(node);
+        }
+        node.textContent = message;
+      };
+      if (document.body) show();
+      else document.addEventListener('DOMContentLoaded',show,{once:true});
+    }
+    function report() {
+      discover();
+      conflicts();
+      console.info('[Poké5e userscripts] Versions detected on this page:');
+      console.table([...records.values()].map(({module,version,status}) => ({module,version,status})));
+    }
+    function scheduleReport() {
+      if (reportQueued) return;
+      reportQueued = true;
+      setTimeout(() => { reportQueued = false; report(); },0);
+    }
+    function discover() {
+      const core = window.__yofiQolBootstrapStatus;
+      const add = (module,version,status = 'running') => {
+        const key = `${module}:${version}`;
+        if (!records.has(key)) records.set(key,{module,version,status});
+      };
+      if (core && core.phase !== 'failed') add('QoL',core.version || 'unknown legacy version',core.phase === 'running' ? 'running' : core.phase);
+      else if (window.__yofiPoke5eQol01020) add('QoL','unknown legacy version');
+      const species = window.__yofiSpeciesCard || window.__yofiHeroLayoutLab;
+      if (typeof species === 'string') add('Species Card',species);
+      for (const key of Object.getOwnPropertyNames(window).filter(name => /^__p5ThemeOverlay\d+$/.test(name))) {
+        const overlay = window[key];
+        let version = overlay?.version;
+        if (!version) { try { version = overlay?.diagnose?.().version; } catch (_) {} }
+        if (version) add('Theme Overlay',version);
+      }
+    }
+    function conflicts() {
+      const groups = new Map();
+      for (const {module,version} of records.values()) {
+        if (!groups.has(module)) groups.set(module,[]);
+        groups.get(module).push(version);
+      }
+      const duplicates = [...groups].filter(([,versions]) => versions.length > 1);
+      if (!duplicates.length) return;
+      const details = duplicates.map(([module,versions]) => `${module}: ${versions.join(', ')}`).join('; ');
+      if (!reportedConflicts.has(details)) {
+        reportedConflicts.add(details);
+        const message = `Multiple userscript versions detected. ${details}. Disable the extra copies and reload this page.`;
+        console.error('[Poké5e userscripts]',message);
+        notice('yofi-userscript-version-conflict',message);
+      }
+    }
+    function register(module, version) {
+      discover();
+      const key = `${module}:${version}`;
+      let record = records.get(key);
+      if (!record) {
+        record = {module,version,status:'starting'};
+        records.set(key,record);
+      }
+      conflicts();
+      scheduleReport();
+      return record;
+    }
+    function status(record, value) { record.status = value; scheduleReport(); }
+    function publishReady() {
+      ready = true;
+      for (const [record,start] of waiting) {
+        waiting.delete(record);
+        document.getElementById(`yofi-${record.module.replace(/\s+/g,'-').toLowerCase()}-missing-qol`)?.remove();
+        queueMicrotask(() => {
+          if (record.module === 'Species Card' && window.__yofiSpeciesCard === record.version) {
+            status(record,'running'); return;
+          }
+          const active = [...records.values()].find(row => row.module === record.module && row.version !== record.version && row.status === 'running');
+          if (active) { status(record,'blocked: another copy is active'); return; }
+          try { status(record,start() === false ? 'blocked' : 'running'); }
+          catch (error) { status(record,'failed'); console.error(`[Poké5e ${record.module}] Startup failed:`,error); }
+        });
+      }
+    }
+    function detectQol() {
+      const core = window.__yofiQolBootstrapStatus;
+      // Legacy names are presence signals, not release-version requirements.
+      if (core?.phase === 'running' || (!core && window.__yofiPoke5eQol01020 && window.__yofiQolRecover)) {
+        const record = register('QoL',core?.version || 'unknown legacy version');
+        status(record,'running');
+        publishReady();
+      }
+      return ready;
+    }
+    function requireQol(record, start) {
+      status(record,'waiting for QoL');
+      waiting.set(record,start);
+      if (ready || detectQol()) { publishReady(); return; }
+      const check = () => {
+        if (!waiting.has(record) || detectQol()) return;
+        if (record.status === 'missing QoL') return;
+        status(record,'missing QoL');
+        const message = `${record.module} requires QoL. Enable one QoL userscript and reload this page.`;
+        console.error(`[Poké5e ${record.module}]`,message);
+        notice(`yofi-${record.module.replace(/\s+/g,'-').toLowerCase()}-missing-qol`,message);
+      };
+      // A task after DOMContentLoaded lets document-end scripts register too.
+      if (document.readyState === 'loading')
+        document.addEventListener('DOMContentLoaded',() => setTimeout(check,0),{once:true});
+      else setTimeout(check,0);
+    }
+    document.addEventListener(readyEvent,publishReady);
+    window.addEventListener('load',detectQol,{once:true});
+    return {register,status,requireQol,report,notice,ready:publishReady};
+  })());
+  const registration = modules.register('Species Card','0.1.18');
+  modules.requireQol(registration,runSpeciesCard);
+  function runSpeciesCard() {
   // Standalone companion. Disable earlier Hero Layout Lab builds, not the QOL script.
   // Older editions used a shared boolean lock. Silently returning was the
   // reason a stale adapter could suppress an updated one with no indication.
@@ -17,42 +148,23 @@
   // the same nodes and both install recurring timers.
   if (window.__yofiHeroLayoutLab) {
     const active = window.__yofiHeroLayoutLab;
-    console.error('[Species Card v0.1.5] Conflicting adapter is already active:',
+    console.error('[Species Card v0.1.18] Conflicting adapter is already active:',
       active, 'Disable ALL earlier Hero Layout Lab / Adapter userscripts and reload.');
-    const warn = () => {
-      if (document.getElementById('lab3-version-conflict')) return;
-      const node = document.createElement('div');
-      node.id = 'lab3-version-conflict';
-      node.setAttribute('role', 'alert');
-      node.textContent = 'Species Card conflict: disable earlier Hero Layout Adapters / Species Card versions and reload. v0.1.5 could not start.';
-      node.style.cssText = 'position:fixed;z-index:2147483647;left:12px;right:12px;bottom:16px;padding:12px 16px;background:#451c20;color:white;font:600 14px/1.4 system-ui;border:2px solid #ffc0c0;border-radius:9px;box-shadow:0 3px 12px #0006';
-      (document.body || document.documentElement).append(node);
-    };
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', warn, {once:true});
-    else warn();
-    return;
+    modules.notice('yofi-userscript-version-conflict','Species Card conflict: disable extra Hero Layout Adapters / Species Card userscripts and reload.');
+    return false;
   }
-  window.__yofiHeroLayoutLab = '0.1.5';
-  window.__yofiSpeciesCard = '0.1.5';
+  window.__yofiHeroLayoutLab = '0.1.18';
+  window.__yofiSpeciesCard = '0.1.18';
 
-  const VERSION = '0.1.5';
+  const VERSION = '0.1.18';
   const STYLE_ID = 'yofi-species-card-hero-css';
-  const PREPARING_CLASS = 'yofi-species-preparing';
-  const SNAPSHOT_CLASS = 'yofi-species-transition-snapshot';
   const PREPARE_EVENT = 'yofi:species-card-prepare-before-reveal';
   const PRE_REVEAL_EVENT = 'yofi:species-card-before-reveal';
-  const LIVE_CARD_SELECTOR = '.page:not(.yofi-species-route-hold) > main article:not(.yofi-species-transition-snapshot)';
-  const PREPARATION_TIMEOUT = 12000;
-  const preparationTimers = new WeakMap();
-  const watchedPreparationImages = new WeakMap();
-  const decodedPreparationImages = new WeakMap();
-  const decodingPreparationImages = new WeakMap();
-  const preparationBaselines = new WeakMap();
-  const readySpeciesIdentities = new WeakMap();
-  let observedSpeciesRouteKey = currentSpeciesRouteKey();
-  let lastStableSpeciesSnapshot = null;
-  let activeSpeciesTransitionHold = null;
-  let snapshotSequence = 0;
+  const LIVE_CARD_SELECTOR = '.page > main article';
+  const processedSpeciesIdentities = new WeakMap();
+  const portraitSources = new WeakMap();
+  const portraitLayoutRatios = new WeakMap();
+  const portraitLoadHandlers = new WeakMap();
   const MAX_ENCOUNTER_LEVEL = 20; // Current level-range display assumption.
   const ICON = {
     hp: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"/></svg>',
@@ -707,67 +819,6 @@ article.yofi-scores-layout section.moves > dl + dl {
   }
 
   const BASE_HERO_CSS = `
-    /* The new native card is measured before reveal. A frozen copy of the last
-       ready card remains visible above it for a continuous species handoff. */
-    article.yofi-species-preparing {
-      opacity: 0 !important;
-      pointer-events: none !important;
-    }
-    .page.yofi-species-route-hold {
-      position: fixed !important;
-      z-index: 2147482000 !important;
-      display: block !important;
-      box-sizing: border-box !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      overflow: hidden !important;
-      pointer-events: none !important;
-      contain: layout paint;
-    }
-    .yofi-species-route-hold > main {
-      display: block !important;
-      box-sizing: border-box !important;
-      width: 100% !important;
-      height: 100% !important;
-      min-width: 0 !important;
-      max-width: none !important;
-      min-height: 0 !important;
-      max-height: none !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      position: relative !important;
-      overflow: hidden !important;
-      pointer-events: none !important;
-    }
-    .yofi-species-route-hold article.yofi-species-transition-snapshot {
-      box-sizing: border-box !important;
-      width: 100% !important;
-      height: 100% !important;
-      margin: 0 !important;
-      pointer-events: none !important;
-    }
-    .yofi-species-transition-snapshot img-zoom {
-      border: 0 !important;
-      outline: 0 !important;
-      box-shadow: none !important;
-    }
-    .yofi-species-transition-snapshot .yofi-species-snapshot-portrait {
-      display: block !important;
-      width: var(--yofi-hero-art-width, 100%) !important;
-      max-width: 100% !important;
-      aspect-ratio: var(--yofi-hero-art-ratio, 1) !important;
-      height: auto !important;
-      margin: 0 0 0 auto !important;
-      border: 0 !important;
-    }
-    .yofi-species-transition-snapshot .yofi-species-snapshot-portrait > img {
-      display: block !important;
-      width: 100% !important;
-      height: auto !important;
-      object-fit: contain !important;
-      outline: 0 !important;
-      border: 0 !important;
-    }
     /* v0.8.5: a fresh hero. Native metadata remains the live, read-only
        source; description and Art stay native nodes with their handlers. */
     article .yofi-species-hero {
@@ -1189,11 +1240,8 @@ article.yofi-scores-layout section.moves > dl + dl {
       fill: none !important;
       background: transparent !important;
     }
-    /* Gender and Egg come from the native metadata, not from image geometry.
-       Keep their last complete values visible while portrait placement settles. */
-    /* Keep the existing portrait visible while a replacement source loads.
-       Safari may clear an IMG as soon as src changes; hiding img-zoom here
-       turned that brief native decode into a visible image flicker. */
+    /* Keep the native artwork box free of transient borders while a keyed
+       replacement image loads in the native artwork box. */
     article .yofi-hero-art-lane.yofi-hero-art-pending .square-image,
     article .yofi-hero-art-lane.yofi-hero-art-pending .square-image > figure,
     article .yofi-hero-art-lane.yofi-hero-art-pending .square-image img-zoom {
@@ -1221,19 +1269,28 @@ article.yofi-scores-layout section.moves > dl + dl {
     return parts.find(part => part === 'pokemon' || part === 'fakemon') || '';
   }
   function isSpeciesRoot() { return currentRoot() !== ''; }
-  function currentSpeciesRouteKey() {
-    const parts = location.pathname.split('/').filter(Boolean);
+  function speciesRouteKeyFromUrl(value) {
+    let url;
+    try { url = new URL(value, location.href); } catch (_) { return ''; }
+    if (url.origin !== location.origin) return '';
+    const parts = url.pathname.split('/').filter(Boolean);
     const rootIndex = parts.findIndex(part => part === 'pokemon' || part === 'fakemon');
     if (rootIndex < 0) return '';
     const root = parts[rootIndex];
     if (root === 'fakemon') {
-      const rawId = new URL(location.href).searchParams.get('id') || '';
-      const id = rawId.replace(/^F\./i, '').trim();
+      const id = (url.searchParams.get('id') || '').replace(/^F\./i, '').trim();
       return id ? `fakemon:${id}` : '';
     }
     let id = parts[rootIndex + 1] || '';
     try { id = decodeURIComponent(id); } catch (_) { return ''; }
     return id ? `pokemon:${id}` : '';
+  }
+  function currentSpeciesRouteKey() { return speciesRouteKeyFromUrl(location.href); }
+  function speciesArticleFrom(root) {
+    if (root instanceof HTMLElement && root.matches('article')) return root;
+    const articles = [...(root?.querySelectorAll?.('article') || [])]
+      .filter(article => article.querySelector('section.stats'));
+    return articles.find(article => article.getClientRects().length > 0) || articles[0] || null;
   }
   function pendingImage(article) {
     return article?.querySelector('section.info .square-image img') || null;
@@ -1246,354 +1303,108 @@ article.yofi-scores-layout section.moves > dl + dl {
     const title = titleNode?.textContent?.replace(/\s+/g, ' ').trim() || '';
     const image = pendingImage(article);
     const imageSource = image?.getAttribute('src') || image?.getAttribute('srcset') || '';
-    return { title, imageSource };
+    const typeSignature = Array.from(article.querySelectorAll(':scope > header .type-tag > .type'))
+      .map(segment => segment.dataset.yofiHeaderType ||
+        segment.querySelector('.yofi-type-original')?.textContent || segment.textContent || '')
+      .map(type => type.replace(/\s+/g, ' ').trim().toLowerCase()).join('/');
+    const metadata = article?.querySelector('section.info > div:first-child > dl');
+    const recordId = [...(metadata?.children || [])]
+      .find(node => node.tagName === 'DD')?.textContent?.replace(/\s+/g, ' ').trim() || '';
+    return { title, imageSource, recordId, typeSignature };
   }
-  function remapSnapshotIds(root) {
-    const nodes = [...root.querySelectorAll('[id]')];
-    if (root.id) nodes.unshift(root);
-    const ids = new Map();
-    for (const node of nodes) {
-      const previous = node.id;
-      if (!previous || ids.has(previous)) continue;
-      const next = `yofi-snapshot-${++snapshotSequence}-${previous}`;
-      ids.set(previous, next);
-      node.id = next;
-    }
-    if (!ids.size) return;
-    for (const node of [root, ...root.querySelectorAll('*')]) {
-      for (const attribute of [...node.attributes]) {
-        let value = attribute.value;
-        for (const [previous, next] of ids) {
-          value = value.replaceAll(`url(#${previous})`, `url(#${next})`);
-          if ((attribute.name === 'href' || attribute.name === 'xlink:href') && value === `#${previous}`)
-            value = `#${next}`;
-          if (['aria-labelledby', 'aria-describedby', 'aria-controls', 'for'].includes(attribute.name))
-            value = value.split(/\s+/).map(token => token === previous ? next : token).join(' ');
-        }
-        if (value !== attribute.value) node.setAttribute(attribute.name, value);
-      }
-    }
+  function visibleSpeciesArticles() {
+    return [...document.querySelectorAll(LIVE_CARD_SELECTOR)].filter(article =>
+      article.querySelector('section.stats') && article.getClientRects().length > 0);
   }
-  function cloneSpeciesArticle(article) {
-    const clone = article.cloneNode(true);
-    clone.classList.remove(PREPARING_CLASS);
-    clone.classList.add(SNAPSHOT_CLASS);
-    clone.removeAttribute('aria-busy');
-    clone.removeAttribute('data-yofi-species-preparing');
-    clone.removeAttribute('data-yofi-species-image-failed');
-    clone.setAttribute('aria-hidden', 'true');
-    clone.inert = true;
-    const computed = getComputedStyle(article);
-    for (let index = 0; index < computed.length; index++) {
-      const property = computed.item(index);
-      if (property.startsWith('--')) {
-        const value = computed.getPropertyValue(property);
-        if (value) clone.style.setProperty(property, value);
-      }
-    }
-    const sourceImages = [...article.querySelectorAll('img-zoom img')];
-    const clonedZooms = [...clone.querySelectorAll('img-zoom')];
-    for (const [index, zoom] of clonedZooms.entries()) {
-      const still = document.createElement('div');
-      still.className = 'yofi-species-snapshot-portrait';
-      const image = zoom.querySelector('img');
-      if (image) {
-        // Pin the snapshot to the exact decoded source shown on the live card.
-        // A cloned lazy image can otherwise fetch/decode only after the old
-        // card is gone, producing a one-frame portrait gap during navigation.
-        const source = sourceImages[index];
-        const sourceUrl = source?.currentSrc || source?.getAttribute('src') || '';
-        image.loading = 'eager';
-        image.decoding = 'sync';
-        image.removeAttribute('srcset');
-        image.removeAttribute('sizes');
-        if (sourceUrl) image.src = sourceUrl;
-        try { if (typeof image.decode === 'function') void image.decode().catch(() => {}); }
-        catch (_) { /* The eager image remains the fallback. */ }
-        still.appendChild(image);
-      }
-      zoom.replaceWith(still);
-    }
-    remapSnapshotIds(clone);
-    return clone;
-  }
-  function rememberStableSpeciesSnapshot(article, routeKey) {
-    if (!article?.isConnected || article.classList.contains(PREPARING_CLASS) ||
-        routeKey !== currentSpeciesRouteKey()) return false;
-    const rect = article.getBoundingClientRect();
-    if (!rect.width || !rect.height) return false;
-    const scrollable = article.querySelector(':scope > .scrollable');
-    lastStableSpeciesSnapshot = {
-      routeKey,
-      clone: cloneSpeciesArticle(article),
-      identity: speciesCardIdentity(article),
-      rect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height },
-      scrollTop: scrollable?.scrollTop || 0
-    };
-    return true;
-  }
-  function clearSpeciesTransitionHold() {
-    activeSpeciesTransitionHold?.remove();
-    activeSpeciesTransitionHold = null;
-  }
-  function showSpeciesTransitionHold(routeKey) {
-    if (activeSpeciesTransitionHold || !routeKey ||
-        lastStableSpeciesSnapshot?.routeKey !== routeKey) return false;
-    const { clone, rect, scrollTop } = lastStableSpeciesSnapshot;
-    const shell = document.createElement('div');
-    // Keep the visual shell out of the site's route-theme page selectors.
-    // Its local article still matches the presentation scripts' `.page > main`
-    // selectors, while route lookup continues to find the real page.
-    shell.className = 'page yofi-species-route-hold';
-    shell.setAttribute('aria-hidden', 'true');
-    shell.inert = true;
-    Object.assign(shell.style, {
-      left: `${rect.left}px`, top: `${rect.top}px`,
-      width: `${rect.width}px`, height: `${rect.height}px`,
-      maxWidth: 'none', maxHeight: 'none', minWidth: '0', minHeight: '0'
-    });
-    const main = document.createElement('main');
-    // Reuse the already-decoding snapshot node. Cloning it again here would
-    // start a second portrait load precisely when the outgoing card is hidden.
-    const visual = clone;
-    const scrollable = visual.querySelector(':scope > .scrollable');
-    if (scrollable) scrollable.scrollTop = scrollTop;
-    main.appendChild(visual);
-    shell.appendChild(main);
-    document.body.appendChild(shell);
-    activeSpeciesTransitionHold = shell;
-    return true;
-  }
-  function captureOutgoingSpeciesSnapshot() {
-    const routeKey = currentSpeciesRouteKey();
-    if (!routeKey) return;
-    const article = document.querySelector(LIVE_CARD_SELECTOR);
-    if (!article?.querySelector('section.stats') || article.classList.contains(PREPARING_CLASS)) return;
-    const identity = speciesCardIdentity(article);
-    const snapshot = lastStableSpeciesSnapshot;
-    if (snapshot?.routeKey === routeKey && snapshot.identity.title === identity.title &&
-        snapshot.identity.imageSource === identity.imageSource) {
-      const rect = article.getBoundingClientRect();
-      if (rect.width && rect.height) {
-        snapshot.rect = { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
-        snapshot.scrollTop = article.querySelector(':scope > .scrollable')?.scrollTop || 0;
-      }
-      return;
-    }
-    rememberStableSpeciesSnapshot(article, routeKey);
-  }
-  function observeSpeciesRouteChange(routeKey) {
-    const previous = observedSpeciesRouteKey;
-    if (routeKey && previous && routeKey !== previous) {
-      showSpeciesTransitionHold(previous);
-    } else if (!routeKey) {
-      clearSpeciesTransitionHold();
-      lastStableSpeciesSnapshot = null;
-    }
-    observedSpeciesRouteKey = routeKey;
+  function visibleSpeciesArticle() {
+    return visibleSpeciesArticles()[0] || null;
   }
   function routeIdentityReady(article, routeKey) {
     if (!routeKey.startsWith('fakemon:')) return true;
     const id = routeKey.slice('fakemon:'.length);
     const renderedId = article.querySelector('.yofi-header-fakemon-id')?.textContent?.trim();
-    return renderedId === `F.${id}`;
+    return renderedId === 'F.' + id;
   }
-  function hasRequiredTypeThemeData(article) {
-    if (!document.documentElement.classList.contains('yofi-type-theme')) return true;
-    const types = [...article.querySelectorAll(':scope > header .type-tag > .type')]
-      .map(node => node.dataset.yofiHeaderType || node.querySelector('.yofi-type-original, .unskew')?.textContent || node.textContent || '')
-      .map(value => value.trim().toLowerCase().replace(/[^a-z]/g, ''))
-      .filter(value => 'normal fire fighting water flying grass poison electric ground psychic rock ice bug dragon ghost dark steel fairy'.split(' ').includes(value));
-    return types.length > 0;
+  function sameSpeciesIdentity(a, b) {
+    return !!a && !!b && a.title === b.title && a.imageSource === b.imageSource &&
+      a.recordId === b.recordId && a.typeSignature === b.typeSignature;
   }
-  function clearPreparationTimer(article) {
-    const timer = preparationTimers.get(article);
-    if (timer) clearTimeout(timer);
-    preparationTimers.delete(article);
-  }
-  function preparationImageSourceKey(image) {
-    return [image.getAttribute('src') || '', image.getAttribute('srcset') || '',
-      image.currentSrc || ''].join('\u0000');
-  }
-  function ensurePreparedImageDecoded(article, routeKey, image) {
-    const sourceKey = preparationImageSourceKey(image);
-    if (decodedPreparationImages.get(image) === sourceKey) return true;
-    if (decodingPreparationImages.get(image) === sourceKey) return false;
-    if (typeof image.decode !== 'function') {
-      // Older engines without decode() retain the native loaded-image gate.
-      if (image.complete && image.naturalWidth > 0) {
-        decodedPreparationImages.set(image, sourceKey);
-        return true;
-      }
-      return false;
+  function prepareIncomingSpecies(article, routeKey) {
+    if (!article?.isConnected || !routeKey) return false;
+    let identity = speciesCardIdentity(article);
+    const previousIdentity = processedSpeciesIdentities.get(article);
+    const previousRouteKey = article.dataset.yofiSpeciesRouteKey || '';
+    if (previousRouteKey === routeKey) {
+      if (sameSpeciesIdentity(previousIdentity, identity)) return false;
+      // The URL can change before Svelte publishes the new record. In that
+      // case the first pass marks the route while the old card is still live;
+      // this same-route identity change is the actual data handoff. Re-run
+      // QOL normalization and theme colors here, before the next paint.
+      document.dispatchEvent(new CustomEvent(PREPARE_EVENT, { detail: { article, routeKey } }));
+      identity = speciesCardIdentity(article);
+      document.dispatchEvent(new CustomEvent(PRE_REVEAL_EVENT, { detail: { article, routeKey } }));
+      processedSpeciesIdentities.set(article, identity);
+      return true;
     }
-    decodingPreparationImages.set(image, sourceKey);
-    let decoding;
-    try { decoding = image.decode(); }
-    catch (_) { decoding = Promise.reject(_); }
-    Promise.resolve(decoding).then(() => {
-      if (decodingPreparationImages.get(image) !== sourceKey) return;
-      decodingPreparationImages.delete(image);
-      if (!article.isConnected || article.dataset.yofiSpeciesPreparing !== routeKey) return;
-      if (pendingImage(article) !== image || preparationImageSourceKey(image) !== sourceKey) {
-        watchPreparationImage(article, routeKey, pendingImage(article));
-        return;
-      }
-      if (!image.complete || image.naturalWidth <= 0) return;
-      decodedPreparationImages.set(image, sourceKey);
-      // decode() resolves only when the current source is ready for paint.
-      // Recompute layout and reveal in this task, before the next frame.
-      tick();
-      releasePreparedSpecies(article, routeKey);
-    }, () => {
-      if (decodingPreparationImages.get(image) !== sourceKey) return;
-      decodingPreparationImages.delete(image);
-      if (!article.isConnected || article.dataset.yofiSpeciesPreparing !== routeKey) return;
-      if (pendingImage(article) !== image || preparationImageSourceKey(image) !== sourceKey) {
-        watchPreparationImage(article, routeKey, pendingImage(article));
-        return;
-      }
-      // Some Safari image decoders reject a redundant decode() even when the
-      // image is complete. Let one paint opportunity settle, then verify the
-      // same loaded source before using the native-complete fallback.
-      requestAnimationFrame(() => {
-        if (!article.isConnected || article.dataset.yofiSpeciesPreparing !== routeKey ||
-            pendingImage(article) !== image || preparationImageSourceKey(image) !== sourceKey ||
-            !image.complete || image.naturalWidth <= 0) return;
-        decodedPreparationImages.set(image, sourceKey);
-        tick();
-        releasePreparedSpecies(article, routeKey);
-      });
-    });
-    return false;
-  }
-  function releasePreparedSpecies(article, routeKey, force = false) {
-    if (!article || article.dataset.yofiSpeciesPreparing !== routeKey) return false;
-    const image = pendingImage(article);
-    const imageReady = image?.complete && image.naturalWidth > 0;
-    const imageFailed = article.dataset.yofiSpeciesImageFailed === 'true';
-    if (!force && !imageReady && !imageFailed) return false;
-    if (!force && imageReady && !ensurePreparedImageDecoded(article, routeKey, image)) return false;
-    if (!force && (!article.querySelector('.yofi-species-hero') || !vitalData(article))) return false;
-    // Give QOL first refusal on native header metadata; Theme Overlay then
-    // reads the now-normalized original type tags in PRE_REVEAL_EVENT.
-    document.dispatchEvent(new CustomEvent(PREPARE_EVENT, {
-      detail: { article, routeKey }
-    }));
-    if (!force && !routeIdentityReady(article, routeKey)) return false;
-    const baseline = preparationBaselines.get(article);
-    if (!force && baseline && baseline.routeKey === routeKey) {
-      const current = speciesCardIdentity(article);
-      // Fakémon may share placeholder artwork, so use their native title.
-      // Canonical Pokémon have distinct portraits more reliably than title
-      // labels, so prefer the image URL there and fall back to the title.
-      const fakemon = routeKey.startsWith('fakemon:');
-      const identityChanged = fakemon
-        ? (baseline.title ? current.title !== baseline.title
-          : baseline.imageSource ? current.imageSource !== baseline.imageSource : true)
-        : (baseline.imageSource ? current.imageSource !== baseline.imageSource
-          : current.title !== baseline.title);
-      if (!identityChanged) return false;
-    }
-
-    // Optional Theme Overlay listens to this event to set the incoming card's
-    // palette synchronously. Baseline QOL + Species Card remain independent.
-    document.dispatchEvent(new CustomEvent(PRE_REVEAL_EVENT, {
-      detail: { article, routeKey }
-    }));
-    if (!force && !hasRequiredTypeThemeData(article)) return false;
-    if (document.documentElement.classList.contains('yofi-type-theme') &&
-        !article.classList.contains('yofi-type-tinted')) return false;
-    readySpeciesIdentities.set(article, speciesCardIdentity(article));
+    // QOL normalizes Fakémon IDs here. That lets us distinguish two records
+    // that share both a name and placeholder portrait without guessing.
+    document.dispatchEvent(new CustomEvent(PREPARE_EVENT, { detail: { article, routeKey } }));
+    // The browser URL can change before Svelte has replaced the previous
+    // species data. Wait for it to change, unless QOL confirms the new
+    // Fakémon ID even though its display name and artwork are identical.
+    if (previousRouteKey && sameSpeciesIdentity(previousIdentity, identity) &&
+        !(routeKey.startsWith('fakemon:') && routeIdentityReady(article, routeKey))) return false;
+    document.dispatchEvent(new CustomEvent(PRE_REVEAL_EVENT, { detail: { article, routeKey } }));
     article.dataset.yofiSpeciesRouteKey = routeKey;
-    delete article.dataset.yofiSpeciesPreparing;
-    delete article.dataset.yofiSpeciesImageFailed;
-    article.classList.remove(PREPARING_CLASS);
-    article.removeAttribute('aria-busy');
-    preparationBaselines.delete(article);
-    clearPreparationTimer(article);
-    rememberStableSpeciesSnapshot(article, routeKey);
-    clearSpeciesTransitionHold();
+    processedSpeciesIdentities.set(article, identity);
     return true;
   }
-  function watchPreparationImage(article, routeKey, image) {
+  function portraitUrl(image) {
+    const source = image?.getAttribute('src');
+    return source ? new URL(source, location.href).href : image?.currentSrc || '';
+  }
+  function portraitRatio(article, image) {
+    const source = image?.getAttribute('src') || image?.currentSrc || '';
+    const routeKey = currentSpeciesRouteKey();
+    const naturalRatio = image?.naturalWidth > 0 && image?.naturalHeight > 0
+      ? image.naturalWidth / image.naturalHeight : 0;
+    const layout = portraitLayoutRatios.get(article);
+    if (layout?.routeKey === routeKey && layout.source === source) {
+      // Keep provisional geometry stable while decoding, then use the
+      // destination image's natural ratio for subsequent layout decisions.
+      if (layout.decoded || !(naturalRatio > 0)) return layout.ratio;
+      layout.ratio = naturalRatio;
+      layout.decoded = true;
+      return naturalRatio;
+    }
+    let ratio = naturalRatio;
+    const known = portraitSources.get(article);
+    if (!(ratio > 0) && known?.ratio > 0 && known.source !== source) ratio = known.ratio;
+    if (!(ratio > 0)) ratio = 1;
+    if (source) portraitLayoutRatios.set(article, {
+      routeKey, source, ratio, decoded: naturalRatio > 0
+    });
+    return ratio;
+  }
+  function watchPortraitImage(article, image) {
     if (!(image instanceof HTMLImageElement)) return;
-    const sourceKey = preparationImageSourceKey(image);
-    const watchKey = `${routeKey}|${sourceKey}`;
-    if (!sourceKey.replace(/\u0000/g, '')) return;
-    const previousWatch = watchedPreparationImages.get(image);
-    if (previousWatch?.key === watchKey) return;
-    if (previousWatch) {
-      image.removeEventListener('load', previousWatch.onLoad);
-      image.removeEventListener('error', previousWatch.onError);
-    }
-    const finish = failed => {
-      if (!article.isConnected || article.dataset.yofiSpeciesPreparing !== routeKey) return;
-      if (pendingImage(article) !== image || preparationImageSourceKey(image) !== sourceKey) {
-        watchPreparationImage(article, routeKey, pendingImage(article));
-        return;
-      }
-      if (failed) article.dataset.yofiSpeciesImageFailed = 'true';
-      else delete article.dataset.yofiSpeciesImageFailed;
-      // A load event is not enough for Safari: wait for decode before reveal.
-      tick();
-      releasePreparedSpecies(article, routeKey);
+    const source = portraitUrl(image);
+    if (!source) return;
+    const old = portraitLoadHandlers.get(image);
+    if (old?.source === source) return;
+    if (old) image.removeEventListener('load', old.onLoad);
+    const finish = () => {
+      if (!article.isConnected || !image.isConnected || portraitUrl(image) !== source ||
+          !image.complete || image.naturalWidth <= 0) return;
+      portraitSources.set(article, {
+        source,
+        ratio: image.naturalWidth / image.naturalHeight
+      });
     };
-    const watch = {
-      key: watchKey,
-      onLoad: () => finish(false),
-      onError: () => finish(true)
-    };
-    watchedPreparationImages.set(image, watch);
-    image.addEventListener('load', watch.onLoad, { once: true });
-    image.addEventListener('error', watch.onError, { once: true });
-    if (image.complete) {
-      if (image.naturalWidth > 0) {
-        if (article.dataset.yofiSpeciesPreparing === routeKey)
-          ensurePreparedImageDecoded(article, routeKey, image);
-        return;
-      }
-      article.dataset.yofiSpeciesImageFailed = 'true';
-    }
-  }
-  function beginSpeciesPreparation(article, routeKey) {
-    if (!article || !routeKey ||
-        (article.dataset.yofiSpeciesRouteKey === routeKey &&
-         !article.dataset.yofiSpeciesPreparing)) return false;
-    if (article.dataset.yofiSpeciesPreparing !== routeKey) {
-      const previousRouteKey = article.dataset.yofiSpeciesRouteKey || '';
-      const wasAlreadyPreparing = !!article.dataset.yofiSpeciesPreparing;
-      const baselineIdentity = wasAlreadyPreparing
-        ? speciesCardIdentity(article)
-        : (readySpeciesIdentities.get(article) || speciesCardIdentity(article));
-      preparationBaselines.set(article, previousRouteKey &&
-        (previousRouteKey !== routeKey || wasAlreadyPreparing)
-        ? { routeKey, ...baselineIdentity }
-        : { routeKey });
-      clearPreparationTimer(article);
-      article.dataset.yofiSpeciesPreparing = routeKey;
-      article.classList.add(PREPARING_CLASS);
-      article.setAttribute('aria-busy', 'true');
-      const timer = setTimeout(() => {
-        if (article.dataset.yofiSpeciesPreparing !== routeKey) return;
-        // Fail open if a broken or unusually slow portrait would otherwise
-        // leave the incoming card hidden indefinitely.
-        tick();
-        releasePreparedSpecies(article, routeKey, true);
-      }, PREPARATION_TIMEOUT);
-      preparationTimers.set(article, timer);
-    }
-    watchPreparationImage(article, routeKey, pendingImage(article));
-    return true;
-  }
-  function clearSpeciesPreparation(article) {
-    if (!article?.classList.contains(PREPARING_CLASS)) return;
-    clearPreparationTimer(article);
-    delete article.dataset.yofiSpeciesPreparing;
-    delete article.dataset.yofiSpeciesImageFailed;
-    article.classList.remove(PREPARING_CLASS);
-    article.removeAttribute('aria-busy');
-    preparationBaselines.delete(article);
+    const handlers = { source, onLoad: finish };
+    portraitLoadHandlers.set(image, handlers);
+    image.addEventListener('load', handlers.onLoad, { once: true });
+    if (image.complete) finish();
   }
   let heroTickQueued = false;
   function requestHeroTick() {
@@ -1642,8 +1453,8 @@ article.yofi-scores-layout section.moves > dl + dl {
     target.yofiSourceHTML = signature;
   }
 
-  function ensureSpeciesHero(main) {
-    const article = main.querySelector("article");
+  function ensureSpeciesHero(article) {
+    if (!(article instanceof HTMLElement) || !article.matches('article')) return null;
     // Never treat the editor, Find by ID, or a non-species card as a hero.
     if (!article?.querySelector("section.stats")) return null;
     let hero = article.querySelector(".yofi-species-hero");
@@ -1701,7 +1512,7 @@ article.yofi-scores-layout section.moves > dl + dl {
       info.classList.add("yofi-hero-art-pending");
     }
     state = { hero, article, info, metadata, description, flow, shortColumn: null,
-      facts, right, gender, values, geometryKey: "", factsKey: "", image: null,
+      facts, right, gender, values, geometryKey: "", factsKey: "",
       observer: null, resizeObserver: null, width: -1, factsMode: "long" };
     speciesHeroStates.set(hero, state);
     activeSpeciesHeroState = state;
@@ -1718,18 +1529,25 @@ article.yofi-scores-layout section.moves > dl + dl {
           change.target instanceof HTMLImageElement)) {
         const current = info.querySelector(".square-image img");
         const pending = current instanceof HTMLImageElement && !current.complete;
-        const routeKey = currentSpeciesRouteKey();
-        const incomingSpecies = !!routeKey && article.dataset.yofiSpeciesRouteKey !== routeKey;
-        if (incomingSpecies) beginSpeciesPreparation(article, routeKey);
+        watchPortraitImage(article, current);
         info.classList.toggle("yofi-hero-art-pending", pending);
-        // Keep the last committed layout while a same-species portrait variant
-        // (normal/shiny) loads. A different species stays hidden until its own
-        // image and measured card layout are ready.
-        if (pending && !article.classList.contains('lab3-active')) sizePendingHeroArt(info, hero);
-        if (pending && incomingSpecies) return;
-        if (!pending && incomingSpecies) { tick(); return; }
       }
-      requestHeroTick();
+      const portraitOnly = change => {
+        const target = change.target.nodeType === 1
+          ? change.target : change.target.parentElement;
+        if (!target?.closest?.('.square-image') || target.closest('figcaption')) return false;
+        if (change.type === 'attributes')
+          return target instanceof HTMLImageElement &&
+            ['src','srcset'].includes(change.attributeName);
+        if (change.type !== 'childList') return false;
+        const nodes = [...change.addedNodes, ...change.removedNodes]
+          .filter(node => node.nodeType === 1);
+        return nodes.length > 0 && nodes.every(node => node.matches?.('img, img-zoom'));
+      };
+      // The document-level species observer handles native keyed-art swaps
+      // synchronously. Avoid a second rAF tick for the same image subtree;
+      // image load itself changes pixels, not layout geometry.
+      if (changes.some(change => !portraitOnly(change))) requestHeroTick();
     });
     state.observer.observe(info, { childList: true, characterData: true, subtree: true,
       attributes: true, attributeFilter: ["src", "srcset"] });
@@ -1748,7 +1566,6 @@ article.yofi-scores-layout section.moves > dl + dl {
             const height = entry.contentRect.height || 0;
             if (Math.abs(height - (state.artHeight ?? -1)) > .5) {
               state.artHeight = height;
-              state.modeSignature = "";
               needsLayout = true;
             }
           }
@@ -1884,7 +1701,7 @@ article.yofi-scores-layout section.moves > dl + dl {
     // Fakemon. Values stay in their original nodes; only the display mirrors.
     const dd = Array.from(state.metadata.children).filter((node) => node.tagName === "DD");
     if (dd.length < 6) return;
-    const [id, size, sr, egg, level, gender] = dd;
+    const egg = dd[3], gender = dd[5];
     const fullGender = !!gender.querySelector('.gender-ratio-display .bar') ||
       (!!heroText(gender) && !gender.querySelector('.gender-ratio-display'));
     const fullEgg = !!heroText(egg);
@@ -1914,36 +1731,29 @@ article.yofi-scores-layout section.moves > dl + dl {
     const copy = state.description.querySelector(".small-text");
     if (!(copy instanceof HTMLElement)) return;
 
-    // A new species may be using the previous card's image geometry while
-    // Svelte is changing image sources. Do NOT commit a provisional "long"
-    // mode while a real portrait is loading: that was the visible jump.
+    // Choose the composition from native content and the reserved image box.
+    // Native route changes and warmed artwork supply the current card data;
+    // geometry is computed independently of the navigation action.
     const hasImage = image instanceof HTMLImageElement;
     const ready = hasImage && image.complete && image.naturalWidth > 0 && image.naturalHeight > 0;
     const pending = hasImage && !ready && !image.complete;
     state.info.classList.toggle("yofi-hero-art-pending", pending);
-    if (pending) {
-      // In the old layout a pending image skipped fitting entirely. The new
-      // image then spent a painted frame at the FULL 50% lane width, before
-      // the 37%-floor fitter ran. Use that same CARD-relative floor immediately.
-      sizePendingHeroArt(state.info, state.hero);
-      delete state.hero.dataset.yofiFactsPending;
-      state.modeSignature = "";
-      return; // Metadata does not depend on artwork decode.
-    }
     delete state.hero.dataset.yofiFactsPending;
 
     const credit = state.info.querySelector(".square-image figure figcaption");
     const hasCredit = credit instanceof HTMLElement && !!credit.textContent.trim();
+    const copyStyle = getComputedStyle(copy);
     const signature = [state.flow.getBoundingClientRect().width.toFixed(1),
-      image?.currentSrc || image?.src || "", image?.naturalWidth, image?.naturalHeight,
-      hasCredit ? credit.textContent.trim() : "", window.innerWidth, copy.innerHTML,
+      currentSpeciesRouteKey(),
+      hasCredit ? credit.textContent.trim() : "", copy.innerHTML,
+      copyStyle.fontFamily, copyStyle.fontSize, copyStyle.lineHeight,
       state.facts.textContent].join("|");
     if (state.modeSignature === signature && state.hero.dataset.yofiFactsMode === state.factsMode) return;
 
     // Measure the original short-mode eligibility before resizing or aligning
     // either column. Previous render measurements must not bias this decision.
     setHeroStyle(state.flow, "--yofi-hero-long-flow-adjust", "0px");
-    setHeroStyle(state.info, "--yofi-hero-art-width", "100%");
+    if (!pending) setHeroStyle(state.info, "--yofi-hero-art-width", "100%");
 
     // Perform the neutral float-layout measurement in the same synchronous
     // pass as the final placement. The facts are concealed only DURING that
@@ -1958,7 +1768,7 @@ article.yofi-scores-layout section.moves > dl + dl {
     // artwork; raise them only if their complete natural block fits above
     // the image bottom. No independent description-only threshold.
     const artBottom = artwork?.getBoundingClientRect().bottom || 0;
-    let next = ready ? "short" : "long";
+    let next = "short";
     state.hero.dataset.yofiFactsMode = next;
     if (next === "short") {
       if (!state.shortColumn) {
@@ -1990,7 +1800,7 @@ article.yofi-scores-layout section.moves > dl + dl {
     const zoom = state.info.querySelector(".square-image img-zoom");
     const lane = state.info.getBoundingClientRect();
     const portrait = zoom?.getBoundingClientRect();
-    if (ready && portrait?.width > 0 && portrait.height > 0 && lane.width > 0) {
+    if (hasImage && portrait?.width > 0 && portrait.height > 0 && lane.width > 0) {
       const artEnd = () => hasCredit
         ? credit.getBoundingClientRect().bottom
         : zoom.getBoundingClientRect().bottom;
@@ -2001,7 +1811,7 @@ article.yofi-scores-layout section.moves > dl + dl {
       // The native section may have inner padding, so its measured lane is
       // not always exactly half the hero's outer width.
       const floor = Math.min(portrait.width, state.hero.getBoundingClientRect().width * .37);
-      const ratio = image.naturalWidth / image.naturalHeight;
+      const ratio = portraitRatio(state.article, image);
       // A long-mode description may reflow as the floated portrait shortens.
       // Resolve that reflow synchronously with a bounded, monotonic adjustment.
       for (let pass = 0; pass < 4; pass++) {
@@ -2052,41 +1862,22 @@ article.yofi-scores-layout section.moves > dl + dl {
   }
 
   function sizeHeroArt(state) {
-    const { info, hero } = state;
+    const { info, article } = state;
     const host = info.querySelector(".square-image");
     const img = host?.querySelector("img");
     info.classList.toggle("yofi-hero-no-art", !host);
     if (!host) return;
-    // Keep the original Art / shimmer / image load handling. Only the aspect
-    // ratio changes with the source: width remains 100% of its 50% lane.
-    if (img && state.image !== img) {
-      state.image = img;
-      img.addEventListener("load", () => {
-        if (!hero.isConnected) return;
-        if (article.dataset.yofiSpeciesPreparing) tick();
-        else requestHeroTick();
-      }, { passive: true });
-      img.addEventListener("error", () => {
-        if (!hero.isConnected) return;
-        if (article.dataset.yofiSpeciesPreparing) {
-          article.dataset.yofiSpeciesImageFailed = 'true';
-          tick();
-        } else requestHeroTick();
-      }, { passive: true });
-    }
-    const ratio = img?.naturalWidth > 0 && img?.naturalHeight > 0
-      ? img.naturalWidth / img.naturalHeight : 1;
-    setHeroStyle(info, "--yofi-hero-art-ratio", String(ratio));
+    // Record the native image ratio for the route's measured layout. The
+    // native image source determines the current ratio.
+    setHeroStyle(info, "--yofi-hero-art-ratio", String(portraitRatio(article, img)));
     // selectHeroFactsMode owns artwork width. Resetting it here would undo
     // the fitted short-mode size on every unrelated installation pass.
   }
 
   function updateNativeHero(article) {
     if (!(article instanceof HTMLElement) || !article.querySelector('section.stats')) return;
-    const main = article.closest('main');
-    if (!(main instanceof HTMLElement)) return;
     if (activeSpeciesHeroState && !activeSpeciesHeroState.hero.isConnected) disconnectSpeciesHero();
-    const state = ensureSpeciesHero(main);
+    const state = ensureSpeciesHero(article);
     if (!state) return;
     syncHeroFacts(state);
     sizeHeroArt(state);
@@ -2756,6 +2547,7 @@ article.yofi-scores-layout section.moves > dl + dl {
         let probe = probes.get(kind);
         if (!probe) {
           const outer = document.createElement('div');
+          outer.dataset.yofiLayoutProbe = 'true';
           outer.style.cssText = 'position:absolute!important;visibility:hidden!important;' +
             'pointer-events:none!important;left:-100000px!important;top:0!important;' +
             'height:auto!important;max-width:none!important;box-sizing:border-box!important;';
@@ -2861,7 +2653,7 @@ article.yofi-scores-layout section.moves > dl + dl {
       bioHeight:bioH,scoreRowHeight:SCORE_ROW,
       leftHeight:leftH,rightHeight:rightH,leftSlack,rightSlack,quality};
   }
-  function selectGeometry(stage, hero, view, ratio, available, imageFloor, measurer) {
+  function selectGeometry(stage, hero, view, ratio, available, imageFloor, measurer, preferredBioMode = null) {
     const desc = hero.querySelector('.yofi-hero-copy');
     if (!desc) return null;
     const descFont = parseFloat(getComputedStyle(desc.querySelector('.small-text') || desc).fontSize)||16;
@@ -2873,8 +2665,10 @@ article.yofi-scores-layout section.moves > dl + dl {
     // Keep the two-row scores wide enough for readable STR/DEX/... values.
     const minCopy = Math.max(stage===1 ? 202 : 226,
       descFont*(stage===1 ? 11.25 : 12.25));
-    const modeOptions = stage === 1 ? ['left-inline','left-stack'] : stage === 2 ?
+    const allModes = stage === 1 ? ['left-inline','left-stack'] : stage === 2 ?
       ['left-inline','right-stack'] : ['left-inline','left-stack'];
+    const modeOptions = preferredBioMode
+      ? allModes.filter(mode => mode === preferredBioMode) : allModes;
     const tiles = [...new Set([tileMin,90,96,103,MAX_TILE].filter(t=>t>=tileMin&&t<=MAX_TILE))];
     const widths = [...new Set([minCopy,minCopy+38,minCopy+78,minCopy+122,minCopy+174]
       .map(n=>Math.round(n/2)*2))];
@@ -2921,7 +2715,7 @@ article.yofi-scores-layout section.moves > dl + dl {
       for (const prop of ['--lab3-gap','--lab3-tile-gap','--lab3-art-width','--lab3-art-height','--lab3-hero-height','--lab3-lane-width','--lab3-score-row-height','--lab3-tile-size','--lab3-side-width','--lab3-copy-width','--lab3-left-offset','--lab3-bio-height','--lab3-tile-cols','--lab3-bio-inline'])
         hero.style.removeProperty(prop);
       // Keep companion nodes mounted but hidden: leaving and re-entering compact
-      // must not destroy the cached cloned gender/egg bar or abilities.
+      // must not rebuild the gender/egg presentation or move native abilities.
       // The original QOL hero is still the visible layout at compact widths.
     }
   }
@@ -2934,12 +2728,15 @@ article.yofi-scores-layout section.moves > dl + dl {
     const available = raw - parseFloat(style.paddingLeft || '0') - parseFloat(style.paddingRight || '0');
     if (!(available > 0)) return null;
     const image = hero.querySelector('.yofi-hero-art-lane img');
-    if (!image || !image.complete || !(image.naturalWidth>0) || !(image.naturalHeight>0)) return null;
-    const ratio = image.naturalWidth/image.naturalHeight;
+    if (!image) return null;
+    // Pick composition from the incoming data and current panel width before
+    // paint. Keep one ratio for the route: source swaps and image load events
+    // must not trigger a second layout pass or move the card in view.
+    const ratio = portraitRatio(article, image);
     if (!Number.isFinite(ratio) || ratio <= 0) return null;
     const desc = hero.querySelector('.yofi-hero-copy');
     const descStyle = getComputedStyle(desc?.querySelector('.small-text') || desc);
-    const identity = [image.currentSrc || image.src, image.naturalWidth,image.naturalHeight,
+    const identity = [currentSpeciesRouteKey(),
       desc?.innerHTML || '',view.abilities?.innerHTML || '',cleanText(view.scoreStrip),
       cleanText(view.vitals),cleanText(view.egg),descStyle.fontSize,
       hero.style.getPropertyValue('--lab3-native-ability-font')].join('|');
@@ -2992,7 +2789,7 @@ article.yofi-scores-layout section.moves > dl + dl {
       const hold=before.peakStage===3 ? stage3 : stage2;
       if(hold)layout=hold;
     }
-    geometryMemo.set(hero,{key,layout,identity});
+    geometryMemo.set(hero,{key,layout,identity,available});
     return layout;
   }
 
@@ -3102,13 +2899,11 @@ article.yofi-scores-layout section.moves > dl + dl {
     });
   }
 
-
-
   const SPECIES_TM_CSS = `
-    /* Geometry only. The theme's color/pills/visible TM labels are untouched.
-       More specific than existing type-mode flex or light/dark column CSS. */
-    html:not(.yofi-type-theme) .page > main article > .scrollable section.moves dd ul[data-yofi-species-tm-columns].yofi-species-tm-grid,
-    html.yofi-type-theme .page > main article.yofi-type-tinted:has(section.moves) > .scrollable section.moves dd ul[data-yofi-species-tm-columns] {
+    /* Light/Dark column geometry only. Type theme owns its natural-width,
+       row-major pill wrapping and does not run this column fitter. */
+    html:not(.yofi-type-theme) .page > main article > .scrollable section.moves dd ul[data-yofi-species-tm-columns].yofi-species-tm-grid {
+      --yofi-species-tm-white-space: nowrap;
       box-sizing: border-box !important;
       display: grid !important;
       grid-auto-flow: column !important;
@@ -3125,20 +2920,20 @@ article.yofi-scores-layout section.moves > dl + dl {
       list-style: none !important;
       column-count: auto !important;
     }
-    html:not(.yofi-type-theme) .page > main article > .scrollable section.moves dd ul[data-yofi-species-tm-columns].yofi-species-tm-grid > li,
-    html.yofi-type-theme .page > main article.yofi-type-tinted:has(section.moves) > .scrollable section.moves dd ul[data-yofi-species-tm-columns].yofi-species-tm-grid > li {
+    html:not(.yofi-type-theme) .page > main article > .scrollable section.moves dd ul[data-yofi-species-tm-columns].yofi-species-tm-grid > li {
       min-width: 0 !important;
       max-width: 100% !important;
       grid-column: auto !important;
       break-inside: avoid !important;
     }
+    html:not(.yofi-type-theme) .page > main article > .scrollable section.moves dd ul.yofi-species-tm-wrap {
+      --yofi-species-tm-white-space: normal;
+    }
     /* If an individual TM name exceeds the entire panel, permit that name
        to wrap. This is a last-resort single-column fallback, not column
        squeezing or a change to the theme's default pill styling. */
     html:not(.yofi-type-theme) .page > main article > .scrollable section.moves dd ul.yofi-species-tm-wrap > li > a,
-    html.yofi-type-theme .page > main article.yofi-type-tinted:has(section.moves) > .scrollable section.moves dd ul.yofi-species-tm-wrap > li > a,
-    html:not(.yofi-type-theme) .page > main article > .scrollable section.moves dd ul.yofi-species-tm-wrap > li > a::before,
-    html.yofi-type-theme .page > main article.yofi-type-tinted:has(section.moves) > .scrollable section.moves dd ul.yofi-species-tm-wrap > li > a::before {
+    html:not(.yofi-type-theme) .page > main article > .scrollable section.moves dd ul.yofi-species-tm-wrap > li > a::before {
       max-width: 100% !important;
       white-space: normal !important;
       overflow-wrap: anywhere !important;
@@ -3184,21 +2979,25 @@ article.yofi-scores-layout section.moves > dl + dl {
     if(!(contentWidth>0))return;
     // Minimum necessary *actual* horizontal separation: never compress below 12px.
     const gap=Math.max(12,parseFloat(ulStyle.columnGap)||0);
-    const label=link=>link.getAttribute('data-p5ov-display')||link.textContent.trim();
     const signature=[contentWidth.toFixed(2),gap,tmFontEpoch,
-      document.documentElement.classList.contains('yofi-type-theme')?'type':'native',
-      ...links.map(a=>label(a)+'~'+a.style.getPropertyValue('--p5ov-tm-font-size'))].join('|');
+      ...links.map(a=>a.textContent.trim()+'~'+a.getAttribute('data-p5ov-display')+'~'+
+        a.style.getPropertyValue('--p5ov-tm-font-size'))].join('|');
     if(tmGridMemo.get(ul)?.signature===signature)return;
     const widths=links.map(link=>{
       const style=getComputedStyle(link);
       const pseudo=getComputedStyle(link,'::before');
-      const value=label(link);
-      const size=parseFloat(link.style.getPropertyValue('--p5ov-tm-font-size'))||
-        parseFloat(pseudo?.fontSize)||parseFloat(style.fontSize)||14;
-      const family=pseudo?.fontFamily||style.fontFamily||'system-ui';
-      const weight=pseudo?.fontWeight||style.fontWeight||'400';
-      const fontStyle=pseudo?.fontStyle||style.fontStyle||'normal';
-      const letterSpacing=parseFloat(pseudo?.letterSpacing)||0;
+      // A display attribute alone does not prove that its pseudo-label is
+      // visible. Otherwise measure the original Svelte text and its own font.
+      const display=link.getAttribute('data-p5ov-display');
+      const generated=display !== null && pseudo?.content &&
+        !['none','normal','""',"''"].includes(pseudo.content);
+      const textStyle=generated?pseudo:style;
+      const value=(generated?display:link.textContent).trim().replace(/\s+/g,' ');
+      const size=parseFloat(textStyle.fontSize)||parseFloat(style.fontSize)||14;
+      const family=textStyle.fontFamily||style.fontFamily||'system-ui';
+      const weight=textStyle.fontWeight||style.fontWeight||'400';
+      const fontStyle=textStyle.fontStyle||style.fontStyle||'normal';
+      const letterSpacing=parseFloat(textStyle.letterSpacing)||0;
       tmGridCanvas.font=`${fontStyle} ${weight} ${size}px ${family}`;
       const glyphWidth=tmGridCanvas.measureText(value).width+
         Math.max(0,value.length-1)*letterSpacing;
@@ -3232,15 +3031,23 @@ article.yofi-scores-layout section.moves > dl + dl {
   }
   function installSpeciesTMColumns() {
     if(!isSpeciesRoot())return;
-    for(const article of document.querySelectorAll(LIVE_CARD_SELECTOR)){
-      if(!article.querySelector('section.stats'))continue;
+    const typeTheme=document.documentElement.classList.contains('yofi-type-theme');
+    for(const article of visibleSpeciesArticles()){
       for(const ul of article.querySelectorAll('section.moves dd ul')){
-        if(isSpeciesTMList(ul))fitSpeciesTMColumns(ul);
+        if(typeTheme){
+          if(!ul.hasAttribute('data-yofi-species-tm-columns'))continue;
+          ul.classList.remove('yofi-species-tm-grid','yofi-species-tm-wrap');
+          ul.removeAttribute('data-yofi-species-tm-columns');
+          for(const property of ['--yofi-species-tm-tracks','--yofi-species-tm-rows','--yofi-species-tm-gap'])
+            ul.style.removeProperty(property);
+          tmGridMemo.delete(ul);
+          if(tmGridSeen.has(ul)){tmResizeObserver?.unobserve(ul);tmGridSeen.delete(ul);}
+        } else if(isSpeciesTMList(ul))fitSpeciesTMColumns(ul);
       }
     }
   }
   window.__yofiSpeciesTMStatus=()=>{
-    const ul=document.querySelector(`${LIVE_CARD_SELECTOR} section.moves ul[data-yofi-species-tm-columns]`);
+    const ul=visibleSpeciesArticle()?.querySelector('section.moves ul[data-yofi-species-tm-columns]');
     return ul?tmGridMemo.get(ul)||null:null;
   };
 
@@ -3280,9 +3087,8 @@ article.yofi-scores-layout section.moves > dl + dl {
 
   function layoutSpeciesStats(page) {
     if (!isSpeciesRoot()) return;
-    const main = page.querySelector(":scope > main");
-    const stats = main?.querySelector("article section.stats");
-    const article = stats?.closest("article");
+    const article = speciesArticleFrom(page);
+    const stats = article?.querySelector("section.stats");
     const skills = article?.querySelector("section.skills");
     const sourceDl = skills?.querySelector(":scope > dl");
     if (!stats || !article || !sourceDl) return;
@@ -3351,19 +3157,14 @@ article.yofi-scores-layout section.moves > dl + dl {
     syncScoreSummary(sourceDl, body.querySelector(".yofi-scores-types"), 4);
     article.classList.add("yofi-scores-layout");
     // Unified content-driven stats layout at every card width.
-    const adaptive = true;
     article.classList.remove("yofi-scores-conditional-wide");
-    article.classList.toggle("yofi-scores-wide", adaptive);
-    if (!adaptive) {
-      article.removeAttribute("data-yofi-stats-layout");
-      body.style.removeProperty("--yofi-stats-tracks");
-    }
+    article.classList.toggle("yofi-scores-wide", true);
   }
 
 
   function syncSpeciesVitals(page) {
     if (!isSpeciesRoot()) return;
-    const article = page.querySelector(':scope > main article');
+    const article = speciesArticleFrom(page);
     const metadata = article?.querySelector('section.info > div:first-child > dl');
     if (!(article instanceof HTMLElement) || !(metadata instanceof HTMLDListElement)) return;
     const stats = article.querySelector("section.stats");
@@ -3455,8 +3256,8 @@ article.yofi-scores-layout section.moves > dl + dl {
   // spans in effectiveness badges. Apply to both source and wide-layout copy.
   function compactEffectivenessBadges(page) {
     if (!isSpeciesRoot()) return;
-    const article = page.querySelector(":scope > main article.yofi-scores-layout");
-    if (!article) return;
+    const article = speciesArticleFrom(page);
+    if (!article?.classList.contains('yofi-scores-layout')) return;
     for (const name of article.querySelectorAll("section.skills .inline-type-name > .name, .yofi-scores-types .inline-type-name > .name")) {
       const full = (name.textContent || "").trim();
       if (!full) continue;
@@ -3484,8 +3285,8 @@ article.yofi-scores-layout section.moves > dl + dl {
 
   function compactBaseStatLabels(page) {
     if (!isSpeciesRoot()) return;
-    const article = page.querySelector(":scope > main article.yofi-scores-layout");
-    if (!article) return;
+    const article = speciesArticleFrom(page);
+    if (!article?.classList.contains('yofi-scores-layout')) return;
     const names = {
       "armor class": "AC", "hit points": "HP",
       "proficiencies": "Skills", "saving throws": "Saves",
@@ -3521,8 +3322,8 @@ article.yofi-scores-layout section.moves > dl + dl {
 
   function compactSkillNames(page) {
     if (!isSpeciesRoot()) return;
-    const article = page.querySelector(":scope > main article.yofi-scores-layout");
-    if (!article) return;
+    const article = speciesArticleFrom(page);
+    if (!article?.classList.contains('yofi-scores-layout')) return;
     // The summary is cloned from the native Skills/Saves. Never abbreviate
     // that live source: Svelte may update it when changing species.
     for (const field of article.querySelectorAll(".yofi-scores-skills > dl > dd:first-of-type")) {
@@ -3567,8 +3368,8 @@ article.yofi-scores-layout section.moves > dl + dl {
   function normalizeStatSentinels(page){
     // Presentation-only sentinel normalization across native stat fields and
     // their wide summary. Avoid mutating badges, prose, labels, or links.
-    const article=page?.querySelector(':scope > main article.yofi-scores-layout');
-    if(!article)return;
+    const article=speciesArticleFrom(page);
+    if(!article?.classList.contains('yofi-scores-layout'))return;
     for(const dd of article.querySelectorAll('.yofi-species-stats-body dd, section.skills dd')){
       if(dd.children.length)continue;
       const raw=(dd.textContent||'').trim();
@@ -3610,12 +3411,11 @@ article.yofi-scores-layout section.moves > dl + dl {
 
   function compactSpeciesDistances(page) {
     if (!isSpeciesRoot()) return;
-    const main = page.querySelector(":scope > main");
-    const stats = main?.querySelector("article section.stats");
+    const article = speciesArticleFrom(page);
+    const stats = article?.querySelector("section.stats");
     const basic = stats?.querySelector(":scope > .yofi-species-stats-body > dl:first-of-type")
       ?? stats?.querySelector(":scope > dl:first-of-type");
     if (!(basic instanceof HTMLDListElement)) return;
-    const article = stats.closest("article");
     // Uniform short forms in Speed and Senses at every card width. Keep the
     // native Svelte records untouched; these are display-only text nodes.
     const fullNames = false;
@@ -4211,94 +4011,7 @@ article.yofi-scores-layout section.moves > dl + dl {
     }
     return true;
   }
-  function adaptiveAlignSplitImmune(root,id){
-    // Only the stacked-label left-Immune variant has a vacant bottom-left cell.
-    // Place Immune alongside the bottom resistance row when it fits.
-    if(id!=='R')return;
-    const immune=root.querySelector('.yofi12-field[data-key="immune"]');
-    const resist=root.querySelector('.yofi12-field[data-key="resist"]');
-    if(!immune||!resist)return;
-    immune.style.removeProperty('margin-top');
-    const rows=[];
-    for(const b of resist.querySelectorAll('.inline-type-name')){
-      const y=adaptiveRect(b).top;
-      if(!rows.some(r=>Math.abs(r-y)<2))rows.push(y);
-    }
-    if(!rows.length)return;
-    const top=adaptiveRect(immune.querySelector(':scope > dt')).top;
-    const delta=rows[rows.length-1]-top;
-    const base=parseFloat(getComputedStyle(immune).marginTop)||0;
-    if(delta>1)immune.style.marginTop=(base+delta).toFixed(2)+'px';
-  }
-  function adaptiveInkBottom(el){
-    if(!el)return null;
-    const range=document.createRange();range.selectNodeContents(el);
-    const rect=range.getBoundingClientRect();return rect.height>0?rect.bottom:null;
-  }
-  function adaptiveAlignBadges(root){
-    // Reproduce v0.11.33g's text-to-text ink-bottom alignment. Keep None
-    // as ordinary text; do not subject it to badge positioning.
-    for(const f of root.querySelectorAll('.yofi12-field.yofi12-effect')){
-      const val=f.querySelector(':scope > .yofi12-value');
-      if(!val||!val.classList.contains('yofi12-badges'))continue;
-      val.style.removeProperty('--yofi12-ink-shift');
-      if(f.classList.contains('yofi12-title-above'))continue;
-      const dt=f.querySelector(':scope > dt');
-      const name=val.querySelector('.inline-type-name > .name');
-      const target=adaptiveInkBottom(dt),origin=adaptiveInkBottom(name);
-      if(target!==null&&origin!==null&&Math.abs(target-origin)>.1)
-        val.style.setProperty('--yofi12-ink-shift',(target-origin).toFixed(2)+'px');
-    }
-  }
-  function adaptiveSyncRows(root){
-    // Align label-bearing fields against visible text/badge rows in *other*
-    // columns of the same horizontal band. Never move continuation values.
-    // Each move is geometry-constrained and applies during candidate scoring.
-    const line=parseFloat(getComputedStyle(root).lineHeight)||
-      (parseFloat(getComputedStyle(root).fontSize)||14.4)*1.3;
-    for(const row of root.querySelectorAll('.yofi12-group[data-kind="row"]')){
-      const bounds=adaptiveRect(row);
-      if(bounds.width<1)continue;
-      const all=[...row.querySelectorAll('.yofi12-field:not([data-absent])')]
-        .filter(f=>!row.parentElement?.closest('.yofi12-group[data-kind="row"]'));
-      if(all.length<3)continue;
-      const anchors=[];
-      for(const f of all){
-        const label=f.querySelector(':scope > dt');
-        if(label)anchors.push({y:adaptiveRect(label).top,x:adaptiveRect(f).left,kind:'label'});
-        for(const dd of f.querySelectorAll('.yofi12-value > dd')){
-          const r=adaptiveRect(dd); if(r.height<1)continue;
-          if(f.querySelector('.yofi12-badges')){
-            anchors.push({y:r.top,x:adaptiveRect(f).left,kind:'badge'});
-          }else{
-            const n=Math.max(1,Math.round(r.height/line));
-            for(let i=0;i<n;i++)anchors.push({y:r.top+i*line,x:adaptiveRect(f).left,kind:'text'});
-          }
-        }
-      }
-      // Align *only* later labels in their column; the top label never moves.
-      // Prefer targets across columns, never within the field being adjusted.
-      const fields=all.slice().sort((a,b)=>adaptiveRect(a).top-adaptiveRect(b).top);
-      for(const f of fields){
-        const parent=f.parentElement;
-        if(parent?.dataset.kind!=='col'||parent.firstElementChild===f)continue;
-        const label=f.querySelector(':scope > dt');if(!label)continue;
-        const old=adaptiveRect(label).top;
-        const cross=anchors.filter(a=>Math.abs(a.x-adaptiveRect(f).left)>8 &&
-          a.y>=old-4 && a.y<=old+line*.8);
-        if(!cross.length)continue;
-        cross.sort((a,b)=>Math.abs(a.y-old)-Math.abs(b.y-old)||
-          (a.kind==='text'?-1:1));
-        const delta=cross[0].y-old;
-        if(delta<1||delta>line*.8)continue;
-        // Preserve the previous item's actual content clearance. No overlay.
-        const prior=f.previousElementSibling;
-        if(prior&&adaptiveRect(prior).bottom>old-1)continue;
-        const priorMargin=parseFloat(f.style.marginTop)||0;
-        f.style.marginTop=(priorMargin+delta).toFixed(2)+'px';
-      }
-    }
-  }
+
   function adaptiveAlignColumns(root){
     // A stack is a structural column of field records. Text-value starts in
     // that stack share one dt track, irrespective of label lengths, wraps,
@@ -4471,7 +4184,8 @@ article.yofi-scores-layout section.moves > dl + dl {
   }
   function chooseConditionalScoreColumns(page){
     if(!isSpeciesRoot())return;
-    const article=page?.querySelector(':scope > main article.yofi-scores-layout');
+    const article=speciesArticleFrom(page);
+    if(!article?.classList.contains('yofi-scores-layout'))return;
     const body=article?.querySelector('.yofi-species-stats-body');
     if(!article||!body||!body.clientWidth)return;
     const data=adaptiveSources(body);if(!data)return;
@@ -4483,7 +4197,7 @@ article.yofi-scores-layout section.moves > dl + dl {
       body.querySelector(':scope > .yofi-scores-types')?.dataset.yofiSummary].join('|');
     let visible=body.querySelector(':scope > .yofi12-visible');
     const prev=adaptiveCache.get(article);
-    if(prev?.signature===signature&&visible?.firstElementChild){article.dataset.yofiStatsLayout=prev.id;return;}
+    if(prev?.signature===signature && (prev.id==='native' || visible?.firstElementChild)){article.dataset.yofiStatsLayout=prev.id;return;}
     if(!visible){visible=document.createElement('div');visible.className='yofi12-stage yofi12-visible';body.append(visible);}
     let probe=body.querySelector(':scope > .yofi12-probe');
     if(!probe){probe=document.createElement('div');probe.className='yofi12-stage yofi12-probe';body.append(probe);}
@@ -4557,13 +4271,13 @@ article.yofi-scores-layout section.moves > dl + dl {
   }
 
 
-  function arrangeHiddenAbilityTags(main){
+  function arrangeHiddenAbilityTags(article){
     // Native source: AbilityPoolInfo.svelte renders
     // <p class="no-margin"><Tag>Hidden</Tag></p><div class="ability">…</div>.
     // The Tag.svelte font is relative to its P parent; moving it inside
     // .ability changes its font size. Only group the TWO ORIGINAL SIBLINGS.
     // Do not alter the original Tag element or its classes/styles.
-    for(const section of main.querySelectorAll('article section.abilities')){
+    for(const section of article.querySelectorAll('section.abilities')){
       for(const item of [...section.children]){
         if(!(item instanceof HTMLParagraphElement)||!item.classList.contains('no-margin'))continue;
         if(item.closest('.yofi-native-hidden-pair'))continue;
@@ -4615,12 +4329,12 @@ article.yofi-scores-layout section.moves > dl + dl {
   }
 
   function installSpeciesPresentation(page) {
-    const article = page?.querySelector(':scope > main article');
+    const article = speciesArticleFrom(page);
     if (!isSpeciesRoot() || !article?.querySelector('section.stats')) return;
     // QOL's header controls, sex-symbol normalization and portrait control are
     // deliberately not invoked or recreated here.
     layoutSpeciesStats(page);
-    arrangeHiddenAbilityTags(page.querySelector(':scope > main'));
+    arrangeHiddenAbilityTags(article);
     decorateSpeciesDescriptionLead(article);
     syncSpeciesVitals(page);
     compactSpeciesDistances(page);
@@ -4635,90 +4349,72 @@ article.yofi-scores-layout section.moves > dl + dl {
 
   let running = false;
   function tick() {
-    if (window.__yofiHeroLayoutLab !== VERSION) return;
-    if (running) return;
+    if (window.__yofiHeroLayoutLab !== VERSION || running) return;
     running = true;
     try {
       const routeKey = currentSpeciesRouteKey();
-      observeSpeciesRouteChange(routeKey);
-      if (routeKey) {
-        for (const article of document.querySelectorAll(LIVE_CARD_SELECTOR)) {
-          if (article.querySelector('section.stats') &&
-              (article.dataset.yofiSpeciesRouteKey !== routeKey ||
-               (article.dataset.yofiSpeciesPreparing &&
-                article.dataset.yofiSpeciesPreparing !== routeKey)))
-            beginSpeciesPreparation(article, routeKey);
-        }
-      } else {
-        for (const article of document.querySelectorAll(`article.${PREPARING_CLASS}`))
-          clearSpeciesPreparation(article);
-      }
       installBaseHeroCSS();
       installCSS();
       installSpeciesContentCSS();
       installTMCSS();
-      // Build native Scores/Vitals and all presentation state BEFORE the hero
-      // adapter attempts to promote those existing elements.
-      for (const page of document.querySelectorAll('.page:not(.yofi-species-route-hold)')) {
-        if (page.querySelector(':scope > main article')) installSpeciesPresentation(page);
-      }
-      for (const article of document.querySelectorAll(LIVE_CARD_SELECTOR)) {
-        if (article.querySelector('section.stats')) updateNativeHero(article);
+
+      const articles = visibleSpeciesArticles();
+      for (const article of articles) {
+        if (routeKey) {
+          prepareIncomingSpecies(article, routeKey);
+          // Keep the existing native card untouched if only the URL has
+          // changed so far. Svelte will update this same article with the
+          // incoming record; its mutation is handled before paint.
+          if (article.dataset.yofiSpeciesRouteKey &&
+              article.dataset.yofiSpeciesRouteKey !== routeKey) continue;
+          watchPortraitImage(article, pendingImage(article));
+        }
+        installSpeciesPresentation(article);
+        updateNativeHero(article);
         const hero = article.querySelector('.yofi-species-hero');
         const required = article.querySelector('section.stats > .yofi-scores-banner') &&
           hero?.querySelector('.yofi-hero-copy') && hero.querySelector('.yofi-hero-art-lane');
         if (!required || !vitalData(article)) { restore(article); continue; }
         const data = vitalData(article);
-        const image = pendingImage(article);
-        // A shiny/normal swap keeps the same species and geometry. Retain the
-        // committed layout while that replacement image loads; do not briefly
-        // restore the native arrangement just because natural dimensions are
-        // temporarily unavailable.
-        if (routeKey && article.dataset.yofiSpeciesRouteKey === routeKey &&
-            article.classList.contains('lab3-active') && image && !image.complete)
-          continue;
         const view = viewFor(hero);
-        if (!locateCanonical(view,article)) {restore(article,view);continue;}
+        if (!locateCanonical(view, article)) { restore(article, view); continue; }
         syncView(view, article, data);
         const layout = chooseStage(article, hero, view);
         if (layout) apply(article, view, layout);
         else {
-          restore(article,view);
+          restore(article, view);
           const state = speciesHeroStates.get(hero);
           if (state) selectHeroFactsMode(state);
           rememberNativeHero(hero);
         }
       }
       installSpeciesTMColumns();
-      if (routeKey) {
-        for (const article of document.querySelectorAll(LIVE_CARD_SELECTOR)) {
-          if (article.classList.contains(PREPARING_CLASS))
-            releasePreparedSpecies(article, routeKey);
-          else if (article.dataset.yofiSpeciesRouteKey === routeKey &&
-              article.querySelector('.yofi-species-hero') && vitalData(article))
-            readySpeciesIdentities.set(article, speciesCardIdentity(article));
-        }
+      for (const article of articles) {
+        if (article.hasAttribute('data-yofi-fullscreen-handoff'))
+          document.dispatchEvent(new CustomEvent('yofi:species-card-presentation-ready',{detail:{article}}));
       }
     } catch (error) { console.warn('[Species Card ' + VERSION + ']', error); }
     finally { running = false; }
   }
+  // Capability-based handoff: QoL can request this existing synchronous pass
+  // without requiring a particular Species Card release number.
+  window.__yofiSpeciesCardPresentation = Object.freeze({prepare:tick});
   // DevTools: window.__yofiHeroLayoutStatus() reports the actually installed
   // version, active stage, computed gender segment widths and score labels.
   window.__yofiSpeciesCardStatus = () => {
-    const article = document.querySelector(`${LIVE_CARD_SELECTOR}.lab3-active`);
+    const article = visibleSpeciesArticles().find(card => card.classList.contains('lab3-active'));
     const hero = article?.querySelector('.yofi-species-hero');
     const gender = hero?.querySelector('.lab3-gender .gender-ratio-display');
     const box = gender?.getBoundingClientRect();
-    const activeHero = document.querySelector(`${LIVE_CARD_SELECTOR} .yofi-species-hero`);
-    const art = activeHero?.querySelector('.yofi-hero-art-lane img');
+    const art = hero?.querySelector('.yofi-hero-art-lane img');
     return {
       version: VERSION,
       active: window.__yofiHeroLayoutLab,
       stage: hero?.dataset.lab3Stage || 'native',
       biology: hero?.dataset.lab3Biology || 'native',
-      preparing:!!article?.classList.contains(PREPARING_CLASS),
+      nativeCard:!!article,
       speciesRouteKey:article?.dataset.yofiSpeciesRouteKey || null,
-      cardWidth: Math.round(document.querySelector(LIVE_CARD_SELECTOR)?.getBoundingClientRect().width || 0),
+      cardWidth: Math.round(article?.getBoundingClientRect().width || 0),
       imageRatio: art?.naturalHeight ? +(art.naturalWidth / art.naturalHeight).toFixed(3) : null,
       artHeight: +(parseFloat(hero?.style.getPropertyValue('--lab3-art-height')) || 0).toFixed(1),
       imageFloor: +(hero?.dataset.lab3ImageFloor || 0),
@@ -4741,78 +4437,87 @@ article.yofi-scores-layout section.moves > dl + dl {
   };
   window.__yofiHeroLayoutStatus = window.__yofiSpeciesCardStatus; // Backward-compatible diagnostics.
   // Native source changes and card navigation invalidate geometry once per frame.
-  // Changed species are prepared synchronously while hidden; ordinary content
-  // and resize updates remain coalesced into one animation-frame pass.
-  const meaningful = (mutation) => {
-    const target = mutation.target.nodeType===1 ? mutation.target : mutation.target.parentElement;
-    if(target?.closest?.('header,section.stats,section.abilities,section.info,section.skills'))
-      return true;
-    if (mutation.type==='attributes')
-      return mutation.attributeName==='src' || mutation.attributeName==='srcset';
-    return [...mutation.addedNodes,...mutation.removedNodes].some(node => {
-      if(node.nodeType===8 || node.nodeType===3) return false;
-      if(node.nodeType!==1) return false;
-      if(node.matches?.('.lab3-left-extra,.lab3-right,.lab3-biologies,.lab3-biology,.lab3-vital,.lab3-measure-abilities,.lab3-copy-facts,.lab3-probe'))return false;
-      if(node.closest?.('.lab3-left-extra,.lab3-right'))return false;
-      return !!(node.matches?.('.page,main,article,header,section,dl,dd,dt,.yofi-scores-banner') ||
-        node.querySelector?.('section.stats,section.abilities,section.info'));
+  // Changed species are prepared from native data before its next paint;
+  // ordinary content and resize updates remain coalesced into one frame.
+  let speciesCardRuntimeStarted = false;
+  function startSpeciesCardRuntime() {
+    const root = document.documentElement;
+    if (speciesCardRuntimeStarted || !root) return false;
+    speciesCardRuntimeStarted = true;
+    const meaningful = mutation => {
+      const target = mutation.target.nodeType === 1
+        ? mutation.target : mutation.target.parentElement;
+      const article = target?.closest?.(LIVE_CARD_SELECTOR);
+      if (mutation.type === 'childList') {
+        const nodes = [...mutation.addedNodes, ...mutation.removedNodes].filter(node => node.nodeType === 1);
+        if (nodes.length && nodes.every(node => node.matches?.(
+            '[data-yofi-layout-probe],.yofi12-stage,.lab3-left-extra,.lab3-right,' +
+            '.lab3-biologies,.lab3-biology,.lab3-vital,.lab3-copy-facts'))) return false;
+      }
+      if (article?.querySelector('section.stats') && article.getClientRects().length) {
+        if (target.closest?.('.lab3-left-extra,.lab3-right,.lab3-biologies,.lab3-biology,' +
+            '.lab3-vital,.lab3-measure-abilities,.lab3-copy-facts,.lab3-probe,.yofi-hero-facts,' +
+            '.yofi12-stage,.yofi-scores-skills,.yofi-scores-types,[data-yofi-layout-probe]'))
+          return false;
+        return true;
+      }
+      return [...mutation.addedNodes, ...mutation.removedNodes].some(node => {
+        if (node.nodeType !== 1) return false;
+        return !!(node.matches?.('article') && node.querySelector('section.stats')) ||
+          !!node.querySelector?.('article section.stats');
+      });
+    };
+    const watch = new MutationObserver(changes => {
+      if (!changes.some(meaningful)) return;
+      const routeKey = currentSpeciesRouteKey();
+      let incomingReady = false;
+      if (routeKey) {
+        for (const article of visibleSpeciesArticles()) {
+          if (prepareIncomingSpecies(article, routeKey)) incomingReady = true;
+          if (article.dataset.yofiSpeciesRouteKey &&
+              article.dataset.yofiSpeciesRouteKey !== routeKey) continue;
+          watchPortraitImage(article, pendingImage(article));
+        }
+      }
+      // MutationObserver runs before the browser's next paint. Prepare the
+      // native card before its first visible frame, without waiting for art.
+      if (incomingReady) tick();
+      else requestHeroTick();
     });
-  };
-  const watch=new MutationObserver(changes=>{
-    if(!changes.some(meaningful))return;
-    const routeKey=currentSpeciesRouteKey();
-    observeSpeciesRouteChange(routeKey);
-    if(routeKey){
-      const articles=[...document.querySelectorAll(LIVE_CARD_SELECTOR)]
-        .filter(article=>article.querySelector('section.stats'));
-      for(const article of articles){
-        if(article.dataset.yofiSpeciesRouteKey!==routeKey ||
-            (article.dataset.yofiSpeciesPreparing &&
-             article.dataset.yofiSpeciesPreparing!==routeKey))
-          beginSpeciesPreparation(article,routeKey);
-      }
-      const pending=articles.filter(article=>article.dataset.yofiSpeciesPreparing===routeKey);
-      if(pending.length){
-        // When the image resource is complete, begin decode gating in this mutation
-        // microtask; the card stays covered until Safari can paint its pixels.
-        if(pending.some(article=>{
-          const image=pendingImage(article);
-          return image?.complete && (image.naturalWidth>0 ||
-            article.dataset.yofiSpeciesImageFailed==='true');
-        }))tick();
-        return;
-      }
-    }else{
-      for(const article of document.querySelectorAll(`article.${PREPARING_CLASS}`))
-        clearSpeciesPreparation(article);
-    }
-    requestHeroTick();
-  });
-  watch.observe(document.documentElement,{childList:true,subtree:true,characterData:true});
-  const tmWatch=new MutationObserver(changes=>{
-    if(changes.some(m=>m.attributeName==='data-p5ov-display'||
-        m.attributeName==='data-p5ov-kind'||m.attributeName==='data-yofi-forced-sex'||m.attributeName==='href'||
-        (m.attributeName==='class' && (m.target===document.documentElement||m.target===document.body))))
+    watch.observe(root, { childList: true, subtree: true, characterData: true });
+    const tmWatch = new MutationObserver(changes => {
+      if (changes.some(m => {
+        const target = m.target.nodeType === 1 ? m.target : m.target.parentElement;
+        if (m.attributeName === 'class')
+          return target === root || target === document.body;
+        return ['data-p5ov-display','data-p5ov-kind','data-yofi-forced-sex'].includes(m.attributeName) &&
+          !!target?.closest?.(LIVE_CARD_SELECTOR)?.getClientRects().length;
+      })) requestHeroTick();
+    });
+    tmWatch.observe(root, { subtree:true, attributes:true,
+      attributeFilter:['data-p5ov-display','data-p5ov-kind','data-yofi-forced-sex','class'] });
+    const invalidateSpeciesFonts = () => {
+      conditionalScoreFontEpoch++;
+      tmFontEpoch++;
       requestHeroTick();
-  });
-  tmWatch.observe(document.documentElement,{subtree:true,attributes:true,
-    attributeFilter:['data-p5ov-display','data-p5ov-kind','data-yofi-forced-sex','href','class']});
-  const invalidateSpeciesFonts=()=>{conditionalScoreFontEpoch++;tmFontEpoch++;requestHeroTick();};
-  document.fonts?.ready?.then(invalidateSpeciesFonts);
-  document.fonts?.addEventListener?.('loadingdone',invalidateSpeciesFonts);
-  // Capture the currently rendered card before the site's delegated navigation
-  // handler changes its route or starts reusing its native article nodes.
-  document.addEventListener('click', () => {
-    if (!currentSpeciesRouteKey()) return;
-    captureOutgoingSpeciesSnapshot();
-    setTimeout(tick, 0);
-  }, true);
-  document.addEventListener('pointerdown', () => {
-    if (currentSpeciesRouteKey()) captureOutgoingSpeciesSnapshot();
-  }, true);
-  window.addEventListener('popstate', tick, true);
-  window.addEventListener('hashchange', tick, true);
-  tick();
-  window.addEventListener('resize',requestHeroTick,{passive:true});
-  window.addEventListener('pageshow',requestHeroTick,{passive:true});
+    };
+    document.fonts?.ready?.then(invalidateSpeciesFonts);
+    document.fonts?.addEventListener?.('loadingdone', invalidateSpeciesFonts);
+    window.addEventListener('popstate', tick, true);
+    window.addEventListener('hashchange', tick, true);
+    window.addEventListener('resize', requestHeroTick, { passive:true });
+    window.addEventListener('pageshow', requestHeroTick, { passive:true });
+    tick();
+    return true;
+  }
+  if (!startSpeciesCardRuntime()) {
+    // `document-start` may run before the parser creates <html>. Start as soon
+    // as the root exists so the card observer is armed before Svelte renders.
+    const rootObserver = new MutationObserver(() => {
+      if (!startSpeciesCardRuntime()) return;
+      rootObserver.disconnect();
+    });
+    rootObserver.observe(document, { childList:true });
+  }
+  } // runSpeciesCard
 })();
