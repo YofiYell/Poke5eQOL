@@ -1,4 +1,4 @@
-# ART-01-R01 — Mandatory diagnostics contract
+# ART-01-R02 — Mandatory diagnostics, source phases and passive counters
 
 **ART-01 only specifies this API. These commands will not work until ART-02 creates the fourth userscript.** The blocks labeled *schema example* are illustrative placeholders, not captured user records or measured data.
 
@@ -43,12 +43,13 @@ type GlobalDiagnostics = Readonly<{
   ready:boolean;
   currentSpecies:{namespace:'fakemon'|'pokemon';speciesId:string}|null;
   currentNormalSourceUrl:string|null;
-  currentContentSha256:string|null;
+  currentContentSha256:string|null; // candidate verified SHA, null while unresolved
   sessionStartedAt:string;
   db:{state:'opening'|'ready'|'blocked'|'unavailable'|'quota-error';version:1};
   counters:{
     scansCompleted:number;             // successful full color analyses this session
-    cacheHits:number;                  // successful memory/IDB last-good reuse
+    cacheHits:number;                  // active presentation reuse only; NOT peek/inspect
+    idbHydrations:number;              // IDB -> memory record hydration, NOT reuse
     sourceRevalidations:number;        // attempted normal-source validations
     analysisFailures:number;           // failed scans, decode/parity, integrity
     storageFailures:number;
@@ -57,7 +58,7 @@ type GlobalDiagnostics = Readonly<{
 }>;
 ```
 
-Counters refer to this module session, not lifetime totals. No getter increments counters merely because DevTools reads it (`cacheHits` increment only on actual consumer reuse, not a diagnostic inspection). Reset after full page refresh; unavailable storage must be shown explicitly rather than silently reported as `persisted`.
+Counters refer to this module session, not lifetime totals. No getter increments counters merely because DevTools reads it. `cacheHits` increments **only on an active presentation consumer's accepted reuse of a compatible last-good decision**, while `idbHydrations` counts separate IDB→memory loads. Passive lookup, inspection, source/status and diagnostics never mutate counts. Scanner completion is separate from changed-decision publication. Reset after full page refresh; unavailable storage must be reported explicitly rather than as `persisted`.
 
 ## Exact per-record inspector response shape
 
@@ -68,9 +69,14 @@ type RecordDiagnostics = Readonly<{
   moduleVersion:string;scannerVersion:string;
   recordState:'missing'|'cached'|'validating'|'analyzing'|'ready'|'unavailable'|'error';
   cacheSource:'persisted'|'memory'|'fresh'|null;
-  normalArtworkUrl:string|null;
-  normalSourceSha256:string|null;
-  decodedRgbaSha256:string|null;
+  normalArtworkUrl:string|null; // current candidate URL, if resolved
+  normalSourceState:'unresolved'|'source_resolved'|'source_bytes_verified'|
+    'decoded_image_verified'|'analysis_complete'|'source_validation_failed';
+  candidateNormalSourceSha256:string|null; // null until candidate bytes verified
+  candidateDecodedRgbaSha256:string|null; // null until candidate decoded
+  lastSuccessfulArtworkUrl:string|null;
+  normalSourceSha256:string|null; // last successful record, NOT provisional candidate
+  decodedRgbaSha256:string|null; // last successful decoded artifact
   imageFormat:string|null;
   sourceDimensions:{width:number;height:number}|null;
   analyzerResultVersion:string|null;
@@ -97,13 +103,19 @@ type RecordDiagnostics = Readonly<{
   cie76:{averagePrimary:number;dominantPrimary:number;combinedPrimary:number;
          averageSecondary:number|null;dominantSecondary:number|null;
          combinedSecondary:number|null;confidenceMargin:number|null}|null;
-  transparency:{class:'has-transparent-pixels'|'opaque-or-no-alpha'|'unknown';
-                scannerAlphaThreshold:128;geometryAlphaThreshold:1}|null;
-  geometry:{state:'ready'|'unavailable_opaque'|'unavailable_empty'|'error'|null;
+  transparency:{class:'meaningful-exterior'|'ambiguous-alpha'|'opaque-or-no-alpha'|'unknown';
+                scannerAlphaThreshold:128;geometryAlphaThreshold:1;
+                alphaZeroPixels:number|null;exteriorZeroPixels:number|null;
+                exteriorBorderSides:('top'|'right'|'bottom'|'left')[];
+                transparentEdgePixelCounts:{top:number;right:number;bottom:number;left:number}|null;
+                reliabilityReason:string|null}|null;
+  geometry:{state:'ready'|'unavailable_opaque'|'unavailable_empty'|'unavailable_alpha_ambiguous'|'error'|null;
     reliable:boolean;maskFormat:'packed-msb-row-v1'|null;
     width:number|null;height:number|null;strideBytes:number|null;
     maskSha256:string|null;maskByteLength:number|null;
     bounds:{left:number;top:number;right:number;bottom:number}|null;
+    observedOccupancyBounds:{left:number;top:number;right:number;bottom:number}|null;
+    visualBoundsAlpha128:{left:number;top:number;right:number;bottom:number}|null; // diagnostic only
     occupiedPixels:number|null;disconnectedComponents:number|null;
     interiorHoles:number|null;} ;
   automaticCorner:{corner:'tr'|'tl'|'bl'|'br'|null;
@@ -161,3 +173,23 @@ These **fabricated example values are only field-shape documentation**, not a re
 - No reads may trigger HTTP traffic, full-resolution analysis, localStorage writes, style changes or event publication.
 - A missing or failed current record can still have last successful data. Diagnostics must report both prior successful result and latest failure (separately) without false fresh status.
 - The user may copy console diagnostics for bug reports. Do not log authentication tokens, private Fakémon write keys, account identifiers or full user data. Read keys/normal public source URLs and source hashes are sufficient to reproduce scanner issues.
+
+## R02 source identity and example passive console session
+
+The future `source('fakemon', id)` returns `{state,candidate,lastVerified,lastSuccessful,latestFailure}` as specified in `INTEGRATION_CONTRACT.md`. **All values are read-only snapshots**. `candidate` has `href` and nullable SHA fields until the corresponding verification stages. `lastSuccessful` is a complete validated historical source, even during a failed attempt or a new candidate's first revalidation. `lastVerified` is a transient confirmed fingerprint that does **not** automatically represent a published result.
+
+```js
+const art = window.__yofiArtworkIntelligence;
+const before = art?.diagnostics();
+const source = art?.source('fakemon','BWMC6BSH0WZDR');
+const record = await art?.inspect('fakemon','BWMC6BSH0WZDR');
+const after = art?.diagnostics();
+console.log({sameCounters: JSON.stringify(before?.counters) === JSON.stringify(after?.counters),
+  sourceState: source?.state, candidateSha: source?.candidate?.contentSha256 ?? null,
+  lastGoodSha: source?.lastSuccessful?.contentSha256 ?? null,
+  recordState: record?.recordState});
+```
+
+**Schema example only (NOT executed in a browser):** `{sameCounters:true,sourceState:'source_resolved',candidateSha:null,lastGoodSha:'…previous verified SHA…',recordState:'validating'}`. With no last-good record `lastGoodSha` is `null`. No fake empty-string SHA or automatic background scan occurs when this diagnostic runs. `decodeSilhouette` must reject malformed byte lengths, nonzero bit padding or inconsistent hash before answering pixel queries.
+
+**Measured test fixture, not a live record:** `fixtures/real/BWMC6BSH0WZDR_python_reference.json` has actual original-Python Rock/Steel color data and a 65,702-byte exact packed mask with corresponding hash; it does **not** establish the presence or content of an ART browser DB. No ART console API exists yet in ART-01.

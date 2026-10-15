@@ -1,4 +1,4 @@
-# ART-01-R01 — Namespaced storage and failure-safe validation schema
+# ART-01-R02 — Namespaced storage, source states and failure-safe validation
 
 **Schema contract:** `schemaVersion=1`, proposed database `yofi-artwork-intelligence` with IndexedDB version `1`. ART-01 creates no live DB. All schema examples below are design contracts, not measured persisted user records.
 
@@ -43,7 +43,7 @@ No extra composite key involving URL, shiny variant, viewport, edition or artwor
     "decision": "<complete Python decide() output, no omissions>"
   },
   "geometry": {
-    "state": "ready", "reliable": true, "alphaThreshold": 1,
+    "state": "ready", "reliable": true, "alphaThreshold": 1, "reliabilityReason": "meaningful_border_connected_transparency",
     "width": 722, "height": 722,
     "bounds": {"left": 0, "top": 0, "right": 722, "bottom": 722},
     "occupiedPixels": "<measured integer>",
@@ -57,9 +57,9 @@ No extra composite key involving URL, shiny variant, viewport, edition or artwor
 }
 ```
 
-All nonliteral angle-bracket values above are **schema placeholders**, not computed data for the 722×722 Fakémon fixture. If color is successful but opaque geometry is unreliable, save `color.state='ready'`, `geometry.state='unavailable_opaque'`, `geometry.reliable=false`, `maskStore=null`. Preserve separate statuses; geometry failure does not imply color failure.
+All nonliteral angle-bracket values above are **schema placeholders**, not computed data for the 722×722 Fakémon fixture. If color analysis succeeds but geometry is opaque **or ambiguous**, save `color.state='ready'`, `geometry.state='unavailable_opaque'|'unavailable_alpha_ambiguous'`, `geometry.reliable=false`, and `maskStore=null`; retain informational observed-occupancy counts/hash/bounds and confidence evidence without publishing a collision-eligible silhouette. Geometry unavailable is independent of color readiness. The example numeric bounds above are schematic, not the measured real fixture.
 
-The separate status-store entry holds `{speciesId,attemptId,sourceHref,state:'cached'|'validating'|'analyzing'|'ready'|'unavailable'|'error',startedAt,endedAt,validationError,analysisError,storageError,lastFailedAt,attemptCount}` and must **never replace** `lastSuccessfulAnalysisAt` or clear the last successful decision. Record schema migration and scanner version changes are independent of stored data.
+The separate status-store entry holds `{speciesId,attemptId,sourceState,candidateSourceHref,candidateContentSha256:null|string,candidateDecodedSha256:null|string,state:'missing'|'cached'|'validating'|'analyzing'|'ready'|'unavailable'|'error',startedAt,endedAt,validationError,analysisError,storageError,lastFailedAt,attemptCount}`. Candidate hash fields are **nullable**, never fake `''`/all-zero SHA values. This store must **never replace** the complete last successful record or clear its timestamps. Record schema migration and scanner version changes are independent of stored data.
 
 ### Storage-size calculation
 
@@ -75,13 +75,34 @@ For the user-reported 722×722 example, one full-canvas bitmask is `ceil(722/8)�
 
 ## Cache/validation lifecycle
 
-- On module initialization, open IndexedDB asynchronously. `peek()` reads only the memory cache; `lookup()` may read IDB but does not start validation or a fetch. Keep last successful results available immediately **once hydrated**, then revalidate in the background (without delaying the native card).
+- On module initialization, optionally read one **bounded minimal last-good decision snapshot** synchronously from localStorage for the *current relevant* species, then asynchronously open/hydrate IndexedDB. `peek()` reads memory only; `lookup()`/`inspect()` may read IDB but remain passive. Neither an IDB hydration nor a DevTools inspection counts as a cache hit. A cache hit is counted **only when an active presentation consumer successfully reuses a compatible last-good record**. New session relevant visits initiate background normal-source revalidation; native card rendering never waits.
 - A session `Set(namespace,speciesId)` marks which IDs have received the first *relevant visit after each browser refresh*. Revisit within the same session does not refetch unchanged art. No rescan on theme toggle, shiny toggle, resize or fullscreen.
 - First relevant Fakémon visit starts **one** normal-source revalidation. Prefer conditional HTTP validation where server supports trustworthy ETag/Last-Modified; otherwise fetch normal bytes once and hash SHA-256. A verified 304 may count as successful source validation; an ambiguous/opaque response is not source validation.
 - If content SHA, scanner algorithm/config or canonical decoded RGBA differ: reanalyze. If source bytes match and relevant type pairing changes: recompute `decide()` from saved color metrics after verifying scanner/config/source; only rescan pixels if those prerequisites differ. If URL changes but fingerprint matches, review source identity and update metadata safely; URL alone must not be used as a primary key.
 - While validation runs, readers see the last successful decision plus a `validating` status. A failed request or unreadable CORS image sets `validationError`, leaves successful record and mask untouched. Only a new **complete successful** analysis updates the published decision.
 - If IndexedDB is denied/quota-restricted/evicted, use bounded in-memory snapshots with a documented `cacheSource='memory'`; do not assert durable persistence and do not duplicate binary mask data into localStorage.
 
-## Synchronous fast snapshot — optional, not default
+## Startup display continuity — R02 chosen bounded sync snapshot
 
-A tiny last-successful `{speciesId,namespace,sourceSha256,typeSignature,scannerVersion,banner,tint,revision}` summary (hundreds of bytes) *may* be used in localStorage only if measured benefit exceeds synchronous read/write cost and if it can be validated against a matching source identity. **Never put full masks or image blobs in localStorage.** The canonical record stays in IDB. Prefer in-memory hydration and consumers' existing fallbacks to speculative stale first-frame colors. No immediate browser update is implemented in ART-01.
+**Decision:** use a tiny, bounded last-successful **color decision** snapshot in localStorage as an optional fast path, keyed by namespace/species ID; canonical analysis/masks remain in IndexedDB. Store only `{schemaVersion,speciesId,namespace,normalSourceHref,contentSha256,typesSignature,scannerVersion,selectedBannerType,selectedTintType,analysisRevision}` plus integrity/version metadata. Cap to **50 species** with LRU/oldest eviction, and permit storage denial without blocking anything. There is never a large mask, decoded RGBA, full analysis record, PII/write key or repeated full response in localStorage.
+
+ART reads a matching snapshot at module initialization / relevant first route so a future **opt-in Theme Overlay** may use it during its own initial color application when load order permits. A snapshot is last successful, **not proof that today's source bytes match**: it must match known candidate normal URL, types and scanner version; an unknown hash is expressly still `source_resolved`. The successful IDB record confirms/corrects it after asynchronous hydration. Publish only a *meaningfully changed* completed decision after verification. If localStorage is missing/blocked or ART loads too late, a late paint change can still occur; **we do not promise flash-free first paint**, delay native cards, or insert placeholders to mask the transition. Theme Overlay integration is not part of ART-01-R02.
+
+Only write the snapshot after a complete successful publication/atomic IDB transaction, or label transient memory-only results explicitly when IDB is denied. If a prior snapshot is inconsistent with IDB, invalidate that fast snapshot; do not overwrite an already reliable live decision with speculative data. Measure synchronous read cost, quota and Safari behavior during ART-02; no persistence guarantee is claimed.
+
+## Candidate normal-source lifecycle versus last successful record
+
+A **stored successful `normalSource` is immutable validated history** and must contain `href`, `contentSha256` (64 verified hexadecimal characters), `decodedRgbaSha256`, format and dimensions. By contrast, the mutable status-store `candidateSource` and the public `source()` response have these stages:
+
+| Source state | Candidate URL | Byte SHA | Decoded SHA | Last success |
+|---|---|---|---|---|
+| `unresolved` | `null` | `null` | `null` | May exist independently |
+| `source_resolved` | authoritative `normalPortrait` URL | `null` | `null` | Retained |
+| `source_bytes_verified` | verified candidate URL | 64-hex SHA | `null` | Retained |
+| `decoded_image_verified` | same | verified | verified | Retained |
+| `analysis_complete` | same | verified | verified | Atomically published if meaningful |
+| `source_validation_failed` | attempted URL or `null` | verified only if verification reached | decoded if reached | **Unchanged** |
+
+Record the **candidate** from the trusted Fakémon read-only `get_fakemon` row; never derive it from displayed shiny/sprite/current `img.src`. A same-URL candidate with null hash is *not* a content match. Its first relevant visit after refresh verifies bytes/ETag and then reruns scan or reuses appropriately. Failed fetch/decoding writes only attempt status; a stale route or older generation may not replace newer results. The `lastVerified` transient fingerprint is distinct from `lastSuccessful` record and does not itself authorize a published decision.
+
+**Counts:** `idbHydrations` records successful memory hydrations from IDB, `cacheHits` records active presentation reuse only, `sourceRevalidations` attempted first-session normal-source validations, `scansCompleted` finished full-resolution analyses, `updateEventsPublished` meaningful coherent changes, and `analysisFailures` errors. None of `peek`, `lookup`, `inspect`, `status`, `source` or `diagnostics` increments usage counters. The reference model simulates these transitions; actual transaction and persistence behavior remain ART-02 tests.

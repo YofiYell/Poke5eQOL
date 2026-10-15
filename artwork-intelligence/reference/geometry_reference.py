@@ -56,28 +56,114 @@ def connected_counts(mask: np.ndarray) -> tuple[int, int]:
     return int(components), int(sum(k not in exterior for k in range(1, count + 1)))
 
 
+def _transparent_background_evidence(transparent: np.ndarray) -> dict:
+    """Separate a genuine exterior alpha background from isolated clear pixels.
+
+    Four-connected transparent regions are used so a diagonal pinhole cannot
+    bridge unrelated areas. The one-pixel perimeter is a scale-derived baseline,
+    not a universal percentage of image area. This deliberately errs toward
+    ambiguous for tightly cropped, partially transparent or edge-heavy assets.
+    """
+    height, width = transparent.shape
+    labeled, count = label(transparent, generate_binary_structure(2, 1))
+    masses = np.bincount(labeled.ravel(), minlength=count + 1)
+    border_labels = {
+        'top': set(np.unique(labeled[0, :])),
+        'right': set(np.unique(labeled[:, -1])),
+        'bottom': set(np.unique(labeled[-1, :])),
+        'left': set(np.unique(labeled[:, 0])),
+    }
+    exterior_ids = set().union(*border_labels.values()) - {0}
+    components = []
+    for component_id in exterior_ids:
+        touched = tuple(side for side in ('top','right','bottom','left')
+                        if component_id in border_labels[side])
+        components.append((int(masses[component_id]), touched))
+    components.sort(key=lambda component: (-component[0], component[1]))
+    perimeter = width if height == 1 else height if width == 1 else 2 * (width + height) - 4
+    largest, sides = components[0] if components else (0, ())
+    # The largest exterior transparent region must substantially exceed a
+    # one-pixel canvas frame and span >=3 distinct edges. A clear corner dot,
+    # interior hole or one-pixel frame is therefore not credible segmentation.
+    supported = len(sides) >= 3 and largest > perimeter
+    if not components:
+        reason = 'no_border_connected_transparency'
+    elif len(sides) < 3:
+        reason = 'exterior_transparency_insufficient_spread'
+    elif largest <= perimeter:
+        reason = 'exterior_transparency_only_perimeter_scale'
+    else:
+        reason = 'meaningful_border_connected_transparency'
+    return {
+        'exteriorPixels': largest,
+        'exteriorBorderSides': list(sides),
+        'transparentEdgePixelCounts': {
+            'top': int(transparent[0, :].sum()),
+            'right': int(transparent[:, -1].sum()),
+            'bottom': int(transparent[-1, :].sum()),
+            'left': int(transparent[:, 0].sum()),
+        },
+        'borderConnectedComponentCount': len(components),
+        'onePixelPerimeterPixels': perimeter,
+        'reliabilityReason': reason,
+        'supportsReliableSubjectMask': bool(supported),
+    }
+
+
 def inspect_rgba(image: Image.Image) -> dict:
+    """Exact alpha occupancy is independent of alpha-as-subject reliability.
+
+    `observedPackedMask` preserves EVERY alpha >= 1 source pixel even when the
+    alpha segmentation is ambiguous (never valid for live collision use).
+    `packedMask` remains the *usable* silhouette only when status is ready.
+    `visualBoundsAlpha128` is informational: no corner test may substitute it
+    for the exact alpha >= 1 bounds without a separately approved change.
+    """
     rgba = np.asarray(image.convert('RGBA'), dtype=np.uint8)
     height, width = rgba.shape[:2]
     alpha = rgba[:, :, 3]
-    if bool(np.all(alpha >= 1)):
-        return dict(status="unavailable_opaque",reliable=False,width=width,height=height,
-                    alphaThreshold=ALPHA_OCCUPIED_THRESHOLD,occupiedPixels=None,
-                    bounds=None,components=None,holes=None,maskBytes=None)
     occupied = alpha >= ALPHA_OCCUPIED_THRESHOLD
+    exact_bounds = mask_bounds(occupied)
+    visual_bounds = mask_bounds(alpha >= 128)
+    alpha_zero = alpha == 0
+    evidence = _transparent_background_evidence(alpha_zero)
+    observed = pack_mask(occupied)
+    observations = {
+        'alphaZeroPixels': int(alpha_zero.sum()),
+        'alphaPartialPixels': int(((alpha > 0) & (alpha < 255)).sum()),
+        'observedOccupancy': {
+            'alphaThreshold': ALPHA_OCCUPIED_THRESHOLD,
+            'occupiedPixels': int(occupied.sum()),
+            'bounds': exact_bounds,
+            'maskFormat': MASK_FORMAT,
+            'maskBytes': len(observed),
+            'maskSha256': hashlib.sha256(observed).hexdigest(),
+        },
+        'observedPackedMask': observed,
+        'visualBoundsAlpha128': visual_bounds,
+        'backgroundEvidence': evidence,
+    }
+    basic = dict(width=width, height=height,
+                 alphaThreshold=ALPHA_OCCUPIED_THRESHOLD)
     if not occupied.any():
-        return dict(status="unavailable_empty",reliable=False,width=width,height=height,
-                    alphaThreshold=ALPHA_OCCUPIED_THRESHOLD,occupiedPixels=0,
-                    bounds=None,components=0,holes=0,maskBytes=None)
-    packed = pack_mask(occupied)
+        return dict(status='unavailable_empty', reliable=False, **basic,
+                    occupiedPixels=0, bounds=None, components=0, holes=0,
+                    maskBytes=None, **observations)
+    if not alpha_zero.any():
+        return dict(status='unavailable_opaque', reliable=False, **basic,
+                    occupiedPixels=None, bounds=None, components=None, holes=None,
+                    maskBytes=None, **observations)
+    if not evidence['supportsReliableSubjectMask']:
+        return dict(status='unavailable_alpha_ambiguous', reliable=False, **basic,
+                    occupiedPixels=None, bounds=None, components=None, holes=None,
+                    maskBytes=None, **observations)
     comps, holes = connected_counts(occupied)
-    return dict(status="ready",reliable=True,width=width,height=height,
-                alphaThreshold=ALPHA_OCCUPIED_THRESHOLD,
-                occupiedPixels=int(occupied.sum()),bounds=mask_bounds(occupied),
-                components=comps,holes=holes,
-                maskFormat=MASK_FORMAT,maskStrideBytes=(width+7)//8,
-                maskBytes=len(packed),maskSha256=hashlib.sha256(packed).hexdigest(),
-                packedMask=packed)
+    return dict(status='ready', reliable=True, **basic,
+                occupiedPixels=int(occupied.sum()), bounds=exact_bounds,
+                components=comps, holes=holes,
+                maskFormat=MASK_FORMAT, maskStrideBytes=(width + 7) // 8,
+                maskBytes=len(observed), maskSha256=hashlib.sha256(observed).hexdigest(),
+                packedMask=observed, **observations)
 
 
 def intersects_rect(mask: np.ndarray, rect: tuple[float,float,float,float]) -> bool:

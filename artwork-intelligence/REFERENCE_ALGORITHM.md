@@ -1,4 +1,4 @@
-# ART-01-R01 — Exact Python color reference and JS parity requirements
+# ART-01-R02 — Exact Python color reference, real PNG and JS parity requirements
 
 **Only authoritative numerical implementation:** `reference/Poke5e_Offline_Color_Scanner_v1.0.0.py` (SHA-256 `f6ac6e346e2e93b2c05110ebe286c8e37d2120b9d035d9ce1766e536d133f1cd`). Byte-for-byte preserved, 12,699 bytes, verified by test. **Do not replace or simplify** the reference algorithm.
 
@@ -82,4 +82,22 @@ S_i = (0.5*A_i + 0.5*D_i)/(0.5 + 0.5)
 | Near ties | Preserve original tie order; no epsilon winner flip accepted |
 | Geometry bitmask and occupied pixel count | Exact bytes/count for same RGBA decoded input |
 
-**Executed:** Python scanner analyses of 16 synthetic PNGs, plus JS Lab/CIE76/final-decision parity for 13 successful outputs (read-only math). **NOT executed:** browser image pipeline, alpha masking, EDT, clustering, end-to-end scanner parity. A byte-identical image can still decode to different RGBA values across browsers because of color profiles, premultiplied alpha, GIF/APNG frame choices, EXIF orientation or browser color management. ART-02 must record raw source SHA256 **and** a canonical decoded RGBA checksum, compare decoded pixels against Pillow and reject parity claims on mismatch. Use unpremultiplied 8-bit RGBA as the canonical analysis input; if Canvas differs, investigate rather than silently accepting a color deviation.
+**Executed:** Python scanner analyses of 16 original synthetic PNGs **plus the real user-supplied 722×722 Rock/Steel PNG**, with frozen unmodified `colors()` and `decide()` outputs. JS Lab/CIE76/final-decision math matches all 13 successful synthetic results **and the real fixture** (read-only math). **NOT executed:** browser image pipeline, alpha masking, EDT, clustering, end-to-end scanner parity. A byte-identical image can still decode to different RGBA values across browsers because of color profiles, premultiplied alpha, GIF/APNG frame choices, EXIF orientation or browser color management. ART-02 must record raw source SHA256 **and** a canonical decoded RGBA checksum, compare decoded pixels against Pillow and reject parity claims on mismatch. Use unpremultiplied 8-bit RGBA as the canonical analysis input; if Canvas differs, investigate rather than silently accepting a color deviation.
+
+## ART-01-R02 — Frozen real Poké5e Fakémon Python measurement
+
+Supplied original normal-artwork bytes, *not a generated substitute*: `fixtures/real/BWMC6BSH0WZDR_normal.png`, 458,051 bytes; source SHA-256 `0749aa41cc2250c67884ad4a33082566f379756530ce1724798a6c035d470bc6`. Source URL `https://poke5e.auroratide.cloud/a79eff8c-4872-4b75-9b45-c7cb73cf4f55.png`. The user observed the Fakémon read key `BWMC6BSH0WZDR` and `rock`/`steel` types in a browser; independent RPC record lookup is still blocked, so preserve the evidence distinction.
+
+| Frozen scanner v1.0.0 metric | Measured result |
+|---|---|
+| Weighted average / raw alpha average | `#8A6A66` / `#856763` |
+| Dominant color and coverage | `#9F4C4E`, `0.23948` |
+| `visible_pixels` (`alpha>=128`) | `285199` |
+| `background_pixels_removed` | `0` |
+| `outline_pixels_discounted` | `17825` |
+| Rock combined score | `38.407839` |
+| Steel combined score | `47.388701` |
+| Confidence margin | `8.980862` |
+| Banner / tint | `rock` / `steel` |
+
+The full eight clusters, all CIE76 components, weights and palette colors are in the **frozen** `fixtures/real/BWMC6BSH0WZDR_python_reference.json`. The new `tests/test_real_fixture.py` reruns `colors()` and `decide()` against the original scanner and compares complete output dictionaries, *without regenerating expected results*. This real case is one pixel-analysis fixture, **not browser parity** or exhaustive species coverage. The unchanged scanner's SHA-256 is `f6ac6e346e2e93b2c05110ebe286c8e37d2120b9d035d9ce1766e536d133f1cd`.

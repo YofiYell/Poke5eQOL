@@ -1,4 +1,4 @@
-# ART-01-R01 — Architecture and inspected ownership
+# ART-01-R02 — Architecture and inspected ownership
 
 ## Actual repository baseline
 
@@ -58,10 +58,10 @@ Native source inspected at [`Auroratide/poke5e`](https://github.com/Auroratide/p
 7. **Records:** Last-successful snapshots may be stale during validation; publish changed UI decisions only after full successful atomic commit. Network error must not erase old results.
 8. **Safari:** Earlier single-image canvas probe establishes only that exact image readable in one test. Browser CORS, IndexedDB capacity and eviction guarantees cannot be inferred from it.
 
-### Narrow proposed module architecture
+### Selected ART-owned acquisition and narrow module architecture
 
 ```
-Native/QOL read-only normal portrait metadata (one coordinator)
+ART-owned read-only get_fakemon(_read_key) normal portrait/type lookup
                 |
    ART-02 acquisition + SHA-256 + validity checks
                 |
@@ -75,4 +75,18 @@ Native/QOL read-only normal portrait metadata (one coordinator)
        Species Card (optional geometry, future work)
 ```
 
-**Current target:** Fakémon's `values.normalPortrait` only. Official Pokémon keep their existing index until separate offline-artwork migration approval. ART-01 modifies no runtime scripts and creates no runtime observer.
+**Current target:** Fakémon's `values.normalPortrait` only. Official Pokémon keep their existing index until separate offline-artwork migration approval. ART-01 modifies no runtime scripts and creates no runtime observer. ART-01-R02 now includes one user-provided, source-byte-verified normal portrait fixture with user-observed read key/type pairing; independent per-record RPC access remains blocked in this execution environment.
+
+## ART-01-R02 — Source-code-confirmed acquisition decision
+
+Upstream `SupabaseFakemonDataProvider.getByReadKey()` calls `rpc('get_fakemon',{_read_key:readKey})`, and `rowToFakemon` maps `row.read_key` to `SpeciesIdentifier.fromFakemonReadKey()` (`F.<readKey>`), `row.type` to the species' primary/secondary type, and `row.normal_portrait_filename` into `media.values.normalPortrait`. The current 2026 native migration defines these fields in the same read-only RPC; `SpeciesPortrait` renders `media.portrait({shiny,gender})` and therefore can display shiny, female, hue-shifted or avatar images distinct from `normalPortrait`. QOL's own `loadPortraitEntries()` already calls that read-only RPC with the public anon key and resolves `normal_portrait_filename` against `https://poke5e.auroratide.cloud/`, but does **not** expose its privately memoized response through a public API.
+
+**Least intrusive ART-02 pathway:** ART independently resolves the Fakémon route read key, executes one deduplicated `get_fakemon` request (which may reuse QOL's fetch-warmup cache opportunistically), verifies `read_key`, consumes `type` and **only** `normal_portrait_filename`, builds a validated HTTP(S) URL, then owns one image fetch/decode/hash/full scanner job. QOL's existing navigation, shiny button and ready-card handoff remain completely independent, and Theme/Species Card never fetch pixels themselves. A parallel QOL metadata RPC is a known possible redundancy; benchmark rather than prematurely add a QOL export API or additional observers. The precise SPA route initiation signal needs live-browser checking; existing Species Card prepare/ready events are useful but not a complete independent route source when Species Card is absent.
+
+### New real user-supplied fixture
+
+`fixtures/real/manifest.json` documents Fakémon read key `BWMC6BSH0WZDR`, `rock`/`steel`, normal source URL `https://poke5e.auroratide.cloud/a79eff8c-4872-4b75-9b45-c7cb73cf4f55.png`, original 458,051-byte PNG with verified SHA-256 `0749aa41cc2250c67884ad4a33082566f379756530ce1724798a6c035d470bc6`, frozen Python metrics and mask. **The species ID/types are from the user's browser observations**, not an independently retrieved live `get_fakemon` row. The bytes were supplied by the user and rerun through the unchanged scanner. They are not proxy artwork and do not establish any general corpus coverage.
+
+### Cache and lifecycle corrections
+
+Separate (a) source candidate with unknown SHA, (b) verified fetched bytes, (c) verified decoded image, and (d) last-successful persisted record. A failed candidate never erases the last-good source. The `source()` API's exact nullable stages are in `INTEGRATION_CONTRACT.md`; `RECORD_SCHEMA.md` fixes source/hash/storage semantics. Passive diagnostics do not count cache hits; only active, matching presentation reuse counts as one. A bounded, optional, localStorage last-good **decision-only** sync snapshot improves initial-visit continuity when available and early, but no script waits on ART or promises no first-paint change. This remains a proposal: all live lifecycle, Safari, IndexedDB and routing behavior is unverified until ART-02.

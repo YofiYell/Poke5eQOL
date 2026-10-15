@@ -15,8 +15,12 @@ class ExactGeometryTests(unittest.TestCase):
             with self.subTest(name=record['name']):
                 with Image.open(ROOT/'fixtures/synthetic'/(record['name']+'.png')) as im:
                     got=inspect_rgba(im)
-                    actual=got.pop('packedMask',None)
-                self.assertEqual({**got,'bounds':list(got['bounds']) if got['bounds'] is not None else None},record['geometry'])
+                    actual=got.get('packedMask')
+                # R01's measured snapshot remains frozen; R02 adds confidence
+                # evidence and raw occupancy independently of those fields.
+                legacy={key:got[key] for key in record['geometry']}
+                legacy['bounds']=list(legacy['bounds']) if legacy['bounds'] is not None else None
+                self.assertEqual(legacy,record['geometry'])
                 if actual is not None:
                     decoded=unpack_mask(actual,got['width'],got['height'])
                     self.assertEqual(int(decoded.sum()),got['occupiedPixels'])

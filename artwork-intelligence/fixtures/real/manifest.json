@@ -1,0 +1,42 @@
+{
+  "manifestVersion": 1,
+  "fixtureKind": "real-fakemon-normal-artwork",
+  "speciesId": "BWMC6BSH0WZDR",
+  "namespace": "fakemon",
+  "nativeSpeciesIdExpected": "F.BWMC6BSH0WZDR",
+  "primaryType": "rock",
+  "secondaryType": "steel",
+  "identityEvidence": {
+    "source": "user-supplied browser observation",
+    "routeSpeciesId": "BWMC6BSH0WZDR",
+    "headerTypes": [
+      "rock",
+      "steel"
+    ],
+    "normalPortraitUrl": "https://poke5e.auroratide.cloud/a79eff8c-4872-4b75-9b45-c7cb73cf4f55.png",
+    "matchesDisplayedImage": true,
+    "independentLiveNativeRpcLookupVerified": false,
+    "upstreamSchemaVerified": "Supabase get_fakemon(_read_key) returns read_key, type, normal_portrait_filename; this record itself could not be fetched in this environment"
+  },
+  "artifactProvenance": {
+    "provider": "user-uploaded ART-01-R02_Real_Fakemon_Fixture.zip",
+    "archiveSha256": "4c7093404d33483ed85941b928a821214c1a88df32d62690bb09ba5a598be45f",
+    "originalImageSource": "user upload, not execution-container HTTP download",
+    "normalImagePath": "fixtures/real/BWMC6BSH0WZDR_normal.png",
+    "normalImageBytes": 458051,
+    "normalImageSha256": "0749aa41cc2250c67884ad4a33082566f379756530ce1724798a6c035d470bc6",
+    "frozenScannerResults": "fixtures/real/BWMC6BSH0WZDR_python_reference.json",
+    "originalScannerSha256": "f6ac6e346e2e93b2c05110ebe286c8e37d2120b9d035d9ce1766e536d133f1cd",
+    "maskPath": "fixtures/real/BWMC6BSH0WZDR_mask_packed_msb_row_v1.bin",
+    "maskSha256": "3a2a9bc555888d03caa2044f23ae9685c44dff349ae300bca22c62e5ff244ee1",
+    "maskBytes": 65702
+  },
+  "analysis": {
+    "colorAnalysis": "Measured with unchanged Python scanner, verified by test_real_fixture.py",
+    "geometryOccupancy": "alpha>=1 source pixels, full-resolution, lossless MSB-row packed mask",
+    "reliableGeometry": "yes, based on connected exterior alpha background; ART-01-R02 classification",
+    "fullBrowserScannerParityVerified": false,
+    "browserSidePersistenceVerified": false
+  },
+  "scope": "ONE supplied Fakemon normal portrait; no all-species coverage inferred"
+}

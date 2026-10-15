@@ -1,0 +1,117 @@
+{
+  "fixture": {
+    "speciesId": "BWMC6BSH0WZDR",
+    "types": [
+      "rock",
+      "steel"
+    ],
+    "source": "https://poke5e.auroratide.cloud/a79eff8c-4872-4b75-9b45-c7cb73cf4f55.png",
+    "sha256": "0749aa41cc2250c67884ad4a33082566f379756530ce1724798a6c035d470bc6",
+    "bytes": 458051,
+    "scannerSha256": "f6ac6e346e2e93b2c05110ebe286c8e37d2120b9d035d9ce1766e536d133f1cd"
+  },
+  "colors": {
+    "average_color": "#8A6A66",
+    "raw_alpha_average_color": "#856763",
+    "dominant_color": "#9F4C4E",
+    "dominant_coverage": 0.23948,
+    "clusters": [
+      {
+        "hex": "#9F4C4E",
+        "coverage": 0.23948
+      },
+      {
+        "hex": "#652F2F",
+        "coverage": 0.187608
+      },
+      {
+        "hex": "#D2D6D7",
+        "coverage": 0.163526
+      },
+      {
+        "hex": "#3E3F40",
+        "coverage": 0.157593
+      },
+      {
+        "hex": "#67696D",
+        "coverage": 0.11277
+      },
+      {
+        "hex": "#959492",
+        "coverage": 0.064989
+      },
+      {
+        "hex": "#F1D07C",
+        "coverage": 0.043267
+      },
+      {
+        "hex": "#9E854F",
+        "coverage": 0.030766
+      }
+    ],
+    "visible_pixels": 285199,
+    "background_pixels_removed": 0,
+    "outline_pixels_discounted": 17825,
+    "near_black_body_fraction": 0.062154,
+    "near_white_body_fraction": 0.005654,
+    "image_width": 722,
+    "image_height": 722,
+    "image_format": "PNG"
+  },
+  "decision": {
+    "primary_type_color": "#ADA984",
+    "secondary_type_color": "#74A2B9",
+    "delta_e_average_primary": 29.572648,
+    "delta_e_dominant_primary": 47.243029,
+    "combined_score_primary": 38.407839,
+    "selected_banner_type": "rock",
+    "selected_tint_type": "steel",
+    "average_match": "rock",
+    "dominant_match": "rock",
+    "metrics_disagree": false,
+    "confidence_margin": 8.980862,
+    "tint_strength": 0.36,
+    "banner_type_strength": 0.85,
+    "banner_black_strength": 0.15,
+    "top_header_types": [
+      "rock",
+      "steel"
+    ],
+    "description_type": "rock",
+    "delta_e_average_secondary": 36.222161,
+    "delta_e_dominant_secondary": 58.555241,
+    "combined_score_secondary": 47.388701
+  },
+  "geometry": {
+    "alphaThreshold": 1,
+    "width": 722,
+    "height": 722,
+    "bounds": {
+      "left": 3,
+      "top": 0,
+      "right": 722,
+      "bottom": 690
+    },
+    "occupiedPixels": 306042,
+    "totalPixels": 521284,
+    "alphaZeroPixels": 215242,
+    "alphaPositivePixels": 306042,
+    "alphaAtLeast128Pixels": 285199,
+    "partiallyTransparentPixels": 42213,
+    "backgroundFraction": 0.41290735951995455,
+    "occupiedFraction": 0.5870926404800454,
+    "components8": 2,
+    "holes4": 1,
+    "maskSha256": "3a2a9bc555888d03caa2044f23ae9685c44dff349ae300bca22c62e5ff244ee1",
+    "maskBytes": 65702,
+    "alphaSamples": {
+      "0": 215242,
+      "1": 3443,
+      "64": 68,
+      "127": 42,
+      "128": 25,
+      "254": 3577,
+      "255": 263829
+    }
+  }
+}

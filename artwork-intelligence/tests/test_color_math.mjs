@@ -30,3 +30,21 @@ test('argmin tie chooses first and near tie remains deterministic',()=>{
   let near=decide({primary_type:'ghost',secondary_type:'psychic',average_color:'#AA7364',dominant_color:'#AA7364'});
   assert.ok(near.confidence_margin<.01);
 });
+test('real Rock/Steel Python fixture matches JS CIE76 final decision math only',()=>{
+  const frozen=JSON.parse(readFileSync(path.join(root,'fixtures/real/BWMC6BSH0WZDR_python_reference.json'),'utf8'));
+  const actual=decide({...frozen.colors,primary_type:'rock',secondary_type:'steel'});
+  const expected=frozen.decision;
+  assert.equal(actual.selected_banner_type,'rock');
+  assert.equal(actual.selected_tint_type,'steel');
+  assert.equal(actual.selected_banner_type,expected.selected_banner_type);
+  assert.equal(actual.selected_tint_type,expected.selected_tint_type);
+  assert.equal(actual.metrics_disagree,expected.metrics_disagree);
+  for(const [k,v] of [['averagePrimary',actual.averages[0]],['averageSecondary',actual.averages[1]],
+                      ['dominantPrimary',actual.dominants[0]],['dominantSecondary',actual.dominants[1]],
+                      ['combinedPrimary',actual.scores[0]],['combinedSecondary',actual.scores[1]]]){
+    const expectedKey={averagePrimary:'delta_e_average_primary',averageSecondary:'delta_e_average_secondary',
+      dominantPrimary:'delta_e_dominant_primary',dominantSecondary:'delta_e_dominant_secondary',
+      combinedPrimary:'combined_score_primary',combinedSecondary:'combined_score_secondary'}[k];
+    assert.ok(Math.abs(v-expected[expectedKey])<=0.000002,`${k}: ${v} != ${expected[expectedKey]}`);
+  }
+});

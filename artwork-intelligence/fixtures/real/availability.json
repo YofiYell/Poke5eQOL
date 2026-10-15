@@ -1,34 +1,40 @@
 {
-  "fixtureKind": "real-fakemon-normal-unavailable",
+  "fixtureKind": "real-fakemon-normal-artwork-local",
   "reportedSource": "https://poke5e.auroratide.cloud/a79eff8c-4872-4b75-9b45-c7cb73cf4f55.png",
-  "userObservedCanvasProbe": {
-    "readable": true,
-    "dimensions": [
-      722,
-      722
+  "currentStatus": {
+    "sourceBytesAvailable": true,
+    "verifiedLocalImagePath": "fixtures/real/BWMC6BSH0WZDR_normal.png",
+    "sourceSHA256": "0749aa41cc2250c67884ad4a33082566f379756530ce1724798a6c035d470bc6",
+    "maskSHA256": "3a2a9bc555888d03caa2044f23ae9685c44dff349ae300bca22c62e5ff244ee1",
+    "nativeSpeciesIdentityFromUserObservation": "BWMC6BSH0WZDR",
+    "typePairFromUserObservation": [
+      "rock",
+      "steel"
     ],
-    "firstPixel": [
-      0,
-      0,
-      0,
-      0
-    ],
-    "source": "https://poke5e.auroratide.cloud/a79eff8c-4872-4b75-9b45-c7cb73cf4f55.png"
+    "independentNativeSpeciesLookupVerified": false,
+    "pythonScannerExecuted": true,
+    "geometryReferenceExecuted": true,
+    "status": "verified-local-user-supplied-source-bytes",
+    "archiveSHA256": "4c7093404d33483ed85941b928a821214c1a88df32d62690bb09ba5a598be45f"
   },
-  "ART01Availability": {
-    "sourceBytesAvailable": false,
-    "sourceSHA256": null,
-    "nativeSpeciesIdentityVerified": false,
-    "typesVerified": false,
-    "scannerExecuted": false,
-    "measuredColors": null,
-    "geometry": null,
-    "blockers": [
-      "Container HTTP fetch failed: DNS name resolution unavailable",
-      "download tool could not fetch object",
-      "web retrieval failed: cache miss",
-      "Native species identity and type pairing not verified from Pok\u00e95e record"
-    ]
+  "historicalART01R01Observation": {
+    "sourceBytesAvailableThen": false,
+    "userObservedCanvasProbe": {
+      "readable": true,
+      "dimensions": [
+        722,
+        722
+      ],
+      "firstPixel": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "source": "https://poke5e.auroratide.cloud/a79eff8c-4872-4b75-9b45-c7cb73cf4f55.png"
+    },
+    "executionContainerAccess": "DNS errors prevented direct artwork-host retrieval",
+    "note": "R01 missing-host-byte status was historical, not the current fixture status."
   },
-  "explicitlyNotMeasured": "Do not use this status fixture as scan data. User-observed Canvas probe is not a source-byte artifact."
+  "provenanceNote": "User-uploaded PNG and mask, with byte hashes verified in R02. No claim of direct image-host download or live API record access."
 }
