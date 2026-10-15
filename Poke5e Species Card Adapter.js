@@ -2404,7 +2404,7 @@ article.yofi-scores-layout section.moves > dl + dl {
       if (!field) return null;
       data[key] = { label: cleanText(field.querySelector('dt')), value: cleanText(field.querySelector('dd')) };
     }
-    const match = data.lvl.value.match(/^\s*(\d+)\s*$/);
+    const match = data.lvl.value.match(/^([1-9]\d*)$/);
     if (match) {
       const level = Number(match[1]);
       if (level >= 1 && level < MAX_ENCOUNTER_LEVEL)
