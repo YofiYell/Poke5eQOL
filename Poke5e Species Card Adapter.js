@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Poke5e Species Card Adapter [v0.1.25]
+// @name         Species Card [v0.1.25]
 // @namespace    yofi.poke5e.species.card
 // @version      0.1.25
 // @description  Pokemon/Fakemon adaptive card presentation with direct native navigation.
