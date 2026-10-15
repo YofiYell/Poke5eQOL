@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Poke5e Species Card Adapter v0.1.23
+// @name         Poke5e Species Card Adapter [v0.1.25]
 // @namespace    yofi.poke5e.species.card
-// @version      0.1.23
+// @version      0.1.25
 // @description  Pokemon/Fakemon adaptive card presentation with direct native navigation.
 // @match        https://poke5e.app/*
 // @run-at       document-start
@@ -138,7 +138,7 @@
     window.addEventListener('load',detectQol,{once:true});
     return {register,status,requireQol,report,notice,ready:publishReady};
   })());
-  const registration = modules.register('Species Card','0.1.23');
+  const registration = modules.register('Species Card','0.1.25');
   modules.requireQol(registration,runSpeciesCard);
   function runSpeciesCard() {
   // Standalone companion. Disable earlier Hero Layout Lab builds, not the QOL script.
@@ -148,15 +148,15 @@
   // the same nodes and both install recurring timers.
   if (window.__yofiHeroLayoutLab) {
     const active = window.__yofiHeroLayoutLab;
-    console.error('[Species Card v0.1.23] Conflicting adapter is already active:',
+    console.error('[Species Card v0.1.25] Conflicting adapter is already active:',
       active, 'Disable ALL earlier Hero Layout Lab / Adapter userscripts and reload.');
     modules.notice('yofi-userscript-version-conflict','Species Card conflict: disable extra Hero Layout Adapters / Species Card userscripts and reload.');
     return false;
   }
-  window.__yofiHeroLayoutLab = '0.1.23';
-  window.__yofiSpeciesCard = '0.1.23';
+  window.__yofiHeroLayoutLab = '0.1.25';
+  window.__yofiSpeciesCard = '0.1.25';
 
-  const VERSION = '0.1.23';
+  const VERSION = '0.1.25';
   const STYLE_ID = 'yofi-species-card-hero-css';
   const PREPARE_EVENT = 'yofi:species-card-prepare-before-reveal';
   const PRE_REVEAL_EVENT = 'yofi:species-card-before-reveal';
