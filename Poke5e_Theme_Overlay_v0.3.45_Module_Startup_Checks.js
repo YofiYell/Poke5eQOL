@@ -482,6 +482,13 @@
     ${CSS_ROOT}.lab3-active > .scrollable .yofi-species-hero .lab3-biologies {
       color: var(--p5ov-body-ink) !important;
     }
+    /* Light only: 25% black over the native white surface yields a visible
+       neutral-grey vital tile. The same selector covers 2- and 1-row grids.
+       Dark and Type retain Species Card's existing translucent tile fill. */
+    html:not(.yofi-type-theme) body:not(.dark-mode)
+      .page > main article.lab3-active > .scrollable .yofi-species-hero .lab3-vital {
+      background: rgba(0,0,0,.25) !important;
+    }
     /* Native Genderless bar: retain the main QoL script's geometry,
        gray --skin-agender-bg segment, and white center label.
        No theme recoloring, pill styling, or shadow on this gender bar. */

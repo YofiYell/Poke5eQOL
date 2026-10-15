@@ -2243,17 +2243,25 @@ article.yofi-scores-layout section.moves > dl + dl {
       line-height:var(--lab3-native-ability-line,normal) !important;
       letter-spacing:var(--lab3-native-ability-tracking,normal) !important;
     }
+    /* Keep the native Abilities h2 and Card.svelte skewed ::before banner.
+       The same spacing applies to layout probes, so measured height matches
+       the promoted section; all banner colors remain theme-owned. */
     article .yofi-species-hero section.abilities:is(.lab3-measure-abilities,.lab3-promoted-abilities) > h2,
     article.lab3-stage3 .lab3-right > section.abilities > h2 {
       display:block;position:relative;box-sizing:border-box;
-      margin:0 0 .5em !important;padding:.25em 0 !important;
-      width:100%;background:var(--lab3-score-bg,var(--skin-bg,#71A9D5));
-      color:#fff;font-size:var(--lab3-native-ability-heading-font,1.05em) !important;
+      margin:0 0 .5em !important;padding:.25em 1em !important;
+      width:100%;background:transparent !important;
+      font-size:var(--lab3-native-ability-heading-font,1.05em) !important;
       line-height:var(--lab3-native-ability-heading-line,1.22) !important;
       font-weight:700;
     }
+    /* Anchor the upper-right tip at the column boundary. With native
+       skewX(-25deg), the lower-right tip recedes into the banner. */
     article .yofi-species-hero section.abilities:is(.lab3-measure-abilities,.lab3-promoted-abilities) > h2::before,
-    article.lab3-stage3 .lab3-right > section.abilities > h2::before {display:none !important;}
+    article.lab3-stage3 .lab3-right > section.abilities > h2::before {
+      inset:0 !important;
+      transform-origin:right top !important;
+    }
     article.lab3-stage3 .lab3-right > section.abilities > :not(h2),
     article .yofi-species-hero section.abilities.lab3-measure-abilities > :not(h2) {
       margin:0 !important;padding-inline:0 !important;
