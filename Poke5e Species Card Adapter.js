@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Poke5e Species Card Adapter
+// @name         Poke5e Species Card Adapter v0.1.22
 // @namespace    yofi.poke5e.species.card
-// @version      0.1.20
+// @version      0.1.22
 // @description  Pokemon/Fakemon adaptive card presentation with direct native navigation.
 // @match        https://poke5e.app/*
 // @run-at       document-start
@@ -138,7 +138,7 @@
     window.addEventListener('load',detectQol,{once:true});
     return {register,status,requireQol,report,notice,ready:publishReady};
   })());
-  const registration = modules.register('Species Card','0.1.20');
+  const registration = modules.register('Species Card','0.1.22');
   modules.requireQol(registration,runSpeciesCard);
   function runSpeciesCard() {
   // Standalone companion. Disable earlier Hero Layout Lab builds, not the QOL script.
@@ -148,15 +148,15 @@
   // the same nodes and both install recurring timers.
   if (window.__yofiHeroLayoutLab) {
     const active = window.__yofiHeroLayoutLab;
-    console.error('[Species Card v0.1.20] Conflicting adapter is already active:',
+    console.error('[Species Card v0.1.22] Conflicting adapter is already active:',
       active, 'Disable ALL earlier Hero Layout Lab / Adapter userscripts and reload.');
     modules.notice('yofi-userscript-version-conflict','Species Card conflict: disable extra Hero Layout Adapters / Species Card userscripts and reload.');
     return false;
   }
-  window.__yofiHeroLayoutLab = '0.1.20';
-  window.__yofiSpeciesCard = '0.1.20';
+  window.__yofiHeroLayoutLab = '0.1.22';
+  window.__yofiSpeciesCard = '0.1.22';
 
-  const VERSION = '0.1.20';
+  const VERSION = '0.1.22';
   const STYLE_ID = 'yofi-species-card-hero-css';
   const PREPARE_EVENT = 'yofi:species-card-prepare-before-reveal';
   const PRE_REVEAL_EVENT = 'yofi:species-card-before-reveal';
@@ -1024,10 +1024,10 @@ article.yofi-scores-layout section.moves > dl + dl {
     }
     .yofi-hero-facts .yofi-hero-egg-value {
       display: block; min-width: 0;
-      font-size: clamp(10px, 8cqi, 14px) !important;
+      font-size: clamp(10px, 6cqi, 14px) !important;
       text-align: center;
       text-transform: capitalize;
-      white-space: normal !important;
+      white-space: nowrap !important;
       overflow-wrap: normal !important;
       word-break: normal !important;
     }
@@ -2059,21 +2059,8 @@ article.yofi-scores-layout section.moves > dl + dl {
       height: var(--lab3-bio-height, 46px) !important;
       min-height: var(--lab3-bio-height, 46px) !important;
     }
-    /* Inline biology keeps the native gender segments while Egg uses the same
-       icon/value grid in a narrower track with natural word wrapping. */
-    article.lab3-active .lab3-biologies.lab3-bio-inline .lab3-egg {
-      padding-inline: 6px !important;
-    }
-    article.lab3-active .lab3-biologies.lab3-bio-inline .lab3-egg .yofi-hero-field-egg {
-      grid-template-columns: 17px minmax(0, 1fr) !important;
-      column-gap: 5px !important;
-    }
-    article.lab3-active .lab3-biologies.lab3-bio-inline .lab3-egg .lab3-egg-icon {
-      width: 17px !important; height: 17px !important;
-    }
-    article.lab3-active .lab3-biologies.lab3-bio-inline .lab3-egg .yofi-hero-egg-value {
-      font-size: clamp(10px, 6cqi, 13px) !important;
-    }
+    /* Inline and stacked biology share the SAME scalable icon/text system.
+       No compact-specific downscaling can make a truncated inline Egg valid. */
     article.lab3-active .lab3-biologies.lab3-bio-inline .lab3-copy-facts {
       font-size: var(--yofi-hero-facts-font, .75rem) !important;
     }
@@ -2189,14 +2176,15 @@ article.yofi-scores-layout section.moves > dl + dl {
       padding: 0 9px;
     }
     .lab3-biology.lab3-gender { padding: 0 !important; background: transparent !important; }
-    /* The promoted bar alone is a width-query container. Font units then
-       scale SVG slots and center text together, bounded also by tile height.
-       The regular compact and unrelated native gender bars are untouched. */
+    /* The promoted bar alone is a width-query container. Keep native SVG
+       slots and centered text on one proportional font scale, bounded by
+       both the real column width and allotted bar height. Unrelated gender
+       displays keep their original sizing. */
     article.lab3-active .yofi-species-hero .lab3-biology.lab3-gender {
       container-type: inline-size;
     }
     article.lab3-active .yofi-species-hero .lab3-gender .gender-ratio-display {
-      font-size: clamp(12px, min(5.8cqi, calc(var(--lab3-bio-height, 50px) * .46)), 24px) !important;
+      font-size: clamp(13px, min(6.2cqi, calc(var(--lab3-bio-height, 50px) * .42)), 18px) !important;
     }
     /* Mirror the COMPLETE native gender node under the original .yofi-hero-facts
        ancestor. Do not rewrite its native segments, ratio, slots, glyphs or colors.
@@ -2245,23 +2233,28 @@ article.yofi-scores-layout section.moves > dl + dl {
       flex: 1 1 auto; width: 100%; min-width: 0 !important;
       margin: 0 !important; font-size: inherit !important;
     }
+    /* A fluid icon track and one no-wrap text track. Font size depends only
+       on this bar's measured inline-size (cqi), not inherited em scaling or
+       alternate inline/stack overrides. Both modes render identically at the
+       same bar width; narrow, overfull modes are rejected by eggFit(). */
     .lab3-egg .yofi-hero-field-egg {
       display: grid !important;
-      grid-template-columns: 22px minmax(0, 1fr) !important;
-      column-gap: 8px !important;
+      font-size: clamp(13px, 6.2cqi, 18px) !important;
+      grid-template-columns: 1.4em minmax(0, 1fr) !important;
+      column-gap: .42em !important;
       width: 100%; min-width: 0 !important;
       align-items: center !important; margin: 0 !important;
       padding: 0 !important;
     }
     .lab3-egg .yofi-hero-field-egg > .lab3-egg-icon {
-      width: 22px; height: 22px;
+      width: 1.4em !important; height: 1.4em !important;
     }
     .lab3-egg .yofi-hero-egg-value {
       display: block !important; min-width: 0 !important;
       margin: 0 !important;
       overflow-wrap: normal !important; word-break: normal !important;
-      white-space: normal !important;
-      font-size: clamp(10px, 5cqi, 16px) !important;
+      white-space: nowrap !important;
+      font-size: inherit !important;
       line-height: 1.16 !important;
       text-align: center !important; text-transform: capitalize !important;
     }
@@ -2622,6 +2615,8 @@ article.yofi-scores-layout section.moves > dl + dl {
           probe = {outer,group,bar,field:right.querySelector('.yofi-hero-field-egg'),
             value:right.querySelector('.yofi-hero-egg-value'),
             icon:right.querySelector('.lab3-egg-icon')};
+          probe.textRange = document.createRange();
+          probe.textRange.selectNodeContents(probe.value);
           probes.set('egg',probe);
         }
         probe.group.classList.toggle('lab3-bio-inline',inline);
@@ -2635,13 +2630,23 @@ article.yofi-scores-layout section.moves > dl + dl {
         const rect = probe.value.getBoundingClientRect();
         const css = getComputedStyle(probe.value);
         const line = parseFloat(css.lineHeight) || parseFloat(css.fontSize)*1.16 || 12;
-        const lines = Math.max(1,Math.round(rect.height / line));
-        const maxLines = inline ? (stage === 1 ? 2 : 3) : 5;
-        const fits = lines <= maxLines &&
-          probe.value.scrollWidth <= probe.value.clientWidth + 1 &&
-          probe.field.scrollWidth <= probe.field.clientWidth + 1;
+        const singleLine = rect.height <= line + 1;
+        // Check actual rendered ink, not scrollWidth alone (a block with
+        // nearly touching text still reports scrollWidth == clientWidth).
+        // Small breathing room at both text-track edges prevents a cramped
+        // side-by-side candidate beating a comfortably readable stack.
+        const inkWidth = probe.textRange.getBoundingClientRect().width;
+        const textWidth = probe.value.clientWidth;
+        // Side-by-side needs enough free space for the text to look like a
+        // label, not a compressed caption. Otherwise prefer an available
+        // full-width stack rather than accepting barely-fitting small type.
+        const comfortable = !inline || inkWidth <= textWidth * .70;
+        const fits = singleLine && comfortable &&
+          inkWidth + 10 <= textWidth + .5 &&
+          probe.value.scrollWidth <= textWidth + .5 &&
+          probe.field.scrollWidth <= probe.field.clientWidth + .5;
         const result = fits ? {height: Math.ceil(Math.max(rect.height,
-          probe.icon.getBoundingClientRect().height) + 12),lines} : null;
+          probe.icon.getBoundingClientRect().height) + 12),lines:1} : null;
         cache.set(key,result);
         return result;
       },
