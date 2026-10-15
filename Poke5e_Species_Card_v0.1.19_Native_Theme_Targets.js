@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Poke5e Species Card v0.1.18 (Ready Card List Handoff)
+// @name         Poke5e Species Card v0.1.19 (Native Theme Targets)
 // @namespace    yofi.poke5e.species.card
-// @version      0.1.18
+// @version      0.1.19
 // @description  Pokemon/Fakemon adaptive card presentation with direct native navigation.
 // @match        https://poke5e.app/*
 // @run-at       document-start
@@ -138,7 +138,7 @@
     window.addEventListener('load',detectQol,{once:true});
     return {register,status,requireQol,report,notice,ready:publishReady};
   })());
-  const registration = modules.register('Species Card','0.1.18');
+  const registration = modules.register('Species Card','0.1.19');
   modules.requireQol(registration,runSpeciesCard);
   function runSpeciesCard() {
   // Standalone companion. Disable earlier Hero Layout Lab builds, not the QOL script.
@@ -148,15 +148,15 @@
   // the same nodes and both install recurring timers.
   if (window.__yofiHeroLayoutLab) {
     const active = window.__yofiHeroLayoutLab;
-    console.error('[Species Card v0.1.18] Conflicting adapter is already active:',
+    console.error('[Species Card v0.1.19] Conflicting adapter is already active:',
       active, 'Disable ALL earlier Hero Layout Lab / Adapter userscripts and reload.');
     modules.notice('yofi-userscript-version-conflict','Species Card conflict: disable extra Hero Layout Adapters / Species Card userscripts and reload.');
     return false;
   }
-  window.__yofiHeroLayoutLab = '0.1.18';
-  window.__yofiSpeciesCard = '0.1.18';
+  window.__yofiHeroLayoutLab = '0.1.19';
+  window.__yofiSpeciesCard = '0.1.19';
 
-  const VERSION = '0.1.18';
+  const VERSION = '0.1.19';
   const STYLE_ID = 'yofi-species-card-hero-css';
   const PREPARE_EVENT = 'yofi:species-card-prepare-before-reveal';
   const PRE_REVEAL_EVENT = 'yofi:species-card-before-reveal';
@@ -196,7 +196,7 @@ article.yofi-scores-layout .yofi-scores-banner {
       margin-inline: 0;
       padding: .38em 0;
       margin-block: 1.2em .85em;
-      color: #fff;
+      color: var(--skin-bg-text);
     }
 
 article.yofi-scores-layout .yofi-scores-banner > h2 {
@@ -285,7 +285,7 @@ article.yofi-scores-layout dl.yofi-scores-strip > :is(dt,dd) {
       min-width: 0;
       padding: 0 !important;
       margin: 0 !important;
-      color: #fff !important;
+      color: var(--skin-bg-text) !important;
       background: transparent !important;
       border: none !important;
       white-space: nowrap !important;
@@ -2250,16 +2250,18 @@ article.yofi-scores-layout section.moves > dl + dl {
     article.lab3-stage3 .lab3-right > section.abilities > h2 {
       display:block;position:relative;box-sizing:border-box;
       margin:0 0 .5em !important;padding:.25em 1em !important;
-      width:100%;background:transparent !important;
+      width:100%;overflow:hidden;background:transparent !important;
       font-size:var(--lab3-native-ability-heading-font,1.05em) !important;
       line-height:var(--lab3-native-ability-heading-line,1.22) !important;
       font-weight:700;
     }
-    /* Anchor the upper-right tip at the column boundary. With native
-       skewX(-25deg), the lower-right tip recedes into the banner. */
+    /* Native Card.svelte extends the ::before backdrop past the card's left
+       edge, where the card clips it straight. Clip at this heading's own left
+       edge instead; retain its native skew and the theme's pseudo-element fill.
+       The upper-right tip still lands at the available column boundary. */
     article .yofi-species-hero section.abilities:is(.lab3-measure-abilities,.lab3-promoted-abilities) > h2::before,
     article.lab3-stage3 .lab3-right > section.abilities > h2::before {
-      inset:0 !important;
+      inset:0 0 0 -4em !important;
       transform-origin:right top !important;
     }
     article.lab3-stage3 .lab3-right > section.abilities > :not(h2),
@@ -2290,7 +2292,7 @@ article.yofi-scores-layout section.moves > dl + dl {
       text-align: center !important;
       font-size: clamp(14px,1.4vw,20px) !important;
       line-height: 1.2 !important;
-      color:#fff !important;
+      color:var(--skin-bg-text) !important;
       background: linear-gradient(to bottom,
         var(--lab3-score-bg,var(--skin-bg,#71A9D5)) 0,
         var(--lab3-score-bg,var(--skin-bg,#71A9D5)) var(--lab3-score-row-height,58px),
@@ -2309,7 +2311,7 @@ article.yofi-scores-layout section.moves > dl + dl {
       line-height: 1.15 !important;
       white-space:nowrap !important;
       text-align:center !important;
-      color:#fff !important;
+      color:var(--skin-bg-text) !important;
       background:none !important;
     }
     article.lab3-scores .lab3-left-extra > dl.yofi-scores-strip > dt {

@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Poke5e Theme Overlay v0.3.45 - Module Startup Checks
+// @name         Poke5e Theme Overlay v0.3.46 - Native Theme Targets
 // @namespace    yofi.poke5e.theme-presentation-companion
-// @version      0.3.45
+// @version      0.3.46
 // @description  Optional theme treatments; keeps theme colors independent while Species Card owns adaptive TM geometry.
 // @match        https://poke5e.app/*
 // @run-at       document-end
@@ -138,11 +138,11 @@
     window.addEventListener('load',detectQol,{once:true});
     return {register,status,requireQol,report,notice,ready:publishReady};
   })());
-  const registration = modules.register('Theme Overlay','0.3.45');
+  const registration = modules.register('Theme Overlay','0.3.46');
   modules.requireQol(registration,runThemeOverlay);
   function runThemeOverlay() {
-  const KEY = '__p5ThemeOverlay0345';
-  const STYLE_ID = 'p5-theme-overlay-v0345-styles';
+  const KEY = '__p5ThemeOverlay0346';
+  const STYLE_ID = 'p5-theme-overlay-v0346-styles';
   const PRE_REVEAL_EVENT = 'yofi:species-card-before-reveal';
   // Stop prior instances, including reinjection of this same version.
   // One namespace check replaces an ever-growing historical version list.
@@ -453,7 +453,7 @@
     ${CSS_ROOT} > .scrollable section h2,
     ${CSS_ROOT} > .scrollable .yofi-scores-banner,
     ${CSS_ROOT} > .scrollable .yofi-scores-banner h2,
-    ${CSS_ROOT} > .scrollable .yofi-scores-banner dl.yofi-scores-strip > :is(dt,dd) {
+    ${CSS_ROOT} > .scrollable dl.yofi-scores-strip > :is(dt,dd) {
       /* Same type/black mix used for move-pill lettering; banner type, not tint type. */
       text-shadow: none !important;
       color: var(--p5ov-art-banner-ink, var(--p5ov-banner-ink)) !important;
@@ -466,6 +466,7 @@
       color: var(--p5ov-body-ink) !important;
     }
     ${CSS_ROOT} > .scrollable :is(.yofi-hero-copy p, section.abilities p, section.abilities h3,
+      section.abilities .ability,
       section.evolution p, section.evolution h3, section.evolutions p,
       section.evolutions h3, section.moves dt, section.moves > dl > dt,
       section.other-info p, section.other-info dt, section.other-info dd) {
@@ -482,12 +483,12 @@
     ${CSS_ROOT}.lab3-active > .scrollable .yofi-species-hero .lab3-biologies {
       color: var(--p5ov-body-ink) !important;
     }
-    /* Light only: 25% black over the native white surface yields a visible
-       neutral-grey vital tile. The same selector covers 2- and 1-row grids.
-       Dark and Type retain Species Card's existing translucent tile fill. */
+    /* Light only: one consistent 15% neutral-grey surface for the vital
+       tiles and Egg bar. Gender retains its native segments and background;
+       Dark and Type keep their existing translucent tile treatments. */
     html:not(.yofi-type-theme) body:not(.dark-mode)
-      .page > main article.lab3-active > .scrollable .yofi-species-hero .lab3-vital {
-      background: rgba(0,0,0,.25) !important;
+      .page > main article.lab3-active > .scrollable .yofi-species-hero :is(.lab3-vital,.lab3-egg) {
+      background: rgba(0,0,0,.15) !important;
     }
     /* Native Genderless bar: retain the main QoL script's geometry,
        gray --skin-agender-bg segment, and white center label.
@@ -984,7 +985,7 @@
       // Color only: TM measurement remains in the normal scheduled pass.
       processCardColors(card, mode());
     } catch (error) {
-      console.warn('[P5 Theme Overlay v0.3.45] Incoming-card color sync failed:', error);
+      console.warn('[P5 Theme Overlay v0.3.46] Incoming-card color sync failed:', error);
     }
   }
   document.addEventListener(PRE_REVEAL_EVENT, prepareSpeciesCardBeforeReveal);
@@ -1000,7 +1001,7 @@
       lastError = null;
     } catch (error) {
       lastError = String(error?.stack || error);
-      console.error('[P5 Theme Overlay v0.3.45]', error);
+      console.error('[P5 Theme Overlay v0.3.46]', error);
     }
   }
   function schedule() {
@@ -1057,7 +1058,7 @@
   document.fonts?.ready?.then(() => { if (!stopped) whenFontsChange(); });
   document.fonts?.addEventListener?.('loadingdone', whenFontsChange);
   window[KEY] = {
-    version:'0.3.45', stop, refresh:apply,
+    version:'0.3.46', stop, refresh:apply,
     diagnose() {
       const all = cards();
       const a = all.find(card => card.getClientRects().length && card.getBoundingClientRect().width > 0) || all[0];
@@ -1069,7 +1070,7 @@
       const genderless = a?.querySelector('.yofi-hero-gender .gender-ratio-display:has(> .bar.genderless)');
       const genderlessLabel = genderless?.querySelector('.yofi-gender-center-label');
       return {
-        version:'0.3.45', themeMode, nativeMode:window.__yofiQolThemeBridge?.mode?.(), heroActive:!!a?.classList.contains('lab3-active'), heroScoresVisible:!!a?.classList.contains('lab3-scores'), heroAbilitiesVisible:!!a?.classList.contains('lab3-abilities'), artworkApplied, artworkIndexed:Object.keys(ARTWORK_TYPE_CHOICES).length, artworkSpeciesId:a && speciesIdentity(a)?.id, artworkChoice:a?.dataset.p5ovArtworkChoice || null, artworkSelected:a?.dataset.p5ovArtworkChoice && ARTWORK_TYPE_CHOICES[speciesIdentity(a)?.id] || null, artworkError:artworkLastError, cardCount:all.length, theme:mode(),
+        version:'0.3.46', themeMode, nativeMode:window.__yofiQolThemeBridge?.mode?.(), heroActive:!!a?.classList.contains('lab3-active'), heroScoresVisible:!!a?.classList.contains('lab3-scores'), heroAbilitiesVisible:!!a?.classList.contains('lab3-abilities'), artworkApplied, artworkIndexed:Object.keys(ARTWORK_TYPE_CHOICES).length, artworkSpeciesId:a && speciesIdentity(a)?.id, artworkChoice:a?.dataset.p5ovArtworkChoice || null, artworkSelected:a?.dataset.p5ovArtworkChoice && ARTWORK_TYPE_CHOICES[speciesIdentity(a)?.id] || null, artworkError:artworkLastError, cardCount:all.length, theme:mode(),
         tinted:!!a?.classList.contains('yofi-type-tinted'),
         computedBodyInk:a?.querySelector(':scope > .scrollable') && getComputedStyle(a.querySelector(':scope > .scrollable')).color,
         computedBannerInk:h && getComputedStyle(h).color,
@@ -1118,6 +1119,6 @@
   setThemeMode(themeMode);
   document.addEventListener('change', onNativeThemeChange, true);
   apply();
-  console.info('[P5 Theme Overlay v0.3.45 - Module Startup Checks] installed');
+  console.info('[P5 Theme Overlay v0.3.46 - Native Theme Targets] installed');
   } // runThemeOverlay
 })();
