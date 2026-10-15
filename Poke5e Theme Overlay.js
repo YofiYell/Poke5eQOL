@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Poke5e Theme Overlay [v0.3.48]
+// @name         Theme Overlay [v0.3.48]
 // @namespace    yofi.poke5e.theme-presentation-companion
 // @version      0.3.48
 // @description  Optional theme treatments; keeps theme colors independent while Species Card owns adaptive TM geometry.
