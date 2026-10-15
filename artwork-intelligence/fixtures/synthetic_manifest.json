@@ -1,0 +1,247 @@
+{
+  "fixtureKind": "synthetic",
+  "generator": "tests/generate_fixtures.py",
+  "notNativeArtwork": true,
+  "fixtures": [
+    {
+      "name": "transparent_margins",
+      "file": "synthetic/transparent_margins.png",
+      "sha256": "b51e7f425f9a15598b2329126a773aa6da914e15aaba2d24cce9c0154108112a",
+      "bytes": 178,
+      "dimensions": [
+        64,
+        64
+      ],
+      "imageMode": "RGBA",
+      "primary_type": "water",
+      "secondary_type": "ice",
+      "sourceKind": "synthetic",
+      "description": "Centered subject with fully transparent outer margin"
+    },
+    {
+      "name": "semi_transparent_boundaries",
+      "file": "synthetic/semi_transparent_boundaries.png",
+      "sha256": "98f00d98785ae01780000056637c420e72c6cab63ea948aa478059c286d95c42",
+      "bytes": 263,
+      "dimensions": [
+        64,
+        64
+      ],
+      "imageMode": "RGBA",
+      "primary_type": "water",
+      "secondary_type": "ice",
+      "sourceKind": "synthetic",
+      "description": "Alpha values below and above scanner threshold 128"
+    },
+    {
+      "name": "opaque_corner_consensus",
+      "file": "synthetic/opaque_corner_consensus.png",
+      "sha256": "191710ac0667eeb00915bb5524939f902cf4b9626c5af560cac05dcf50e7d0eb",
+      "bytes": 339,
+      "dimensions": [
+        64,
+        64
+      ],
+      "imageMode": "RGB",
+      "primary_type": "fire",
+      "secondary_type": "fighting",
+      "sourceKind": "synthetic",
+      "description": "White border-connected backdrop removed only from color mask"
+    },
+    {
+      "name": "opaque_no_consensus",
+      "file": "synthetic/opaque_no_consensus.png",
+      "sha256": "d7330612028d0d2a205082130d4f612e1bed78be5d8cd0702d3da500e732dc4f",
+      "bytes": 198,
+      "dimensions": [
+        64,
+        64
+      ],
+      "imageMode": "RGB",
+      "primary_type": "fire",
+      "secondary_type": "water",
+      "sourceKind": "synthetic",
+      "description": "Four incompatible corners: no opaque background removal"
+    },
+    {
+      "name": "interior_hole",
+      "file": "synthetic/interior_hole.png",
+      "sha256": "80b702bd9ece07b90fa39076a8881e4f6bf40007e5d813e11403a25f47b1a08b",
+      "bytes": 400,
+      "dimensions": [
+        64,
+        64
+      ],
+      "imageMode": "RGBA",
+      "primary_type": "grass",
+      "secondary_type": "poison",
+      "sourceKind": "synthetic",
+      "description": "Alpha ring and retained transparent hole"
+    },
+    {
+      "name": "disconnected_components",
+      "file": "synthetic/disconnected_components.png",
+      "sha256": "a4ae34368e6e407fe93a734a1802f5206f5dfb31525a6dd871433913a9390e2a",
+      "bytes": 302,
+      "dimensions": [
+        64,
+        64
+      ],
+      "imageMode": "RGBA",
+      "primary_type": "psychic",
+      "secondary_type": "fairy",
+      "sourceKind": "synthetic",
+      "description": "Two disconnected visible components preserved"
+    },
+    {
+      "name": "one_pixel_extensions",
+      "file": "synthetic/one_pixel_extensions.png",
+      "sha256": "b0639eba1201e8ab9aa9da0db69240ce3760cdca03681656ab718823d09e9f3e",
+      "bytes": 230,
+      "dimensions": [
+        64,
+        64
+      ],
+      "imageMode": "RGBA",
+      "primary_type": "ground",
+      "secondary_type": "rock",
+      "sourceKind": "synthetic",
+      "description": "Long 1px horn/extension and disconnected edge behavior"
+    },
+    {
+      "name": "incidental_white",
+      "file": "synthetic/incidental_white.png",
+      "sha256": "bd641766615e5ead1fe52dd21eca1baf2a27187075060ccc436142e476d303c1",
+      "bytes": 264,
+      "dimensions": [
+        64,
+        64
+      ],
+      "imageMode": "RGBA",
+      "primary_type": "water",
+      "secondary_type": "steel",
+      "sourceKind": "synthetic",
+      "description": "Small white patch on a colored subject"
+    },
+    {
+      "name": "dark_outline",
+      "file": "synthetic/dark_outline.png",
+      "sha256": "0d5eb5951ba0743943531d9f39bb53a907eeea3ac4e9087aacb2a1bcee220404",
+      "bytes": 232,
+      "dimensions": [
+        64,
+        64
+      ],
+      "imageMode": "RGBA",
+      "primary_type": "fighting",
+      "secondary_type": "dark",
+      "sourceKind": "synthetic",
+      "description": "Narrow dark border compared to bright interior"
+    },
+    {
+      "name": "dark_interior",
+      "file": "synthetic/dark_interior.png",
+      "sha256": "539143417bb2c58d7f97de9e46734ff94fec7273258ac2ca4bbdf13bf27cda9e",
+      "bytes": 240,
+      "dimensions": [
+        64,
+        64
+      ],
+      "imageMode": "RGBA",
+      "primary_type": "dark",
+      "secondary_type": "steel",
+      "sourceKind": "synthetic",
+      "description": "Substantial dark interior should survive outline discount"
+    },
+    {
+      "name": "tiny_white_highlight",
+      "file": "synthetic/tiny_white_highlight.png",
+      "sha256": "b8b5bcc1f1ca79deefe6e55af799466547562c304909acfde9ab1c84b70e162b",
+      "bytes": 381,
+      "dimensions": [
+        64,
+        64
+      ],
+      "imageMode": "RGBA",
+      "primary_type": "water",
+      "secondary_type": "ice",
+      "sourceKind": "synthetic",
+      "description": "Near-white fraction below 12 percent"
+    },
+    {
+      "name": "dual_color_tie_case",
+      "file": "synthetic/dual_color_tie_case.png",
+      "sha256": "8e86c8b725800e056ce1cfefd6bc79fc5bea3c7e608a87366fe2619f32f2c27e",
+      "bytes": 214,
+      "dimensions": [
+        64,
+        64
+      ],
+      "imageMode": "RGBA",
+      "primary_type": "ghost",
+      "secondary_type": "psychic",
+      "sourceKind": "synthetic",
+      "description": "Two large RGB-bin clusters; decision fixture, not assured tie"
+    },
+    {
+      "name": "nearly_invisible_alpha",
+      "file": "synthetic/nearly_invisible_alpha.png",
+      "sha256": "28adb9fca64f0d095a4c4314af0bd07e68ed46533241ad598c6fa5a34dfaeff4",
+      "bytes": 233,
+      "dimensions": [
+        64,
+        64
+      ],
+      "imageMode": "RGBA",
+      "primary_type": "psychic",
+      "secondary_type": "ghost",
+      "sourceKind": "synthetic",
+      "description": "Alpha=1 outskirts count for silhouette, not scanner color mask"
+    },
+    {
+      "name": "opaque_full_canvas",
+      "file": "synthetic/opaque_full_canvas.png",
+      "sha256": "504bb36bf187b29ef363fdf33b1584efdc1a6f428f668696cf7f06d35aa4cbb1",
+      "bytes": 156,
+      "dimensions": [
+        64,
+        64
+      ],
+      "imageMode": "RGB",
+      "primary_type": "water",
+      "secondary_type": "steel",
+      "sourceKind": "synthetic",
+      "description": "Fully opaque: geometry MUST be unreliable"
+    },
+    {
+      "name": "insufficient_visible",
+      "file": "synthetic/insufficient_visible.png",
+      "sha256": "e815c341e7c2d5177c4001c2f7e610be595881acc402d78ecc86d9ade2006c11",
+      "bytes": 123,
+      "dimensions": [
+        64,
+        64
+      ],
+      "imageMode": "RGBA",
+      "primary_type": "grass",
+      "secondary_type": "bug",
+      "sourceKind": "synthetic",
+      "description": "16 pixels: scanner must reject before clustering"
+    },
+    {
+      "name": "empty_alpha",
+      "file": "synthetic/empty_alpha.png",
+      "sha256": "8d447892b6efbc450beab391a7003090694cfcd0014d20766150112cab1675a0",
+      "bytes": 96,
+      "dimensions": [
+        64,
+        64
+      ],
+      "imageMode": "RGBA",
+      "primary_type": "normal",
+      "secondary_type": "ghost",
+      "sourceKind": "synthetic",
+      "description": "No visible pixels: scanner must reject"
+    }
+  ]
+}

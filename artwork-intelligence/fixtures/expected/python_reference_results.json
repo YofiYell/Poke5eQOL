@@ -1,0 +1,1104 @@
+{
+  "fixtureCount": 16,
+  "kind": "executed-python-reference-not-browser-parity",
+  "results": [
+    {
+      "dimensions": [
+        64,
+        64
+      ],
+      "geometry": {
+        "alphaThreshold": 1,
+        "bounds": [
+          14,
+          17,
+          49,
+          47
+        ],
+        "components": 1,
+        "height": 64,
+        "holes": 0,
+        "maskBytes": 512,
+        "maskFormat": "packed-msb-row-v1",
+        "maskSha256": "e6ce0c8ddb9fa0086ed3dad37cfdb862d819c448d62154b0bd8737ccd5640296",
+        "maskStrideBytes": 8,
+        "occupiedPixels": 1050,
+        "reliable": true,
+        "status": "ready",
+        "width": 64
+      },
+      "imageBytes": 178,
+      "name": "transparent_margins",
+      "scan": {
+        "colors": {
+          "average_color": "#2D7BDB",
+          "background_pixels_removed": 0,
+          "clusters": [
+            {
+              "coverage": 1.0,
+              "hex": "#2D7BDB"
+            }
+          ],
+          "dominant_color": "#2D7BDB",
+          "dominant_coverage": 1.0,
+          "image_format": "PNG",
+          "image_height": 64,
+          "image_width": 64,
+          "near_black_body_fraction": 0.0,
+          "near_white_body_fraction": 0.0,
+          "outline_pixels_discounted": 0,
+          "raw_alpha_average_color": "#2D7BDB",
+          "visible_pixels": 1050
+        },
+        "decision": {
+          "average_match": "water",
+          "banner_black_strength": 0.15,
+          "banner_type_strength": 0.85,
+          "combined_score_primary": 16.778367,
+          "combined_score_secondary": 48.005877,
+          "confidence_margin": 31.22751,
+          "delta_e_average_primary": 16.778367,
+          "delta_e_average_secondary": 48.005877,
+          "delta_e_dominant_primary": 16.778367,
+          "delta_e_dominant_secondary": 48.005877,
+          "description_type": "water",
+          "dominant_match": "water",
+          "metrics_disagree": false,
+          "primary_type_color": "#4C79BC",
+          "secondary_type_color": "#78CCF0",
+          "selected_banner_type": "water",
+          "selected_tint_type": "ice",
+          "tint_strength": 0.36,
+          "top_header_types": [
+            "water",
+            "ice"
+          ]
+        },
+        "status": "ok"
+      },
+      "sha256": "b51e7f425f9a15598b2329126a773aa6da914e15aaba2d24cce9c0154108112a"
+    },
+    {
+      "dimensions": [
+        64,
+        64
+      ],
+      "geometry": {
+        "alphaThreshold": 1,
+        "bounds": [
+          9,
+          9,
+          56,
+          56
+        ],
+        "components": 1,
+        "height": 64,
+        "holes": 0,
+        "maskBytes": 512,
+        "maskFormat": "packed-msb-row-v1",
+        "maskSha256": "fc779cde1f13e68cfe12852d2a76e4030bc93c953cd39e534a0875206253bdb6",
+        "maskStrideBytes": 8,
+        "occupiedPixels": 2209,
+        "reliable": true,
+        "status": "ready",
+        "width": 64
+      },
+      "imageBytes": 263,
+      "name": "semi_transparent_boundaries",
+      "scan": {
+        "colors": {
+          "average_color": "#3C64B4",
+          "background_pixels_removed": 0,
+          "clusters": [
+            {
+              "coverage": 1.0,
+              "hex": "#3C64B4"
+            }
+          ],
+          "dominant_color": "#3C64B4",
+          "dominant_coverage": 1.0,
+          "image_format": "PNG",
+          "image_height": 64,
+          "image_width": 64,
+          "near_black_body_fraction": 0.0,
+          "near_white_body_fraction": 0.0,
+          "outline_pixels_discounted": 0,
+          "raw_alpha_average_color": "#3C64B4",
+          "visible_pixels": 1681
+        },
+        "decision": {
+          "average_match": "water",
+          "banner_black_strength": 0.15,
+          "banner_type_strength": 0.85,
+          "combined_score_primary": 12.308951,
+          "combined_score_secondary": 49.635596,
+          "confidence_margin": 37.326645,
+          "delta_e_average_primary": 12.308951,
+          "delta_e_average_secondary": 49.635596,
+          "delta_e_dominant_primary": 12.308951,
+          "delta_e_dominant_secondary": 49.635596,
+          "description_type": "water",
+          "dominant_match": "water",
+          "metrics_disagree": false,
+          "primary_type_color": "#4C79BC",
+          "secondary_type_color": "#78CCF0",
+          "selected_banner_type": "water",
+          "selected_tint_type": "ice",
+          "tint_strength": 0.36,
+          "top_header_types": [
+            "water",
+            "ice"
+          ]
+        },
+        "status": "ok"
+      },
+      "sha256": "98f00d98785ae01780000056637c420e72c6cab63ea948aa478059c286d95c42"
+    },
+    {
+      "dimensions": [
+        64,
+        64
+      ],
+      "geometry": {
+        "alphaThreshold": 1,
+        "bounds": null,
+        "components": null,
+        "height": 64,
+        "holes": null,
+        "maskBytes": null,
+        "occupiedPixels": null,
+        "reliable": false,
+        "status": "unavailable_opaque",
+        "width": 64
+      },
+      "imageBytes": 339,
+      "name": "opaque_corner_consensus",
+      "scan": {
+        "colors": {
+          "average_color": "#CD5537",
+          "background_pixels_removed": 2580,
+          "clusters": [
+            {
+              "coverage": 1.0,
+              "hex": "#CD5537"
+            }
+          ],
+          "dominant_color": "#CD5537",
+          "dominant_coverage": 1.0,
+          "image_format": "PNG",
+          "image_height": 64,
+          "image_width": 64,
+          "near_black_body_fraction": 0.0,
+          "near_white_body_fraction": 0.0,
+          "outline_pixels_discounted": 0,
+          "raw_alpha_average_color": "#CD5537",
+          "visible_pixels": 1516
+        },
+        "decision": {
+          "average_match": "fire",
+          "banner_black_strength": 0.15,
+          "banner_type_strength": 0.85,
+          "combined_score_primary": 13.607738,
+          "combined_score_secondary": 27.206138,
+          "confidence_margin": 13.5984,
+          "delta_e_average_primary": 13.607738,
+          "delta_e_average_secondary": 27.206138,
+          "delta_e_dominant_primary": 13.607738,
+          "delta_e_dominant_secondary": 27.206138,
+          "description_type": "fire",
+          "dominant_match": "fire",
+          "metrics_disagree": false,
+          "primary_type_color": "#D43A30",
+          "secondary_type_color": "#F08833",
+          "selected_banner_type": "fire",
+          "selected_tint_type": "fighting",
+          "tint_strength": 0.36,
+          "top_header_types": [
+            "fire",
+            "fighting"
+          ]
+        },
+        "status": "ok"
+      },
+      "sha256": "191710ac0667eeb00915bb5524939f902cf4b9626c5af560cac05dcf50e7d0eb"
+    },
+    {
+      "dimensions": [
+        64,
+        64
+      ],
+      "geometry": {
+        "alphaThreshold": 1,
+        "bounds": null,
+        "components": null,
+        "height": 64,
+        "holes": null,
+        "maskBytes": null,
+        "occupiedPixels": null,
+        "reliable": false,
+        "status": "unavailable_opaque",
+        "width": 64
+      },
+      "imageBytes": 198,
+      "name": "opaque_no_consensus",
+      "scan": {
+        "colors": {
+          "average_color": "#B65C46",
+          "background_pixels_removed": 0,
+          "clusters": [
+            {
+              "coverage": 0.840394,
+              "hex": "#CD5537"
+            },
+            {
+              "coverage": 0.054104,
+              "hex": "#0000FF"
+            },
+            {
+              "coverage": 0.054104,
+              "hex": "#00D200"
+            },
+            {
+              "coverage": 0.037873,
+              "hex": "#FFFFFF"
+            },
+            {
+              "coverage": 0.013526,
+              "hex": "#000000"
+            }
+          ],
+          "dominant_color": "#CD5537",
+          "dominant_coverage": 0.840394,
+          "image_format": "PNG",
+          "image_height": 64,
+          "image_width": 64,
+          "near_black_body_fraction": 0.054932,
+          "near_white_body_fraction": 0.054932,
+          "outline_pixels_discounted": 225,
+          "raw_alpha_average_color": "#AE5C47",
+          "visible_pixels": 4096
+        },
+        "decision": {
+          "average_match": "fire",
+          "banner_black_strength": 0.15,
+          "banner_type_strength": 0.85,
+          "combined_score_primary": 20.614701,
+          "combined_score_secondary": 82.725019,
+          "confidence_margin": 62.110318,
+          "delta_e_average_primary": 27.621665,
+          "delta_e_average_secondary": 75.075106,
+          "delta_e_dominant_primary": 13.607738,
+          "delta_e_dominant_secondary": 90.374932,
+          "description_type": "fire",
+          "dominant_match": "fire",
+          "metrics_disagree": false,
+          "primary_type_color": "#D43A30",
+          "secondary_type_color": "#4C79BC",
+          "selected_banner_type": "fire",
+          "selected_tint_type": "water",
+          "tint_strength": 0.36,
+          "top_header_types": [
+            "fire",
+            "water"
+          ]
+        },
+        "status": "ok"
+      },
+      "sha256": "d7330612028d0d2a205082130d4f612e1bed78be5d8cd0702d3da500e732dc4f"
+    },
+    {
+      "dimensions": [
+        64,
+        64
+      ],
+      "geometry": {
+        "alphaThreshold": 1,
+        "bounds": [
+          10,
+          10,
+          54,
+          54
+        ],
+        "components": 1,
+        "height": 64,
+        "holes": 1,
+        "maskBytes": 512,
+        "maskFormat": "packed-msb-row-v1",
+        "maskSha256": "587582057a546d4f1fe2ad976dd8a59cb0c363888a1fd9a2217ce172f2d74ba7",
+        "maskStrideBytes": 8,
+        "occupiedPixels": 1316,
+        "reliable": true,
+        "status": "ready",
+        "width": 64
+      },
+      "imageBytes": 400,
+      "name": "interior_hole",
+      "scan": {
+        "colors": {
+          "average_color": "#14AA5F",
+          "background_pixels_removed": 0,
+          "clusters": [
+            {
+              "coverage": 1.0,
+              "hex": "#14AA5F"
+            }
+          ],
+          "dominant_color": "#14AA5F",
+          "dominant_coverage": 1.0,
+          "image_format": "PNG",
+          "image_height": 64,
+          "image_width": 64,
+          "near_black_body_fraction": 0.0,
+          "near_white_body_fraction": 0.0,
+          "outline_pixels_discounted": 0,
+          "raw_alpha_average_color": "#14AA5F",
+          "visible_pixels": 1316
+        },
+        "decision": {
+          "average_match": "grass",
+          "banner_black_strength": 0.15,
+          "banner_type_strength": 0.85,
+          "combined_score_primary": 21.222803,
+          "combined_score_secondary": 108.742928,
+          "confidence_margin": 87.520125,
+          "delta_e_average_primary": 21.222803,
+          "delta_e_average_secondary": 108.742928,
+          "delta_e_dominant_primary": 21.222803,
+          "delta_e_dominant_secondary": 108.742928,
+          "description_type": "grass",
+          "dominant_match": "grass",
+          "metrics_disagree": false,
+          "primary_type_color": "#5D9D3C",
+          "secondary_type_color": "#6D4B97",
+          "selected_banner_type": "grass",
+          "selected_tint_type": "poison",
+          "tint_strength": 0.36,
+          "top_header_types": [
+            "grass",
+            "poison"
+          ]
+        },
+        "status": "ok"
+      },
+      "sha256": "80b702bd9ece07b90fa39076a8881e4f6bf40007e5d813e11403a25f47b1a08b"
+    },
+    {
+      "dimensions": [
+        64,
+        64
+      ],
+      "geometry": {
+        "alphaThreshold": 1,
+        "bounds": [
+          5,
+          5,
+          59,
+          58
+        ],
+        "components": 2,
+        "height": 64,
+        "holes": 0,
+        "maskBytes": 512,
+        "maskFormat": "packed-msb-row-v1",
+        "maskSha256": "a030964823a7ca1fbf832196a1e81966d08eea75def35a82b000de4022ec8ff1",
+        "maskStrideBytes": 8,
+        "occupiedPixels": 554,
+        "reliable": true,
+        "status": "ready",
+        "width": 64
+      },
+      "imageBytes": 302,
+      "name": "disconnected_components",
+      "scan": {
+        "colors": {
+          "average_color": "#C828A0",
+          "background_pixels_removed": 0,
+          "clusters": [
+            {
+              "coverage": 1.0,
+              "hex": "#C828A0"
+            }
+          ],
+          "dominant_color": "#C828A0",
+          "dominant_coverage": 1.0,
+          "image_format": "PNG",
+          "image_height": 64,
+          "image_width": 64,
+          "near_black_body_fraction": 0.0,
+          "near_white_body_fraction": 0.0,
+          "outline_pixels_discounted": 0,
+          "raw_alpha_average_color": "#C828A0",
+          "visible_pixels": 554
+        },
+        "decision": {
+          "average_match": "psychic",
+          "banner_black_strength": 0.15,
+          "banner_type_strength": 0.85,
+          "combined_score_primary": 35.939245,
+          "combined_score_secondary": 41.984784,
+          "confidence_margin": 6.045539,
+          "delta_e_average_primary": 35.939245,
+          "delta_e_average_secondary": 41.984784,
+          "delta_e_dominant_primary": 35.939245,
+          "delta_e_dominant_secondary": 41.984784,
+          "description_type": "psychic",
+          "dominant_match": "psychic",
+          "metrics_disagree": false,
+          "primary_type_color": "#DC4D79",
+          "secondary_type_color": "#BA7FB5",
+          "selected_banner_type": "psychic",
+          "selected_tint_type": "fairy",
+          "tint_strength": 0.36,
+          "top_header_types": [
+            "psychic",
+            "fairy"
+          ]
+        },
+        "status": "ok"
+      },
+      "sha256": "a4ae34368e6e407fe93a734a1802f5206f5dfb31525a6dd871433913a9390e2a"
+    },
+    {
+      "dimensions": [
+        64,
+        64
+      ],
+      "geometry": {
+        "alphaThreshold": 1,
+        "bounds": [
+          19,
+          3,
+          62,
+          55
+        ],
+        "components": 1,
+        "height": 64,
+        "holes": 0,
+        "maskBytes": 512,
+        "maskFormat": "packed-msb-row-v1",
+        "maskSha256": "aee9c94370096f7ab63001e00c640a97e14f6df2b0ca608286812b2b43bf8a96",
+        "maskStrideBytes": 8,
+        "occupiedPixels": 906,
+        "reliable": true,
+        "status": "ready",
+        "width": 64
+      },
+      "imageBytes": 230,
+      "name": "one_pixel_extensions",
+      "scan": {
+        "colors": {
+          "average_color": "#A06E37",
+          "background_pixels_removed": 0,
+          "clusters": [
+            {
+              "coverage": 1.0,
+              "hex": "#A06E37"
+            }
+          ],
+          "dominant_color": "#A06E37",
+          "dominant_coverage": 1.0,
+          "image_format": "PNG",
+          "image_height": 64,
+          "image_width": 64,
+          "near_black_body_fraction": 0.0,
+          "near_white_body_fraction": 0.0,
+          "outline_pixels_discounted": 0,
+          "raw_alpha_average_color": "#A06E37",
+          "visible_pixels": 906
+        },
+        "decision": {
+          "average_match": "ground",
+          "banner_black_strength": 0.15,
+          "banner_type_strength": 0.85,
+          "combined_score_primary": 12.27878,
+          "combined_score_secondary": 31.940238,
+          "confidence_margin": 19.661457,
+          "delta_e_average_primary": 12.27878,
+          "delta_e_average_secondary": 31.940238,
+          "delta_e_dominant_primary": 12.27878,
+          "delta_e_dominant_secondary": 31.940238,
+          "description_type": "ground",
+          "dominant_match": "ground",
+          "metrics_disagree": false,
+          "primary_type_color": "#895229",
+          "secondary_type_color": "#ADA984",
+          "selected_banner_type": "ground",
+          "selected_tint_type": "rock",
+          "tint_strength": 0.36,
+          "top_header_types": [
+            "ground",
+            "rock"
+          ]
+        },
+        "status": "ok"
+      },
+      "sha256": "b0639eba1201e8ab9aa9da0db69240ce3760cdca03681656ab718823d09e9f3e"
+    },
+    {
+      "dimensions": [
+        64,
+        64
+      ],
+      "geometry": {
+        "alphaThreshold": 1,
+        "bounds": [
+          9,
+          9,
+          55,
+          55
+        ],
+        "components": 1,
+        "height": 64,
+        "holes": 0,
+        "maskBytes": 512,
+        "maskFormat": "packed-msb-row-v1",
+        "maskSha256": "5a90d94a1e97bf578113060e3e6934649120152ef0f1ad8bd65719a40b862948",
+        "maskStrideBytes": 8,
+        "occupiedPixels": 2116,
+        "reliable": true,
+        "status": "ready",
+        "width": 64
+      },
+      "imageBytes": 264,
+      "name": "incidental_white",
+      "scan": {
+        "colors": {
+          "average_color": "#487ABF",
+          "background_pixels_removed": 0,
+          "clusters": [
+            {
+              "coverage": 0.986573,
+              "hex": "#4678BE"
+            },
+            {
+              "coverage": 0.013427,
+              "hex": "#FFFFFF"
+            }
+          ],
+          "dominant_color": "#4678BE",
+          "dominant_coverage": 0.986573,
+          "image_format": "PNG",
+          "image_height": 64,
+          "image_width": 64,
+          "near_black_body_fraction": 0.0,
+          "near_white_body_fraction": 0.017486,
+          "outline_pixels_discounted": 0,
+          "raw_alpha_average_color": "#497ABF",
+          "visible_pixels": 2116
+        },
+        "decision": {
+          "average_match": "water",
+          "banner_black_strength": 0.15,
+          "banner_type_strength": 0.85,
+          "combined_score_primary": 1.682481,
+          "combined_score_secondary": 31.848858,
+          "confidence_margin": 30.166377,
+          "delta_e_average_primary": 1.408019,
+          "delta_e_average_secondary": 31.361289,
+          "delta_e_dominant_primary": 1.956943,
+          "delta_e_dominant_secondary": 32.336427,
+          "description_type": "water",
+          "dominant_match": "water",
+          "metrics_disagree": false,
+          "primary_type_color": "#4C79BC",
+          "secondary_type_color": "#74A2B9",
+          "selected_banner_type": "water",
+          "selected_tint_type": "steel",
+          "tint_strength": 0.36,
+          "top_header_types": [
+            "water",
+            "steel"
+          ]
+        },
+        "status": "ok"
+      },
+      "sha256": "bd641766615e5ead1fe52dd21eca1baf2a27187075060ccc436142e476d303c1"
+    },
+    {
+      "dimensions": [
+        64,
+        64
+      ],
+      "geometry": {
+        "alphaThreshold": 1,
+        "bounds": [
+          9,
+          9,
+          55,
+          55
+        ],
+        "components": 1,
+        "height": 64,
+        "holes": 0,
+        "maskBytes": 512,
+        "maskFormat": "packed-msb-row-v1",
+        "maskSha256": "5a90d94a1e97bf578113060e3e6934649120152ef0f1ad8bd65719a40b862948",
+        "maskStrideBytes": 8,
+        "occupiedPixels": 2116,
+        "reliable": true,
+        "status": "ready",
+        "width": 64
+      },
+      "imageBytes": 232,
+      "name": "dark_outline",
+      "scan": {
+        "colors": {
+          "average_color": "#BE6722",
+          "background_pixels_removed": 0,
+          "clusters": [
+            {
+              "coverage": 0.769139,
+              "hex": "#F48228"
+            },
+            {
+              "coverage": 0.230861,
+              "hex": "#0A0C0C"
+            }
+          ],
+          "dominant_color": "#F48228",
+          "dominant_coverage": 0.769139,
+          "image_format": "PNG",
+          "image_height": 64,
+          "image_width": 64,
+          "near_black_body_fraction": 0.387524,
+          "near_white_body_fraction": 0.0,
+          "outline_pixels_discounted": 516,
+          "raw_alpha_average_color": "#99541D",
+          "visible_pixels": 2116
+        },
+        "decision": {
+          "average_match": "fighting",
+          "banner_black_strength": 0.15,
+          "banner_type_strength": 0.85,
+          "combined_score_primary": 11.355452,
+          "combined_score_secondary": 68.760779,
+          "confidence_margin": 57.405327,
+          "delta_e_average_primary": 16.942535,
+          "delta_e_average_secondary": 59.231164,
+          "delta_e_dominant_primary": 5.768369,
+          "delta_e_dominant_secondary": 78.290394,
+          "description_type": "fighting",
+          "dominant_match": "fighting",
+          "metrics_disagree": false,
+          "primary_type_color": "#F08833",
+          "secondary_type_color": "#4E403F",
+          "selected_banner_type": "fighting",
+          "selected_tint_type": "dark",
+          "tint_strength": 0.36,
+          "top_header_types": [
+            "fighting",
+            "dark"
+          ]
+        },
+        "status": "ok"
+      },
+      "sha256": "0d5eb5951ba0743943531d9f39bb53a907eeea3ac4e9087aacb2a1bcee220404"
+    },
+    {
+      "dimensions": [
+        64,
+        64
+      ],
+      "geometry": {
+        "alphaThreshold": 1,
+        "bounds": [
+          7,
+          7,
+          56,
+          56
+        ],
+        "components": 1,
+        "height": 64,
+        "holes": 0,
+        "maskBytes": 512,
+        "maskFormat": "packed-msb-row-v1",
+        "maskSha256": "d3dd40258da4d37df3175a33dc7503cc294878c940b76e7501d7cd44b1c237d2",
+        "maskStrideBytes": 8,
+        "occupiedPixels": 2401,
+        "reliable": true,
+        "status": "ready",
+        "width": 64
+      },
+      "imageBytes": 240,
+      "name": "dark_interior",
+      "scan": {
+        "colors": {
+          "average_color": "#171719",
+          "background_pixels_removed": 0,
+          "clusters": [
+            {
+              "coverage": 1.0,
+              "hex": "#171719"
+            }
+          ],
+          "dominant_color": "#171719",
+          "dominant_coverage": 1.0,
+          "image_format": "PNG",
+          "image_height": 64,
+          "image_width": 64,
+          "near_black_body_fraction": 1.0,
+          "near_white_body_fraction": 0.0,
+          "outline_pixels_discounted": 552,
+          "raw_alpha_average_color": "#161718",
+          "visible_pixels": 2401
+        },
+        "decision": {
+          "average_match": "dark",
+          "banner_black_strength": 0.15,
+          "banner_type_strength": 0.85,
+          "combined_score_primary": 21.785125,
+          "combined_score_secondary": 59.316302,
+          "confidence_margin": 37.531177,
+          "delta_e_average_primary": 21.785125,
+          "delta_e_average_secondary": 59.316302,
+          "delta_e_dominant_primary": 21.785125,
+          "delta_e_dominant_secondary": 59.316302,
+          "description_type": "dark",
+          "dominant_match": "dark",
+          "metrics_disagree": false,
+          "primary_type_color": "#4E403F",
+          "secondary_type_color": "#74A2B9",
+          "selected_banner_type": "dark",
+          "selected_tint_type": "steel",
+          "tint_strength": 0.36,
+          "top_header_types": [
+            "dark",
+            "steel"
+          ]
+        },
+        "status": "ok"
+      },
+      "sha256": "539143417bb2c58d7f97de9e46734ff94fec7273258ac2ca4bbdf13bf27cda9e"
+    },
+    {
+      "dimensions": [
+        64,
+        64
+      ],
+      "geometry": {
+        "alphaThreshold": 1,
+        "bounds": [
+          8,
+          8,
+          56,
+          56
+        ],
+        "components": 1,
+        "height": 64,
+        "holes": 0,
+        "maskBytes": 512,
+        "maskFormat": "packed-msb-row-v1",
+        "maskSha256": "3bc473af3f97cce63c37230efa57e6f4ca68f212338c5d8fffb54f1f0dc41354",
+        "maskStrideBytes": 8,
+        "occupiedPixels": 1833,
+        "reliable": true,
+        "status": "ready",
+        "width": 64
+      },
+      "imageBytes": 381,
+      "name": "tiny_white_highlight",
+      "scan": {
+        "colors": {
+          "average_color": "#4774C3",
+          "background_pixels_removed": 0,
+          "clusters": [
+            {
+              "coverage": 0.992939,
+              "hex": "#4673C3"
+            },
+            {
+              "coverage": 0.007061,
+              "hex": "#FFFFFF"
+            }
+          ],
+          "dominant_color": "#4673C3",
+          "dominant_coverage": 0.992939,
+          "image_format": "PNG",
+          "image_height": 64,
+          "image_width": 64,
+          "near_black_body_fraction": 0.0,
+          "near_white_body_fraction": 0.016367,
+          "outline_pixels_discounted": 0,
+          "raw_alpha_average_color": "#4975C4",
+          "visible_pixels": 1833
+        },
+        "decision": {
+          "average_match": "water",
+          "banner_black_strength": 0.15,
+          "banner_type_strength": 0.85,
+          "combined_score_primary": 8.035545,
+          "combined_score_secondary": 44.010021,
+          "confidence_margin": 35.974476,
+          "delta_e_average_primary": 7.669945,
+          "delta_e_average_secondary": 43.65006,
+          "delta_e_dominant_primary": 8.401145,
+          "delta_e_dominant_secondary": 44.369982,
+          "description_type": "water",
+          "dominant_match": "water",
+          "metrics_disagree": false,
+          "primary_type_color": "#4C79BC",
+          "secondary_type_color": "#78CCF0",
+          "selected_banner_type": "water",
+          "selected_tint_type": "ice",
+          "tint_strength": 0.36,
+          "top_header_types": [
+            "water",
+            "ice"
+          ]
+        },
+        "status": "ok"
+      },
+      "sha256": "b8b5bcc1f1ca79deefe6e55af799466547562c304909acfde9ab1c84b70e162b"
+    },
+    {
+      "dimensions": [
+        64,
+        64
+      ],
+      "geometry": {
+        "alphaThreshold": 1,
+        "bounds": [
+          10,
+          10,
+          54,
+          54
+        ],
+        "components": 1,
+        "height": 64,
+        "holes": 0,
+        "maskBytes": 512,
+        "maskFormat": "packed-msb-row-v1",
+        "maskSha256": "6b315aaae2b019906a5afeda528ad6122518e3c2d058cc2ebfe59bd0a58d1c9d",
+        "maskStrideBytes": 8,
+        "occupiedPixels": 1936,
+        "reliable": true,
+        "status": "ready",
+        "width": 64
+      },
+      "imageBytes": 214,
+      "name": "dual_color_tie_case",
+      "scan": {
+        "colors": {
+          "average_color": "#794C76",
+          "background_pixels_removed": 0,
+          "clusters": [
+            {
+              "coverage": 0.523756,
+              "hex": "#5A5890"
+            },
+            {
+              "coverage": 0.476244,
+              "hex": "#9B3E59"
+            }
+          ],
+          "dominant_color": "#5A5890",
+          "dominant_coverage": 0.523756,
+          "image_format": "PNG",
+          "image_height": 64,
+          "image_width": 64,
+          "near_black_body_fraction": 0.0,
+          "near_white_body_fraction": 0.0,
+          "outline_pixels_discounted": 0,
+          "raw_alpha_average_color": "#794C76",
+          "visible_pixels": 1936
+        },
+        "decision": {
+          "average_match": "ghost",
+          "banner_black_strength": 0.15,
+          "banner_type_strength": 0.85,
+          "combined_score_primary": 11.085889,
+          "combined_score_secondary": 50.731341,
+          "confidence_margin": 39.645453,
+          "delta_e_average_primary": 5.009152,
+          "delta_e_average_secondary": 42.472451,
+          "delta_e_dominant_primary": 17.162626,
+          "delta_e_dominant_secondary": 58.990232,
+          "description_type": "ghost",
+          "dominant_match": "ghost",
+          "metrics_disagree": false,
+          "primary_type_color": "#6B426E",
+          "secondary_type_color": "#DC4D79",
+          "selected_banner_type": "ghost",
+          "selected_tint_type": "psychic",
+          "tint_strength": 0.36,
+          "top_header_types": [
+            "ghost",
+            "psychic"
+          ]
+        },
+        "status": "ok"
+      },
+      "sha256": "8e86c8b725800e056ce1cfefd6bc79fc5bea3c7e608a87366fe2619f32f2c27e"
+    },
+    {
+      "dimensions": [
+        64,
+        64
+      ],
+      "geometry": {
+        "alphaThreshold": 1,
+        "bounds": [
+          12,
+          12,
+          52,
+          52
+        ],
+        "components": 2,
+        "height": 64,
+        "holes": 1,
+        "maskBytes": 512,
+        "maskFormat": "packed-msb-row-v1",
+        "maskSha256": "56d16a58a15abd1413a1bada9017c1ad3962dc33b9d0660153833ab411437f78",
+        "maskStrideBytes": 8,
+        "occupiedPixels": 940,
+        "reliable": true,
+        "status": "ready",
+        "width": 64
+      },
+      "imageBytes": 233,
+      "name": "nearly_invisible_alpha",
+      "scan": {
+        "colors": {
+          "average_color": "#8250BE",
+          "background_pixels_removed": 0,
+          "clusters": [
+            {
+              "coverage": 1.0,
+              "hex": "#8250BE"
+            }
+          ],
+          "dominant_color": "#8250BE",
+          "dominant_coverage": 1.0,
+          "image_format": "PNG",
+          "image_height": 64,
+          "image_width": 64,
+          "near_black_body_fraction": 0.0,
+          "near_white_body_fraction": 0.0,
+          "outline_pixels_discounted": 0,
+          "raw_alpha_average_color": "#8250BE",
+          "visible_pixels": 784
+        },
+        "decision": {
+          "average_match": "ghost",
+          "banner_black_strength": 0.15,
+          "banner_type_strength": 0.85,
+          "combined_score_primary": 59.295785,
+          "combined_score_secondary": 37.908992,
+          "confidence_margin": 21.386793,
+          "delta_e_average_primary": 59.295785,
+          "delta_e_average_secondary": 37.908992,
+          "delta_e_dominant_primary": 59.295785,
+          "delta_e_dominant_secondary": 37.908992,
+          "description_type": "psychic",
+          "dominant_match": "ghost",
+          "metrics_disagree": false,
+          "primary_type_color": "#DC4D79",
+          "secondary_type_color": "#6B426E",
+          "selected_banner_type": "ghost",
+          "selected_tint_type": "psychic",
+          "tint_strength": 0.36,
+          "top_header_types": [
+            "psychic",
+            "ghost"
+          ]
+        },
+        "status": "ok"
+      },
+      "sha256": "28adb9fca64f0d095a4c4314af0bd07e68ed46533241ad598c6fa5a34dfaeff4"
+    },
+    {
+      "dimensions": [
+        64,
+        64
+      ],
+      "geometry": {
+        "alphaThreshold": 1,
+        "bounds": null,
+        "components": null,
+        "height": 64,
+        "holes": null,
+        "maskBytes": null,
+        "occupiedPixels": null,
+        "reliable": false,
+        "status": "unavailable_opaque",
+        "width": 64
+      },
+      "imageBytes": 156,
+      "name": "opaque_full_canvas",
+      "scan": {
+        "error": "too_few_visible_pixels",
+        "errorType": "ValueError",
+        "status": "error"
+      },
+      "sha256": "504bb36bf187b29ef363fdf33b1584efdc1a6f428f668696cf7f06d35aa4cbb1"
+    },
+    {
+      "dimensions": [
+        64,
+        64
+      ],
+      "geometry": {
+        "alphaThreshold": 1,
+        "bounds": [
+          0,
+          0,
+          4,
+          4
+        ],
+        "components": 1,
+        "height": 64,
+        "holes": 0,
+        "maskBytes": 512,
+        "maskFormat": "packed-msb-row-v1",
+        "maskSha256": "0a3ad546184acb3a3898495e6e1799110d803c2de08fc2216fb3bbf89fee15eb",
+        "maskStrideBytes": 8,
+        "occupiedPixels": 16,
+        "reliable": true,
+        "status": "ready",
+        "width": 64
+      },
+      "imageBytes": 123,
+      "name": "insufficient_visible",
+      "scan": {
+        "error": "too_few_visible_pixels",
+        "errorType": "ValueError",
+        "status": "error"
+      },
+      "sha256": "e815c341e7c2d5177c4001c2f7e610be595881acc402d78ecc86d9ade2006c11"
+    },
+    {
+      "dimensions": [
+        64,
+        64
+      ],
+      "geometry": {
+        "alphaThreshold": 1,
+        "bounds": null,
+        "components": 0,
+        "height": 64,
+        "holes": 0,
+        "maskBytes": null,
+        "occupiedPixels": 0,
+        "reliable": false,
+        "status": "unavailable_empty",
+        "width": 64
+      },
+      "imageBytes": 96,
+      "name": "empty_alpha",
+      "scan": {
+        "error": "too_few_visible_pixels",
+        "errorType": "ValueError",
+        "status": "error"
+      },
+      "sha256": "8d447892b6efbc450beab391a7003090694cfcd0014d20766150112cab1675a0"
+    }
+  ],
+  "runtime": {
+    "numpy": "2.3.5",
+    "pillow": "12.3.0",
+    "python": "3.13.5",
+    "scipy": "1.17.0"
+  },
+  "scannerSha256": "f6ac6e346e2e93b2c05110ebe286c8e37d2120b9d035d9ce1766e536d133f1cd",
+  "scannerVersion": "1.0.0"
+}

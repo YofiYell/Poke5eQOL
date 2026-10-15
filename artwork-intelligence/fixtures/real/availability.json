@@ -1,0 +1,34 @@
+{
+  "fixtureKind": "real-fakemon-normal-unavailable",
+  "reportedSource": "https://poke5e.auroratide.cloud/a79eff8c-4872-4b75-9b45-c7cb73cf4f55.png",
+  "userObservedCanvasProbe": {
+    "readable": true,
+    "dimensions": [
+      722,
+      722
+    ],
+    "firstPixel": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "source": "https://poke5e.auroratide.cloud/a79eff8c-4872-4b75-9b45-c7cb73cf4f55.png"
+  },
+  "ART01Availability": {
+    "sourceBytesAvailable": false,
+    "sourceSHA256": null,
+    "nativeSpeciesIdentityVerified": false,
+    "typesVerified": false,
+    "scannerExecuted": false,
+    "measuredColors": null,
+    "geometry": null,
+    "blockers": [
+      "Container HTTP fetch failed: DNS name resolution unavailable",
+      "download tool could not fetch object",
+      "web retrieval failed: cache miss",
+      "Native species identity and type pairing not verified from Pok\u00e95e record"
+    ]
+  },
+  "explicitlyNotMeasured": "Do not use this status fixture as scan data. User-observed Canvas probe is not a source-byte artifact."
+}
