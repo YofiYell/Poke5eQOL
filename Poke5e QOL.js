@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Pokemon 5e QOL - v0.13.2 Ready Card List Handoff
+// @name         Poke5e QOL
 // @namespace    yofi.poke5e.qol.v01239
 // @version      0.13.2
 // @description  Core navigation and controls; canonical universal Scarlet/Violet type palette; neighbor data warmup and decoded pre-paint portrait synchronization.

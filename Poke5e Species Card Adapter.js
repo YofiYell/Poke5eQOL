@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Poke5e Species Card v0.1.19 (Native Theme Targets)
+// @name         Poke5e Species Card Adapter
 // @namespace    yofi.poke5e.species.card
-// @version      0.1.19
+// @version      0.1.20
 // @description  Pokemon/Fakemon adaptive card presentation with direct native navigation.
 // @match        https://poke5e.app/*
 // @run-at       document-start
@@ -138,7 +138,7 @@
     window.addEventListener('load',detectQol,{once:true});
     return {register,status,requireQol,report,notice,ready:publishReady};
   })());
-  const registration = modules.register('Species Card','0.1.19');
+  const registration = modules.register('Species Card','0.1.20');
   modules.requireQol(registration,runSpeciesCard);
   function runSpeciesCard() {
   // Standalone companion. Disable earlier Hero Layout Lab builds, not the QOL script.
@@ -148,15 +148,15 @@
   // the same nodes and both install recurring timers.
   if (window.__yofiHeroLayoutLab) {
     const active = window.__yofiHeroLayoutLab;
-    console.error('[Species Card v0.1.19] Conflicting adapter is already active:',
+    console.error('[Species Card v0.1.20] Conflicting adapter is already active:',
       active, 'Disable ALL earlier Hero Layout Lab / Adapter userscripts and reload.');
     modules.notice('yofi-userscript-version-conflict','Species Card conflict: disable extra Hero Layout Adapters / Species Card userscripts and reload.');
     return false;
   }
-  window.__yofiHeroLayoutLab = '0.1.19';
-  window.__yofiSpeciesCard = '0.1.19';
+  window.__yofiHeroLayoutLab = '0.1.20';
+  window.__yofiSpeciesCard = '0.1.20';
 
-  const VERSION = '0.1.19';
+  const VERSION = '0.1.20';
   const STYLE_ID = 'yofi-species-card-hero-css';
   const PREPARE_EVENT = 'yofi:species-card-prepare-before-reveal';
   const PRE_REVEAL_EVENT = 'yofi:species-card-before-reveal';
@@ -999,9 +999,35 @@ article.yofi-scores-layout section.moves > dl + dl {
     }
     .yofi-hero-facts dt { font-weight: 700; }
     .yofi-hero-facts dt::after { content: none !important; }
+    /* One actual icon/value field in compact and promoted hero modes. The
+       native metadata remains the source; the field itself moves between bars. */
+    .yofi-hero-facts > dl.yofi-hero-facts-right {
+      container-type: inline-size;
+    }
+    .yofi-hero-facts .yofi-hero-field-egg {
+      display: grid !important;
+      grid-template-columns: 18px minmax(0, 1fr);
+      align-items: center !important;
+      column-gap: 6px !important;
+      width: 100%; min-width: 0;
+      box-sizing: border-box;
+      padding-inline: 6px !important;
+    }
+    .yofi-hero-field-egg > dt { display: none !important; }
+    .yofi-hero-field-egg > .lab3-egg-icon {
+      display: grid; place-items: center;
+      width: 18px; height: 18px; min-width: 0;
+    }
+    .yofi-hero-field-egg > .lab3-egg-icon svg {
+      display: block; width: 100%; height: 100%;
+      fill: none; stroke: currentColor; stroke-width: 2.1;
+    }
     .yofi-hero-facts .yofi-hero-egg-value {
+      display: block; min-width: 0;
+      font-size: clamp(10px, 8cqi, 14px) !important;
+      text-align: center;
       text-transform: capitalize;
-      white-space: nowrap !important;
+      white-space: normal !important;
       overflow-wrap: normal !important;
       word-break: normal !important;
     }
@@ -1491,10 +1517,16 @@ article.yofi-scores-layout section.moves > dl + dl {
     const eggField = document.createElement("div");
     eggField.className = "yofi-hero-field yofi-hero-field-egg";
     const eggLabel = document.createElement("dt");
-    eggLabel.textContent = "Egg:";
+    eggLabel.textContent = "Egg Group:";
+    eggField.setAttribute("role", "group");
+    eggField.setAttribute("aria-label", "Egg group");
+    const eggIcon = document.createElement("span");
+    eggIcon.className = "lab3-egg-icon";
+    eggIcon.setAttribute("aria-hidden", "true");
+    eggIcon.innerHTML = ICON.egg;
     const eggValue = document.createElement("dd");
     eggValue.className = "yofi-hero-egg-value";
-    eggField.append(eggLabel, eggValue);
+    eggField.append(eggIcon, eggLabel, eggValue);
     right.appendChild(eggField);
     const values = { egg: eggValue };
     facts.append(gender, right);
@@ -1708,16 +1740,6 @@ article.yofi-scores-layout section.moves > dl + dl {
     if (!fullGender || !fullEgg) return;
     state.hero.dataset.yofiKind = currentRoot();
     copyHeroValue(egg, state.values.egg);
-    // Only single, short standard groups get the fuller label. "Amorphous",
-    // "Undiscovered", "Gender Unknown" and "Human-Like" stay concise;
-    // all multiple-group combinations also retain "Egg:".
-    const eggGroups = heroText(egg).split(/,\s*/).map(value => value.trim()).filter(Boolean);
-    const shortSingleEgg = eggGroups.length === 1 && /^(?:bug|field|grass|fairy|ditto|flying|dragon|monster|mineral|water [123])$/i.test(eggGroups[0]);
-    const eggLabel = state.right.querySelector('.yofi-hero-field-egg > dt');
-    if (eggLabel) {
-      const label = shortSingleEgg ? 'Egg Group:' : 'Egg:';
-      if (eggLabel.textContent !== label) eggLabel.textContent = label;
-    }
     // Semantic normalization is owned by QOL; this renderer only consumes it.
     const forcedSex = ['female','male'].includes(state.article.dataset.yofiForcedSex)
       ? state.article.dataset.yofiForcedSex : null;
@@ -2037,20 +2059,20 @@ article.yofi-scores-layout section.moves > dl + dl {
       height: var(--lab3-bio-height, 46px) !important;
       min-height: var(--lab3-bio-height, 46px) !important;
     }
-    /* A compact but legible option for both the first and score-promoted
-       layouts. Only bounding dimensions change; the native gender contents,
-       ratio/slots and colors are never replaced. Allow Egg to wrap naturally. */
+    /* Inline biology keeps the native gender segments while Egg uses the same
+       icon/value grid in a narrower track with natural word wrapping. */
     article.lab3-active .lab3-biologies.lab3-bio-inline .lab3-egg {
-      padding-inline: 4px !important;
-      gap: 4px !important;
-      font-size: .82em !important;
-      line-height: 1.16 !important;
+      padding-inline: 6px !important;
     }
-    article.lab3-active .lab3-biologies.lab3-bio-inline .lab3-egg-icon {
-      width: 17px !important; height: 17px !important; flex-basis: 17px !important;
+    article.lab3-active .lab3-biologies.lab3-bio-inline .lab3-egg .yofi-hero-field-egg {
+      grid-template-columns: 17px minmax(0, 1fr) !important;
+      column-gap: 5px !important;
     }
-    article.lab3-active .lab3-biologies.lab3-bio-inline .lab3-egg-icon svg {
+    article.lab3-active .lab3-biologies.lab3-bio-inline .lab3-egg .lab3-egg-icon {
       width: 17px !important; height: 17px !important;
+    }
+    article.lab3-active .lab3-biologies.lab3-bio-inline .lab3-egg .yofi-hero-egg-value {
+      font-size: clamp(10px, 6cqi, 13px) !important;
     }
     article.lab3-active .lab3-biologies.lab3-bio-inline .lab3-copy-facts {
       font-size: var(--yofi-hero-facts-font, .75rem) !important;
@@ -2167,6 +2189,15 @@ article.yofi-scores-layout section.moves > dl + dl {
       padding: 0 9px;
     }
     .lab3-biology.lab3-gender { padding: 0 !important; background: transparent !important; }
+    /* The promoted bar alone is a width-query container. Font units then
+       scale SVG slots and center text together, bounded also by tile height.
+       The regular compact and unrelated native gender bars are untouched. */
+    article.lab3-active .yofi-species-hero .lab3-biology.lab3-gender {
+      container-type: inline-size;
+    }
+    article.lab3-active .yofi-species-hero .lab3-gender .gender-ratio-display {
+      font-size: clamp(12px, min(5.8cqi, calc(var(--lab3-bio-height, 50px) * .46)), 24px) !important;
+    }
     /* Mirror the COMPLETE native gender node under the original .yofi-hero-facts
        ancestor. Do not rewrite its native segments, ratio, slots, glyphs or colors.
        Only enlarge the native bar's bounding box and round its corners. */
@@ -2205,24 +2236,34 @@ article.yofi-scores-layout section.moves > dl + dl {
     }
     /* All other segment colors, centered odds and icon slots are inherited
        directly from the extracted native gender selectors. */
-    .lab3-egg { display: flex; gap: 8px; align-items: center; justify-content: center; }
-    .lab3-egg-icon { display: grid; place-items: center; width: 22px; height: 22px; flex: 0 0 22px; }
-    .lab3-egg-icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.1; }
+    .lab3-egg {
+      display: flex; align-items: center; justify-content: stretch;
+      container-type: inline-size;
+    }
     .lab3-egg .yofi-hero-facts-right {
-      display:flex !important;align-items:center !important;justify-content:center !important;
-      min-width:0 !important;max-width:100% !important; margin:0 !important;
-      font-size:inherit !important;line-height:inherit !important;
+      display: block !important;
+      flex: 1 1 auto; width: 100%; min-width: 0 !important;
+      margin: 0 !important; font-size: inherit !important;
     }
     .lab3-egg .yofi-hero-field-egg {
-      display:flex !important;align-items:center !important;justify-content:center !important;
-      min-width:0 !important;margin:0 !important;
+      display: grid !important;
+      grid-template-columns: 22px minmax(0, 1fr) !important;
+      column-gap: 8px !important;
+      width: 100%; min-width: 0 !important;
+      align-items: center !important; margin: 0 !important;
+      padding: 0 !important;
     }
-    .lab3-egg .yofi-hero-field-egg > dt {display:none !important;}
+    .lab3-egg .yofi-hero-field-egg > .lab3-egg-icon {
+      width: 22px; height: 22px;
+    }
     .lab3-egg .yofi-hero-egg-value {
-      display:block !important;min-width:0 !important;
-      overflow-wrap:anywhere !important;white-space:normal !important;
-      font-size:inherit !important;line-height:inherit !important;
-      text-align:center !important;text-transform:capitalize !important;
+      display: block !important; min-width: 0 !important;
+      margin: 0 !important;
+      overflow-wrap: normal !important; word-break: normal !important;
+      white-space: normal !important;
+      font-size: clamp(10px, 5cqi, 16px) !important;
+      line-height: 1.16 !important;
+      text-align: center !important; text-transform: capitalize !important;
     }
     article.lab3-stage3 .yofi-species-hero > .lab3-right > section.abilities,
     article .yofi-species-hero section.abilities.lab3-measure-abilities {
@@ -2364,8 +2405,11 @@ article.yofi-scores-layout section.moves > dl + dl {
       data[key] = { label: cleanText(field.querySelector('dt')), value: cleanText(field.querySelector('dd')) };
     }
     const match = data.lvl.value.match(/^\s*(\d+)\s*$/);
-    if (match && Number(match[1]) <= MAX_ENCOUNTER_LEVEL)
-      data.lvl.value = `${match[1]}\u2013${MAX_ENCOUNTER_LEVEL}`;
+    if (match) {
+      const level = Number(match[1]);
+      if (level >= 1 && level < MAX_ENCOUNTER_LEVEL)
+        data.lvl.value = `${level}+`;
+    }
     return data;
   }
 
@@ -2381,7 +2425,6 @@ article.yofi-scores-layout section.moves > dl + dl {
     gender.append(genderBody);
     const egg = document.createElement('div');
     egg.className = 'lab3-biology lab3-egg';
-    egg.innerHTML = '<span class="lab3-egg-icon">' + ICON.egg + '</span>';
     biologies.append(gender, egg);
     left.append(biologies);
     const side = document.createElement('aside');
@@ -2484,52 +2527,6 @@ article.yofi-scores-layout section.moves > dl + dl {
     firstColumnCorrection: .09 // First promotion only: permit a small one-time dip.
   });
 
-  function eggMinWidth(view) {
-    const text = cleanText(view.hero.querySelector('.yofi-hero-egg-value'));
-    const font = parseFloat(getComputedStyle(view.egg).fontSize) || 16;
-    return Math.max(126, Math.min(350, Math.ceil(54 + text.length * font * .52)));
-  }
-  let inlineMeasureContext = null;
-  function inlineBiologyHeight(view, width, stage) {
-    // Both Gender and Egg must be truly readable at their final *individual*
-    // widths. A two-line Field/Fairy tile fits in little more than 100px;
-    // requiring two full-width labels was excluding the useful compact state.
-    const half = (width - TILE_GAP) / 2;
-    if (half < 91) return null;
-    const name = cleanText(view.hero.querySelector('.yofi-hero-egg-value'));
-    if (!name) return 36;
-    const style = getComputedStyle(view.egg);
-    // At a previous inline stage this computed size ALREADY includes .82em.
-    // Never apply the compact font reduction twice during consecutive resizes.
-    const wasInline = view.biologies.classList.contains('lab3-bio-inline');
-    const font = (parseFloat(style.fontSize) || 16) * (wasInline ? 1 : .82);
-    const family = style.fontFamily || 'sans-serif';
-    const measure = inlineMeasureContext || (inlineMeasureContext = document.createElement('canvas').getContext('2d'));
-    measure.font = `${font}px ${family}`;
-    // CSS uses a 17px egg, a 4px gap, and 4px padding on either side.
-    const lineWidth = half - 29;
-    if (lineWidth < 48) return null;
-    const words = name.split(/\s+/).filter(Boolean);
-    let lines = 1, occupied = 0;
-    for (const word of words) {
-      const ww = measure.measureText(word).width;
-      const space = occupied ? measure.measureText(' ').width : 0;
-      if (occupied && occupied + space + ww > lineWidth) { lines++; occupied=0; }
-      if (ww > lineWidth) {
-        const extra = Math.floor((ww - .01) / lineWidth);
-        lines += extra;
-        occupied = ww - extra * lineWidth;
-      } else occupied += (occupied ? space : 0) + ww;
-    }
-    const maxLines = stage === 1 ? 2 : 3;
-    if (lines > maxLines) return null;
-    return Math.max(35, Math.ceil(lines * font * 1.16 + 11));
-  }
-  function bioTileHeight(egg, trackWidth, tile, stage) {
-    if (stage === 1) return (tile - TILE_GAP) / 2;
-    const rows = Math.max(1, Math.ceil((egg - 54) / Math.max(55, trackWidth - 55)));
-    return Math.max(42, Math.min(72, 26 + rows * 16));
-  }
   function artFloor(available, ratio) {
     // Compact's 37%-of-CARD art rule is respected *at its upper anchor*, then
     // smoothly extended with a smaller slope. This is a target for promoted
@@ -2594,11 +2591,65 @@ article.yofi-scores-layout section.moves > dl + dl {
         cache.set(key,h);
         return h;
       },
+      eggFit(view, width, inline, stage) {
+        if (width < 82) return null;
+        const w = Math.round(width * 2) / 2;
+        const key = `egg:${inline ? 'inline' : 'stack'}:${stage}:${w}`;
+        if (cache.has(key)) return cache.get(key);
+        let probe = probes.get('egg');
+        if (!probe) {
+          // One reusable rendered-content probe, never one per candidate and
+          // never an observer. It reproduces the same icon/value DOM and CSS.
+          const outer = document.createElement('article');
+          outer.className = 'lab3-active';
+          outer.style.cssText = 'position:absolute!important;visibility:hidden!important;' +
+            'pointer-events:none!important;left:-100000px!important;top:0!important;' +
+            'height:auto!important;width:auto!important;max-width:none!important;' +
+            'overflow:visible!important;';
+          const host = document.createElement('div');
+          host.className = 'yofi-species-hero';
+          const group = document.createElement('div');
+          group.className = 'lab3-biologies';
+          const bar = document.createElement('div');
+          bar.className = 'lab3-biology lab3-egg';
+          const nativeField = view.hero.querySelector('.yofi-hero-field-egg');
+          if (!nativeField) return null;
+          const right = document.createElement('dl');
+          right.className = 'yofi-hero-facts-right';
+          right.append(cloneWithoutIds(nativeField));
+          bar.append(right); group.append(bar); host.append(group); outer.append(host);
+          document.body.append(outer);
+          probe = {outer,group,bar,field:right.querySelector('.yofi-hero-field-egg'),
+            value:right.querySelector('.yofi-hero-egg-value'),
+            icon:right.querySelector('.lab3-egg-icon')};
+          probes.set('egg',probe);
+        }
+        probe.group.classList.toggle('lab3-bio-inline',inline);
+        // The container width is the candidate's final width. Set the bar's
+        // height to auto for natural content measurement before fitting it.
+        probe.group.style.setProperty('width',`${w}px`,'important');
+        probe.bar.style.setProperty('width',`${w}px`,'important');
+        probe.bar.style.setProperty('height','auto','important');
+        probe.bar.style.setProperty('min-height','0','important');
+        probe.bar.style.setProperty('overflow','visible','important');
+        const rect = probe.value.getBoundingClientRect();
+        const css = getComputedStyle(probe.value);
+        const line = parseFloat(css.lineHeight) || parseFloat(css.fontSize)*1.16 || 12;
+        const lines = Math.max(1,Math.round(rect.height / line));
+        const maxLines = inline ? (stage === 1 ? 2 : 3) : 5;
+        const fits = lines <= maxLines &&
+          probe.value.scrollWidth <= probe.value.clientWidth + 1 &&
+          probe.field.scrollWidth <= probe.field.clientWidth + 1;
+        const result = fits ? {height: Math.ceil(Math.max(rect.height,
+          probe.icon.getBoundingClientRect().height) + 12),lines} : null;
+        cache.set(key,result);
+        return result;
+      },
       close() { for (const {outer} of probes.values()) outer.remove(); }
     };
   }
   function geometryFor(stage, bioMode, tile, copyWidth, hero, view, ratio,
-                       available, minImageHeight, measurer, eggWidth) {
+                       available, minImageHeight, measurer) {
     const gap = Math.max(12, Math.min(20, Math.round(available * .014)));
     const cols = stage === 3 ? 4 : 2;
     const rightWidth = cols * tile + (cols - 1) * TILE_GAP;
@@ -2608,12 +2659,12 @@ article.yofi-scores-layout section.moves > dl + dl {
     if (!nativeDesc) return null;
     const leftBio = bioMode !== 'right-stack';
     const inline = bioMode === 'left-inline';
-    if (stage === 1 && !inline && copyWidth < eggWidth) return null;
-    if (!leftBio && rightWidth < eggWidth) return null;
     const bioWidth = leftBio ? (inline ? (copyWidth - TILE_GAP) / 2 : copyWidth) : rightWidth;
-    const bioH = inline ? inlineBiologyHeight(view,copyWidth,stage) :
-      bioTileHeight(eggWidth,bioWidth,tile,stage);
-    if (bioH == null) return null;
+    const eggFit = measurer.eggFit(view,bioWidth,inline,stage);
+    if (!eggFit) return null;
+    const bioH = inline ? Math.max(35,eggFit.height) : stage===1
+      ? (tile-TILE_GAP)/2 : Math.max(42,eggFit.height);
+    if (eggFit.height > bioH + .5 || bioH > 100) return null;
     const bioTotal = inline ? bioH : 2 * bioH + TILE_GAP;
     // Neither Gender nor Egg is allowed to disappear or become illegible.
     if (stage === 1 && bioH < 32) return null;
@@ -2667,7 +2718,6 @@ article.yofi-scores-layout section.moves > dl + dl {
     const desc = hero.querySelector('.yofi-hero-copy');
     if (!desc) return null;
     const descFont = parseFloat(getComputedStyle(desc.querySelector('.small-text') || desc).fontSize)||16;
-    const eggWidth = eggMinWidth(view);
     const hpText = cleanText(view.vitals.querySelector('[data-key="hp"] .lab3-number'));
     const vitalFont = parseFloat(getComputedStyle(view.vitals.querySelector('.lab3-number')).fontSize)||16;
     const tileMin = Math.max(MIN_TILE,Math.ceil(hpText.length*vitalFont*.55+12));
@@ -2685,7 +2735,7 @@ article.yofi-scores-layout section.moves > dl + dl {
     let best = null;
     for (const mode of modeOptions) for (const tile of tiles) for (const copyWidth of widths) {
       const candidate = geometryFor(stage,mode,tile,copyWidth,hero,view,ratio,
-        available,imageFloor,measurer,eggWidth);
+        available,imageFloor,measurer);
       if (candidate && (!best || candidate.quality < best.quality - .01 ||
         (Math.abs(candidate.quality-best.quality)<=.01 && candidate.imageWidth>best.imageWidth)))
         best = candidate;
