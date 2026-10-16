@@ -231,13 +231,23 @@ Current implementation: GEO-01-R01 and GEO-01-R02, through Species Card 0.1.26.
 
 HERO-OSCILLATION — Repeated self-triggered promotion/demotion on a stationary card
 
-Status: Ready for root-cause investigation; Safari recording supplied, no code fix approved.
+Status: Ready for Nosepass-specific root-cause investigation and cause-driven corrective work; no userscript changes yet.
 
 Observed behavior (2026-10-16)
 
 * Nosepass (#0299) repeatedly alternates between native and promoted hero arrangements while the selected species and browser-panel width remain unchanged. The animation visibly relocates ability scores, gender/egg bars and artwork, rather than showing a normal one-time load transition.
 * The recording shows the problem in desktop-style Safari with a narrow split browser panel. Other species shown after navigation do not establish that the defect is unique to Nosepass.
 * The recording proves repeated layout changes, but does not include live layout-state or computed-style telemetry. The full causal chain is not yet confirmed.
+* Nosepass is the first and so far only species reported to oscillate. Explain the species-specific trigger rather than treating generic layout feedback as a sufficient explanation; do not claim that other species cannot reproduce it.
+* The clip visibly alternates between native scores and a scores-promoted arrangement; confirm the exact promotion flags by instrumenting the real layout selector. A near-tie between candidates is a hypothesis, not a measured finding.
+
+Nosepass-specific investigation
+
+* Record Nosepass's actual description text and rendered line count, gender/egg field values (including the short Mineral label), normal portrait intrinsic dimensions/aspect ratio and displayed size, Abilities content, card inner width, font state and layout measurements. Compare against representative species that stay stable at the same width and theme.
+* Capture the entire candidate table before and after each flip: promotion tuple (especially native versus scores-only), biology arrangement, track widths, content/section heights, displaced native-footprint measurements, feasibility constraints, image minimums, quality score and chosen winner.
+* Test whether content geometry places Nosepass near a legitimate decision boundary. Quantify any score/height difference and show precisely which input changes between passes; do not assume that a short Egg label, long description or image aspect ratio is causal without comparing measurements.
+* Check the intrinsic portrait ratio at first render versus after decode, and remeasure under an unchanged ratio to separate image readiness from selector-induced oscillation.
+* Reproduce at the recording's narrow desktop split-card geometry, then compare a range of widths immediately above and below the boundary, including stable neighboring Pokémon.
 
 Source inspection leads (Species Card 0.1.26 on `dev/hero-restoration-2026-10-14`)
 
@@ -254,6 +264,9 @@ Requirements and acceptance
 * Capture per-pass chosen promotion, biology mode, source identity, card/content widths, projected footprints, candidate costs, image height and reason for recalculation on live Safari.
 * Regression-test Nosepass near the recorded narrow split-pane width, as well as shorter/taller descriptions, different abilities, theme modes, refresh, next/previous navigation and manual resizing across thresholds.
 * Preserve adaptive promotions when actually beneficial; fix the input/state inconsistency rather than disabling a legitimate layout mode.
+* After tracing the actual cause, correct the offending geometry measurement, native-state restoration, memory invalidation or observer dependency at its owner; remove obsolete logic superseded by the correction. Do not add delays, a cooldown, arbitrary threshold hysteresis or a Nosepass-specific exemption.
+* Confirm that the chosen native or promoted scores layout is stable across repeated evaluations while inputs are unchanged, and changes appropriately when text, fonts, dimensions or portrait data genuinely change. Validate with the actual Nosepass content, not only synthetic test fixtures.
+* Keep this as a scoped implementation and regression task on the development branch; main remains the accepted baseline until tested and approved.
 
 HERO-BANNERS — Promoted Abilities heading
 
@@ -732,24 +745,31 @@ Requirements
 * Preserve native navigation and normal/shiny interaction.
 * Investigate lifecycle and geometry causes rather than conceal symptoms with placeholders, delays or redraw loops.
 
-PRES-HIDDEN-GAP — Intermittent blank gap before the final Hidden ability
+PRES-ABILITY-SPACING — Intermittent excess vertical space within or after Abilities
 
-Status: Ready for investigation; Safari evidence supplied, underlying cause not yet established.
+Status: Ready for investigation and corrective work; multiple Safari screenshots supplied, underlying cause(s) unconfirmed.
 
-Observed behavior
+Observed behavior and corrected scope (2026-10-16)
 
-* On Mawile, a large empty vertical region sometimes appears between Intimidate and the final Hidden: Sheer Force entry. A refresh using the same scripts restores normal spacing; the gap is intermittent during normal use.
-* The affected region is the Abilities text section, not the six STR/DEX/CON/INT/WIS/CHA ability-score fields. The report does not establish whether a stale node, computed style, or layout measurement causes the space.
+* Mawile: with identical userscripts before/after refresh, one capture shows a large gap between the regular ability Intimidate and the final Hidden ability Sheer Force; the other shows natural spacing. This proves an intermittent excess gap in one inter-ability position.
+* Aegislash (#0681): a separate Safari screenshot shows a conspicuous gap AFTER its ordinary Stance Change ability and BEFORE the Evolution heading. No Hidden ability appears. The report broadens the defect beyond Hidden labels and beyond a gap before the last ability.
+* Treat the general defect as abnormal spacing around Abilities entries and section boundaries. The screenshots do not yet establish whether the Mawile and Aegislash cases share the same underlying cause; do not force one diagnosis onto both.
+* The six STR/DEX/CON/INT/WIS/CHA ability scores are not the affected text entries. The defect concerns the Pokémon ability descriptions/section and their surrounding layout.
 
-Requirements
+Investigation and corrective requirements
 
-* Capture element rectangles and computed margins, padding, height, layout display/positioning and neighboring DOM structure in both the bad and good states before selecting a fix.
-* Trace the native AbilityPoolInfo.svelte normal/Hidden sibling output and the Species Card transformation into `.yofi-native-hidden-pair`, including relevant QoL and Theme CSS and Svelte update lifecycle.
-* Correct the demonstrated cause; do not insert compensating fixed margins, hidden placeholders, timers or observers to conceal the gap.
-* Preserve the original Hidden tag and ability text, natural multiline wrapping and intended regular inter-ability spacing.
-* Prevent stale spacing across navigation, refresh, responsive layout selection, content updates and Light/Dark/Type switching.
+* Capture live DOM rectangles, computed margins/padding/height, display/flow/flex/grid properties, pseudo-elements, surrounding section heights and sibling positions in both normal and oversized states. Check the actual gap location, not just the last ability element's own margin.
+* Compare all relevant paths: native `AbilityPoolInfo.svelte` output, Species Card's reparenting/promotion/restoration, QoL's grouping of Hidden paragraphs (when present), Theme's appearance rules, native Svelte content updates and measurement clones. The Hidden wrapper is one possible contributor to the Mawile case, not a universal explanation.
+* Specifically check the final regular `.ability` element, `section.abilities` height and margins, next `section.evolution` or other section heading, any fixed/min-height or space distribution, stale layout styles, and browser margin collapsing. Measure whether apparent whitespace is internal to Abilities or belongs to the following section.
+* Determine whether layout-selection state, route transitions, promoted/native ability placement, font/image readiness, or extra preserved dimensions cause the discrepancy; distinguish multiple causes if evidence requires it.
+* Correct verified source behavior only: retain original ability descriptions, their natural wrap and intended entry spacing; remove stale/obsolete CSS or geometry machinery where responsible. No arbitrary fixed spacers, masking, late corrective repaint, delay or compensating observer.
 
-Acceptance: at an unchanged card width and script configuration, Mawile's Intimidate-to-Hidden spacing remains consistent on initial entry, revisits and refresh. Repeat with Pokémon/Fakémon that have multiple regular and Hidden abilities, including promoted and native Abilities placements. No lost or duplicated ability text.
+Acceptance and regression
+
+* Mawile: consistent normal Intimidate-to-Sheer Force spacing before and after refresh and across navigation.
+* Aegislash: natural Stance Change-to-Evolution spacing with no Hidden ability; compare its behavior across narrow split-pane, fullscreen and refresh.
+* Include species with one normal ability, several normal abilities, a Hidden ability, and no Hidden ability. Validate the Abilities-to-next-section boundary and internal spacing in Light, Dark and Type, promoted and unpromoted layouts, first load, back/forward and resize.
+* No missing/duplicated ability text, displaced sections, layout flicker or new excessive whitespace. Do not mark resolved until browser acceptance.
 
 ⸻
 
