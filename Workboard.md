@@ -260,7 +260,7 @@ Requirements
 
 HERO-BIOLOGY — Adaptive gender/egg arrangement
 
-Status: Implemented; browser acceptance outstanding.
+Status: Implemented candidate; paired-size and column-boundary regressions reported, browser acceptance outstanding.
 
 Requirements
 
@@ -271,8 +271,20 @@ Requirements
 * Retain the same underlying native biology information.
 * Avoid sacrificing available egg-text width merely to preserve an inline arrangement.
 * Preserve continuity while layout selection changes.
+* Treat Gender and Egg as a coordinated pair in every selected orientation: equal outer widths AND heights, consistent corner geometry, and one shared typography/icon scale. This applies to horizontal, stacked and any split arrangement.
+* Fill the actual assigned layout tracks, less established padding/margins/gaps. Side by side, allocate two equal tracks; stacked, both fill the same column's inner width. Never leave unused width because a gender bar retains its native fixed size or size the Egg bar beyond its track.
+* A compact stacked arrangement may use a smaller shared bar height, text and icon scale than a horizontal arrangement. Compare their actual content fit and total page height; never shrink one bar independently.
+* Bound both bars to their assigned column boxes at every layout stage. Reject arrangements that intrude into an adjacent column or the artwork lane rather than masking overflow with clipping or arbitrary CSS corrections.
+* Measure the final text and icon geometry when comparing orientations, accounting for font readiness and wrapping, and keep the accepted layout stable through navigation and resize.
 
-Current implementation: BIO-01 and GEO-01 introduced measured fitting and additional arrangements.
+Reported Safari regression cases (2026-10-16; exact installed script commit not independently verified):
+* Gummibo: side-by-side Gender bar does not stretch to match the Egg bar's allocated width.
+* Gummigills: stacked bars differ in width and can be unnecessarily large for the available space.
+* Mawile: Egg bar extends past the left text column into the adjacent artwork lane.
+
+Acceptance: both bars have equal measured outer dimensions in each accepted layout, use their full assigned width without crossing column boundaries, and remain consistent after refresh, navigation and promotion changes in Light, Dark and Type themes.
+
+Current implementation: BIO-01 and GEO-01 introduced measured fitting and additional arrangements; acceptance of shared geometry remains outstanding.
 
 ⸻
 
@@ -280,16 +292,17 @@ BIO — Species Biology Presentation
 
 BIO-EGG — Unified egg-group bar
 
-Status: Implemented; styling acceptance outstanding.
+Status: Implemented candidate; paired sizing and Egg overflow require correction, styling acceptance outstanding.
 
 Requirements
 
 * Use the same recognizable egg-bar presentation in compact and promoted species layouts.
 * Place the egg icon consistently at the left.
 * Center the remaining text within its available content region.
-* Scale the icon and text proportionally at different sizes.
-* Prefer a readable single line; reject layouts that cannot accommodate it.
-* Avoid breaking words or clipping group names.
+* Scale the icon and text proportionally at different sizes; the egg SVG's visible height should match its adjacent text's visible height (using font-relative dimensions and optical adjustment if needed).
+* Match the Gender bar's full outer width and height in every arrangement, using the shared allocated layout width rather than intrinsic label width.
+* Prefer a readable single line where it fits. Otherwise allow natural whole-word wrapping within the assigned bar width, increasing BOTH bars' shared height as needed; reject only layouts that cannot fit legibly.
+* Avoid breaking words, clipping group names, or overlapping an adjacent layout column.
 * Remove visible Egg: and Egg Group: labels and obsolete display alternatives.
 * Preserve accessible meaning and native egg-group data.
 * Reuse the same icon/value construction instead of duplicating components.
@@ -303,7 +316,8 @@ Status: Implemented; browser acceptance outstanding.
 Requirements
 
 * Scale gender symbols and ratio typography according to available bar width and height.
-* Preserve relative icon/text proportions and centering.
+* Preserve relative icon/text proportions and centering; make gender symbols' visible SVG height match the text height at the selected shared scale.
+* Fill the full assigned bar width and match the Egg bar's outer width and height. Do not retain a narrower native/fixed-width bar inside a larger allocated track.
 * Accommodate genderless, single-gender and mixed ratios.
 * Preserve the native gender segments and their behavior.
 * Prevent clipped icons, oversized labels and narrow-width collisions.
@@ -691,6 +705,25 @@ Requirements
 * Prevent momentary oversized artwork, black image outlines and shiny-transition flashes.
 * Preserve native navigation and normal/shiny interaction.
 * Investigate lifecycle and geometry causes rather than conceal symptoms with placeholders, delays or redraw loops.
+
+PRES-HIDDEN-GAP — Intermittent blank gap before the final Hidden ability
+
+Status: Ready for investigation; Safari evidence supplied, underlying cause not yet established.
+
+Observed behavior
+
+* On Mawile, a large empty vertical region sometimes appears between Intimidate and the final Hidden: Sheer Force entry. A refresh using the same scripts restores normal spacing; the gap is intermittent during normal use.
+* The affected region is the Abilities text section, not the six STR/DEX/CON/INT/WIS/CHA ability-score fields. The report does not establish whether a stale node, computed style, or layout measurement causes the space.
+
+Requirements
+
+* Capture element rectangles and computed margins, padding, height, layout display/positioning and neighboring DOM structure in both the bad and good states before selecting a fix.
+* Trace the native AbilityPoolInfo.svelte normal/Hidden sibling output and the Species Card transformation into `.yofi-native-hidden-pair`, including relevant QoL and Theme CSS and Svelte update lifecycle.
+* Correct the demonstrated cause; do not insert compensating fixed margins, hidden placeholders, timers or observers to conceal the gap.
+* Preserve the original Hidden tag and ability text, natural multiline wrapping and intended regular inter-ability spacing.
+* Prevent stale spacing across navigation, refresh, responsive layout selection, content updates and Light/Dark/Type switching.
+
+Acceptance: at an unchanged card width and script configuration, Mawile's Intimidate-to-Hidden spacing remains consistent on initial entry, revisits and refresh. Repeat with Pokémon/Fakémon that have multiple regular and Hidden abilities, including promoted and native Abilities placements. No lost or duplicated ability text.
 
 ⸻
 
