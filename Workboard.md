@@ -405,6 +405,148 @@ Requirements
 * Share the resulting visual convention with the TM list.
 * Scope the styling to the intended Power cells rather than every occurrence of None.
 
+
+⸻
+
+CUSTOM-MOVES — Custom Move Creation and Integration
+
+Scope: User-authored move definitions usable by multiple Fakémon and trainer Pokémon. Requirements describe desired behavior; Implementation recommendations are provisional engineering guidance, not approved architecture or authorization to change code.
+
+CM-DEFINITIONS — Reusable custom move definitions and editing
+
+Status: Planned; native editor preview inspected, no complete authoring implementation.
+
+Requirements
+
+* Create and edit reusable custom moves from the Moves view and from Fakémon create/edit.
+* Support the native mechanical fields needed for correct display and calculations: stable ID, name, type, move power, PP, timing, duration/concentration, range, area shape, attack/save properties, damage/healing dice, description and higher-level effects.
+* Allow the user to reuse an authored move across any number of Fakémon without duplicating its authoritative definition.
+* Present authored moves in the normal Moves list, details and relevant selectors, consistent with native type, stat and description presentation.
+* Support editing an existing move without unexpectedly invalidating its existing learnset references.
+* Validate required fields and mechanically unsupported choices rather than silently creating incomplete definitions.
+* Preserve distinctions between standard moves, shared custom moves, and per-Pokémon customizations.
+
+Implementation recommendations
+
+* Represent authored definitions using Poké5e's current MoveJson schema and stable namespaced IDs; validate against both supported edition formats.
+* Reuse the native move display and calculation code wherever available; build only the missing authorship UI and persistence layer in the userscript.
+* Treat src/lib/moves/custom/CustomMoveEditor.svelte as a UI reference, not a working API: its preview page has an empty submit handler and no complete save/load workflow.
+* Do not confuse native MoveCustomization (changes to a particular trainer Pokémon's learned move) with globally reusable CustomMoves.
+* Start with the fields supported by native rendering, then explicitly handle remaining fields such as area shapes, saving throws, dice tiers and higher-level progression before declaring feature completion.
+
+CM-LIBRARY — Persistent, independent custom-move registry
+
+Status: Discussing; hidden-library-Fakémon approach preferred for investigation, not yet implemented.
+
+Requirements
+
+* Keep shared move definitions independent of any individual Fakémon that learns them.
+* Do not delete a definition merely because all learners unlearn it or are deleted.
+* Persist definitions across refreshes and browser restarts; support access from the user's other devices.
+* Keep the library out of normal userscript Fakémon views without requiring it to disappear from bare Poké5e.
+* Preserve ordinary Fakémon notes and any existing authored content; userscript editing must expose clean move fields even if raw JSON/comments remain visible in bare Poké5e.
+* Support backups, versioned formats, explicit deletion, and safe handling of duplicate IDs or conflicting edits.
+* Clearly explain how a newly linked device gains access to the shared library and how stale local copies reconcile.
+
+Implementation recommendations
+
+* Evaluate one dedicated hidden library Fakémon with versioned JSON in its Notes field as the server-backed source of truth, rather than scattering definitions across learners' notes.
+* Keep a locally persisted last-good mirror for early page startup; load and refresh the authoritative library through the existing Fakémon read-key path.
+* Preserve the library's access keys and prevent accidental hiding from becoming accidental deletion; make recovery/export possible.
+* Make registry synchronization explicit and conflict-aware. Do not silently overwrite newer remote data with stale notes or a browser cache.
+* Resolve startup sequencing before shipping: the library must be discoverable without depending on the very custom-move resolution it supplies.
+* Avoid requiring users to add duplicate definition payloads to every learner. Their saved learnsets should reference stable custom move IDs.
+
+CM-NATIVE — Native move lookup, injection and lifecycle
+
+Status: Ready for targeted diagnosis; initial injection probe worked, saved-reference regression observed.
+
+Requirements
+
+* Make custom move definitions resolvable wherever Poké5e expects move objects: Moves list, move detail, Fakémon selectors, species move links, trainer Pokémon learned moves, and relevant stat calculations.
+* Support both 2018 and 2024 editions and preserve native filtering, sorting, navigation and links.
+* Keep definitions available on fresh loads, direct deep links, client-side navigation, editor entry, refresh, and post-save rendering.
+* Prevent late initialization or changes to the fetch interceptor from removing definitions that are already referenced by saved Pokémon.
+* Integrate with native move-store caching without redundant requests, competing interception layers, or repeated DOM reconstruction.
+* Preserve behavior of canonical Pokémon and ordinary moves when the custom registry is unavailable.
+
+Implementation recommendations
+
+* Trace actual native dependency paths before altering code: MovesSrdClient / MovesStore (including srdStore edition caching), server-provided Moves listings, per-ID detail loading, and species/trainer move consumers.
+* First instrument whether the definition is present at each native lookup point. Compare direct entry, refresh, and same-page navigation, and determine why the prior probe reported fetchPatchActive: false.
+* Investigate whether early, reliable SRD response injection can populate the cached MovesStore for all consumers; verify rather than assume late response interception updates an already-settled store.
+* Account separately for the server-rendered Moves-list fallback and the per-move detail route; successful insertion into one list does not prove complete registration.
+* Keep one shared registry and one coordinated injection mechanism, rather than maintaining multiple shadow catalogs or late compensating observers.
+
+CM-WORKFLOW — In-place authoring and Fakémon editor continuity
+
+Status: Planned.
+
+Requirements
+
+* Allow creating a custom move while editing a Fakémon without discarding its unsaved changes, losing its active identity, or closing its editor.
+* Saving or cancelling the move editor must return to the same active Fakémon editing context; newly saved moves should be immediately selectable.
+* Support opening the custom move editor from the Moves view independently of a Fakémon.
+* Improve new Fakémon creation by transitioning from successful initial creation directly to the full edit view.
+* Preserve established navigation, native controls, and mobile/desktop interaction conventions.
+
+Implementation recommendations
+
+* Use a script-managed in-page dialog/panel attached to the current view rather than navigating to /moves/custom while a Fakémon form is open.
+* Keep the existing Fakémon editor and its state mounted; preserve unsaved fields, active selection and scroll position.
+* Commit the new move to the registry before adding its ID to the current learnset. On cancel, do not mutate the learnset.
+* Hook the successful native create result for the create-then-edit transition; do not fabricate a new Fakémon or preemptively navigate before its real read key exists.
+* Test dialog return, validation errors, save failures and mobile keyboard/viewport behavior.
+
+CM-SAFETY — Missing move recovery and data integrity
+
+Status: Ready for investigation; destructive regression reproduced and Gummiglo restored.
+
+Requirements
+
+* A missing or invalid custom move definition must not make a Fakémon or trainer Pokémon inaccessible or uneditable.
+* Preserve the saved move ID visibly as a recoverable unresolved reference when its definition cannot be loaded.
+* Allow safe removal or repair of an unresolved reference without discarding the species' other moves, abilities, notes, artwork or stats.
+* Never write a custom move ID into a production Fakémon until the corresponding definition can be resolved in the relevant native consumers.
+* Provide a verified backup/rollback path for library edits and learner changes; no broad localStorage deletion or partial database RPC update.
+* Diagnose root causes and remove failed experimental interception code rather than stacking timers, redraws or shadow replacement cards.
+
+Implementation recommendations
+
+* Specifically audit src/lib/pokemon/move-pool/MovePoolGroupFields.svelte: it can pass undefined after moves.find(); MoveOption.svelte immediately reads value.id. This source-supported failure mechanism matches the observed undefined-id crash, but production stack attribution is not yet proven.
+* Design an unresolved-move display/removal state for both information and editing views; block destructive saves until all other data can be preserved.
+* Keep a record-level backup and verify the complete payload before invoking native update_fakemon, which expects a full record rather than a partial move-array patch.
+* Run all persistence experiments on disposable Fakémon; preserve an exact targeted recovery procedure and verify successful reload after rollback.
+
+CM-ACCEPTANCE — End-to-end custom move verification
+
+Status: Planned; partial exploratory browser evidence only.
+
+Requirements
+
+* Prove create → save → list → detail → assign → save Fakémon → refresh → reopen → edit → unlearn works without crashes.
+* Verify the move remains in the global library after every learner unlearns it or is removed.
+* Verify a second browser/device can discover the library and consistently render the move after refresh.
+* Test fresh deep links, both rules editions, native list filtering, per-move routes, Fakémon creation, existing Fakémon editing and trainer Pokémon move presentation/calculations.
+* Verify failure and recovery when the library is unavailable, the cache is stale or the move definition is missing.
+* Regression-test mobile Safari and desktop, with and without unrelated QoL/Species Card/Theme/Artwork Intelligence scripts where relevant.
+* Keep implementation, testing and user browser acceptance distinct; do not mark Accepted solely because an injector displays a move once.
+
+Implementation recommendations
+
+* Sequence development as: (1) instrument lookup and failure timing, (2) prove safe native definition availability, (3) add recoverable missing-ID handling, (4) implement versioned library and synchronization, (5) build in-place editor/workflow, (6) test saved references and cross-device operation.
+* Keep an independently removable proof-of-concept injector and maintain a disposable test Fakémon until the end-to-end test passes.
+* Capture reproducible console evidence, native request paths, supported/unsupported move fields, and exact tested userscript versions.
+
+Exploratory evidence (not an accepted implementation)
+
+* A temporary yofi-injection-probe definition appeared with native styling in the Moves detail interface and Fakémon move selector. The probe logged two list injections, two detail requests, and zero injection failures across 2018/2024 data requests.
+* Saving that move ID to Gummiglo's learnset made Gummiglo inaccessible. Removing only yofi-injection-probe from its stored move arrays restored it.
+* The saved ID was accepted by the Fakémon persistence pipeline; the failure occurred on subsequent client use/rendering. Source inspection identifies a possible undefined lookup dereference in MovePoolGroupFields → MoveOption. The precise production lookup/timing failure has not yet been instrumented.
+* Native CustomMoves is currently an incomplete editor preview. Native MoveCustomization persists per-trainer-Pokémon overrides and is not a global definition store.
+* No production custom-move userscript or shared custom-move library has been implemented or accepted.
+
+
 ⸻
 
 EVOLUTION — Species Names and Evolution Sections
