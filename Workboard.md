@@ -10,59 +10,77 @@ These are working development candidates. Presence in GitHub does not establish 
 
 ART — Artwork Intelligence
 
+Agreed scope for the present Fakémon phase
+
+* Analyze normal/main portrait artwork only. Never analyze shiny artwork for either color or geometry.
+* Produce useful subject geometry for **all Fakémon**; perform theme color selection **only for dual-type Fakémon**. Monotypes retain their existing styling.
+* The aim is correct **initial** presentation, not mid-view corrections. Keep color and geometry computations independently useful, while reusing source acquisition and decoding when possible.
+* ART-02-R01 is a working implementation candidate, **not** authority to retain unnecessary algorithms, masks, or tests. The requirements below take precedence when the candidate differs from them.
+* Keep original Pokémon artwork decisions unchanged. The desired future original-Pokémon equivalent is offline-derived and deferred.
+
 ART-COLOR — Dual-type color selection
 
-Status: Discussing optimization; existing implementation candidate available.
+Status: Discussing scoring optimization; existing Python-parity JavaScript candidate available.
 
 Requirements
 
-* Analyze only normal/main artwork.
-* Perform color selection only for dual-type Fakémon.
-* Determine which of the two type colors best represents the artwork.
-* Preserve existing single-type styling and official Pokémon decisions.
-* Reduce scan time substantially from the observed 569 ms.
-* Compare direct type-color matching against existing scanner results before selecting a replacement.
+* Analyze only the normal/main artwork of dual-type Fakémon for **one purpose**: select which of the two established Scarlet/Violet type colors best matches the actual character's predominant/average color.
+* The selected closer type supplies the banner; the other supplies the tint. Retain the existing tint/banner styling strengths until separately reviewed.
+* Preserve existing monotype styling and all original Pokémon assignments.
+* Substantially reduce the user-observed ~569 ms full-color scan cost, with measured attribution to decoding, weighting, distance transform, clustering, worker overhead and other stages; do not assume every stage is necessary.
+* Compare inexpensive alternatives such as direct two-type comparison using a sampled perceptual mean or sampled majority of subject colors against the existing Python v1.0.0 decisions and representative **real** Fakémon artwork. A histogram is an option, not a decided prerequisite.
+* Test actual decision quality and speed, especially mixed hues, large neutral regions, outlines, transparent backgrounds and near ties. Do not silently change established selections or claim numerical parity for a replacement algorithm.
+* The current Python-equivalent scanner remains a comparison baseline until a production scoring algorithm and acceptable differences have been expressly selected; it need not remain runtime work if a simpler method is approved.
 
-Unresolved: Final scoring algorithm and acceptable differences from the Python reference.
+Unresolved: Final color scorer, sampling/weighting choices, accepted differences from Python selections, and measured performance target.
 
 ART-GEO — Subject geometry
 
-Status: Implemented; simplification under discussion.
+Status: Existing full-canvas mask candidate implemented; required exterior-contour implementation **not yet complete**.
 
 Requirements
 
-* Analyze normal artwork for all Fakémon.
-* Determine whether a usable transparent background exists.
-* Calculate actual visible-content bounds.
-* Extract accurate exterior subject contours, including detached details.
-* No need to preserve interior holes for overlap decisions.
-* Avoid unnecessary permanent pixel-mask and pixel-by-pixel collision machinery.
-* Use dependable fallback for opaque artwork.
+* Analyze normal/main artwork for **all Fakémon**, including monotypes, independently of whether a color decision is needed.
+* Determine whether transparent alpha provides a usable subject/background separation; expose a simple usable-transparency Boolean and appropriate diagnostics.
+* Compute actual visible subject bounds rather than fitting the usually-square natural canvas. Validate which alpha threshold represents visible artwork without losing meaningful fine details.
+* Trace and retain faithful **exterior** subject outline paths, including narrow extensions and detached pieces. Do not simplify away details needed to protect other card content.
+* **Interior holes are not required** for overlap decisions or stored contour data; do not compute/persist them merely to satisfy the old ART-02 mask contract.
+* Do not require a permanent full-canvas bitmask or pixel-by-pixel affine collision engine when exterior contours meet the production needs. A temporary pixel mask used during accurate outline extraction is acceptable.
+* Map outline coordinates to the actual rendered scale and position for lightweight contour/rectangle clearance tests; do not repeatedly inspect individual source pixels when placing the shiny control.
+* If subject isolation is unreliable (for example an opaque background), retain dependable existing fitting/placement behavior without speculative segmentation. Color selection may still work for dual types.
+
+Retire obsolete packed-mask, interior-hole and per-pixel collision runtime paths and tests when a verified replacement makes them unnecessary. Preserve tests that validate the retained exact exterior-outline behavior.
 
 ART-PREFETCH — Anticipatory analysis
 
-Status: Planned; approach under discussion.
+Status: Planned; three-priority scheduling approach agreed in principle, not yet implemented.
 
 Requirements
 
-* Analyze artwork before the user opens a card wherever possible.
-* Consider list-based idle analysis, hover/focus prioritization, and neighboring Fakémon.
-* Prioritize user interaction over background processing.
-* Avoid duplicate work, excessive requests, or repeated analysis of cached images.
-* Preserve responsiveness throughout.
+* Produce artwork metadata **before a card is clicked whenever possible**, so its initial colors and geometry are ready on first reveal.
+* Access species read keys directly from the native Fakémon list without opening each detail card; resolve normal portrait URLs and ordered types through the existing read-only `get_fakemon` pathway.
+* Use **one bounded, deduplicating priority queue**: (1) pointer hover/dwell, keyboard focus and feasible touch intent; (2) previous and next entries in the actual list order while a card is open; (3) idle warming of uncached Fakémon from the list.
+* Promote an already queued job rather than creating a duplicate. Keep scan and fetch concurrency conservative, prioritize interaction, and suspend/defer low-priority work during active loading or resource pressure.
+* Avoid repeatedly validating or scanning unchanged artwork in one session. Prefer reusing existing native/QoL response work where safely available, without making ART depend on QoL.
+* Preserve normal card/list responsiveness and avoid eager site-wide bulk scanning when no relevant Fakémon list/context has been entered.
+* Confirm real list lifecycle, read-key extraction, network/CORS behavior and queue effectiveness in a target browser; no native detail-card opening is required for artwork retrieval.
+
+Open implementation details: exact event attachment to the list, idle budget, concurrency limit and touch behavior. These are to be measured rather than guessed.
 
 ART-CACHE — Persistent analysis records
 
-Status: Implemented; browser acceptance outstanding.
+Status: Initial IndexedDB/snapshot candidate implemented; real-browser acceptance and streamlined schema outstanding.
 
 Requirements
 
-* Use species ID as the record identity.
-* Persist successful artwork metadata.
-* Reuse previous results without unnecessary rescanning.
-* Revalidate after refresh while retaining successful cached results.
-* Preserve last-good decisions on failure.
-* Avoid recomputation from shiny toggles or resizing.
+* Use the existing species ID alone as the lookup identity within its namespace; source URL, source hash, ordered types and analysis versions remain record metadata.
+* Cache successful normal-artwork geometry for every Fakémon; cache color decisions only for dual types.
+* Keep color and geometry independently ready and reusable, but coordinate **one stable card presentation** from whatever validated outputs are available at reveal time.
+* Reuse previous successful results without unnecessary rescans. Revalidate authoritative normal artwork on the first relevant visit after refresh while keeping last-good data.
+* Recompute only an invalidated/changed analysis product; preserve last-good metadata on failure, interrupted requests and storage denial.
+* A changed successful analysis should not recolor or reposition a card already being viewed; apply new decisions at a subsequent coordinated presentation.
+* Avoid recomputation from shiny toggles, viewport resizing, theme changes or routine same-session navigation.
+* Migrate away from obsolete mask records/diagnostics and tests only when the new contour format and compatibility path are verified. Keep synchronous snapshots small and canonical persistent records in IndexedDB.
 
 ART-MODULE — Standalone Artwork Intelligence userscript
 
@@ -99,51 +117,54 @@ Current implementation: ART-02-R01 includes an independent acquisition coordinat
 
 ART-INTEGRATION — Shared analysis consumers
 
-Status: Planned; no consumer integration committed at the verified HEAD.
+Status: Planned; no consumer integration committed in ART-02-R01.
 
 Requirements
 
-* Theme Overlay consumes verified Fakémon color decisions.
-* Species Card consumes reliable subject bounds and geometry.
-* QoL optionally consumes shiny-icon corner recommendations.
-* Keep all display, interaction and styling responsibilities with their existing script owners.
-* Reject metadata belonging to an outgoing species, outdated artwork source or incompatible analysis revision.
-* Publish complete successful analysis updates atomically.
-* Prevent partial color or geometry changes during card presentation.
-* Do not require consumers to decode or scan the same source pixels independently.
-* Preserve existing behavior when Artwork Intelligence is absent, incomplete or unsuccessful.
+* Theme Overlay consumes validated dual-type Fakémon color decisions; monotypes and original Pokémon keep their existing styling.
+* Species Card consumes reliable visible bounds, exterior outlines and effective composition bounds for hero scaling/positioning and decorative overlap.
+* QoL consumes optional shiny-icon corner recommendations without relinquishing the button or manual preferences.
+* Color and geometry may analyze, finish and persist **independently**; neither analysis product must wait for the other merely to become available.
+* The **card presentation** is nevertheless coherent: select compatible completed results before first reveal, use them without a visible second-pass color or layout change, and freeze that presentation while the card remains on screen.
+* Reject outgoing-species, stale source, mismatched types and incompatible analysis revisions. Keep last-good results during background revalidation; apply newly changed decisions on a future presentation.
+* Existing script owners retain all display, interaction and styling responsibilities. Consumers do not fetch or reanalyze source pixels separately.
+* Preserve normal standalone behavior when Artwork Intelligence is absent, incomplete or unsuccessful, without hiding loading defects with replacement cards or corrective flashes.
+
+The cold direct-link / immediate uncached-click policy is **unresolved**, because instant correct first paint cannot be guaranteed before the required information exists.
 
 ART-QOL — Optional shiny-control enhancement
 
-Status: Ready; consumer integration not implemented.
+Status: Planned; design requirements settled, integration awaits exterior-contour geometry.
 
 Requirements
 
 * QoL remains the sole owner of the shiny button, toggle, manual positions and saved preferences.
-* Artwork Intelligence must enhance the shiny button, never become a dependency of it.
+* Artwork Intelligence enhances the shiny button but must never become a dependency of it.
 * Without Artwork Intelligence, preserve all existing shiny functionality.
 * Apply preference precedence: explicit manual corner → valid automatic recommendation → existing top-right fallback.
 * Distinguish an absent manual preference from the default returned by savedPortraitCorner().
-* Never override any of the four unrestricted manual corner choices.
-* Recalculate recommendations when relevant rendered geometry changes, without rescanning the image.
-* A missing, late or failed recommendation must not interrupt interaction or card loading.
+* Evaluate four candidate corners using the normal artwork's visible-content box, actual icon dimensions, clearance and the **exterior contour**, not repeated pixel-level collision tests.
+* If any original corner is valid, do **not** expand. If none is valid, expand equally on all four sides by exactly one rendered icon width and reevaluate; supply the effective composition bounds to Species Card.
+* Never override or constrain any of the four explicit manual corner choices, including intentionally inconvenient choices.
+* Recalculate placement cheaply when real rendered dimensions/position change, without artwork rescans or unnecessary repositioning loops.
+* A missing, late or failed recommendation must not interrupt interaction, card loading or existing shiny behavior. Never analyze shiny artwork.
 
 ART-RUNTIME — Worker and browser performance
 
-Status: Discussing optimization; initial worker implementation exists.
+Status: Discussing optimization; ART-02-R01 worker and full-scan fallback exist.
 
 Requirements
 
-* Keep expensive image analysis off the UI thread wherever supported.
-* Examine Blob-worker compatibility, especially in iPad Safari and the installed browser extension.
-* Diagnose fallback behavior when workers are blocked.
-* Avoid allowing a full-resolution main-thread fallback to cause visible interaction stalls.
-* Measure actual scan time, worker overhead, memory usage and cache hydration.
-* Preserve full-resolution color accuracy while comparing optimizations.
-* Report unsupported image formats and decoder differences explicitly.
-* Do not replace precise results with unverified approximations merely to improve speed.
+* Separate and profile native metadata retrieval, image transfer, decoding, geometry extraction, color scoring, hashing, worker transfer and storage writes.
+* Keep expensive analysis off the UI thread wherever supported; verify Blob-worker behavior in the actual userscript extension/iPad Safari environment.
+* A worker-denied main-thread fallback must not cause an uninterrupted large UI stall. Measure any fallback and implement safe scheduling without delaying native card presentation.
+* Avoid decoding twice, competing scanners, excessive RGBA copies or retaining per-species temporary buffers after analysis.
+* Test inexpensive **candidate** color scorers against real-image quality, speed and the original Python reference; full-resolution Python parity is the existing candidate's baseline, not automatic authorization to retain unneeded production work after a scoring change is approved.
+* Preserve pixel-faithful exterior contours at whatever representation is chosen; do not claim approximate geometry is exact.
+* Report unsupported formats, decoding and color-management differences. Distinguish actual Safari measurements from desktop/Node or calculated memory proxies.
+* Remove retired production algorithms, masks, caches, worker code and tests rather than keeping them running or maintained for hypothetical reuse.
 
-Current implementation: ART-02-R01 includes a Blob worker and same-bundle fallback. Safari performance remains unverified.
+Current implementation: ART-02-R01 includes a Blob worker and same-bundle fallback; actual Safari timing/persistence is unverified.
 
 ART-ORIGINAL — Future original-Pokémon metadata migration
 
@@ -168,11 +189,13 @@ Status: Planned.
 
 Requirements
 
-* Fit and center artwork according to visible subject bounds, not transparent canvas margins.
-* Account for actual rendered scale and position.
-* Allow appropriate decorative extension into unused neighboring space.
-* Protect HP values, labels, controls and hit targets.
-* Avoid layout jumps, temporary oversizing and compensating redraws.
+* Fit, center and scale artwork using actual visible subject bounds instead of transparent canvas margins, while retaining the complete original artwork source.
+* Use accurately extracted normal-artwork exterior contours to allow suitable decorative extension into empty neighboring hero space.
+* Protect HP values, labels, controls, hit targets and stacking from subject-outline overlap.
+* Use the uniformly **expanded effective composition bounds** when automatic shiny placement has required expansion; otherwise use the original content bounds.
+* Work with the actual rendered artwork transform and existing content-driven hero grammar, not a new catalog of fixed layout permutations.
+* Maintain a dependable fallback for opaque or unavailable geometry, preserving existing hero behavior.
+* Avoid layout jumps, transient oversized artwork, unnecessary DOM reconstruction and repeated post-paint corrections.
 
 HERO-SHINY — Automatic shiny-icon placement
 
@@ -180,12 +203,13 @@ Status: Planned.
 
 Requirements
 
-* Preserve all four unrestricted manual placements.
-* Evaluate four corners of the normal-artwork content box using the icon’s actual dimensions and exterior contour.
-* Prefer a valid original corner.
-* Only if all four fail, expand equally on all four sides by exactly one rendered icon width.
-* Use expanded composition bounds for fitting when expansion is necessary.
-* Do not analyze shiny artwork.
+* Preserve all four unrestricted manual placements and the established manual-over-auto precedence.
+* Score four corners **within** the normal-artwork subject box using the icon's real rendered width/height and stored exterior contours; no interior-hole fitting or pixel-by-pixel source collision engine.
+* Prefer a valid original corner with stable clearance. If any original corner is usable, do not expand.
+* Only if all four original corners fail, expand equally on all four sides by **exactly one current rendered icon width** and reevaluate four corners.
+* Pass any expanded composition bounds into hero fitting; do not clip artwork to this rectangle or draw a visible outline.
+* Use normal artwork metadata only, even if shiny artwork is currently displayed, subject to safe source/geometry compatibility checks.
+* Keep manual position controls and interaction unchanged, without layout rescue for intentionally inconvenient manual choices.
 
 HERO-GRAMMAR — Content-driven adaptive composition
 
@@ -628,17 +652,18 @@ PRESENTATION — Loading and Continuity
 
 PRES-FIRST — Correct first presentation
 
-Status: Discussing.
+Status: Discussing cold-start edge case; pre-analysis strategy selected in principle.
 
 Requirements
 
-* Correct theme colors and artwork composition when the card first appears.
-* No color changes or layout shifts while viewing the card.
-* Preserve the existing list-to-card handoff.
-* Never show an empty interval or substitute card merely to conceal loading.
-* Pre-analysis should eliminate as many cold-start waits as possible.
+* Correct artwork-derived theme colors and subject-aware composition **on the first visible card frame**, including first-ever visits wherever prefetch succeeded.
+* No mid-view color changes, layout shifts or geometry corrections after the user sees the card.
+* Preserve the existing real-list-to-ready-card handoff. Never show an empty interval or substitute card merely to conceal loading.
+* Prioritize proactive list analysis, hover/focus intent and neighboring-species warming instead of making an expensive scanner routine work on click.
+* Revalidation changes discovered while viewing a card apply to its next presentation, not as an immediate visible repaint.
+* Color and geometry are independently computable; coordinate compatible cached/ready decisions before first reveal.
 
-Unresolved: Behavior when a never-before-analyzed Fakémon is opened directly or before prefetch completes.
+**Unresolved:** A truly cold direct URL or an immediate click before analysis completes cannot be guaranteed both immediately visible and correctly themed/composed without waiting or precomputed data. Establish and approve a cold-first-reveal policy before consumer integration; do not invent one by default.
 
 PRES-ATOMIC — Analysis and presentation synchronization
 
@@ -646,12 +671,13 @@ Status: Planned; not integrated.
 
 Requirements
 
-* Publish successful metadata coherently rather than exposing partially completed color/geometry decisions.
-* Prevent a late result for a previous species from affecting the current card.
+* Publish each complete, successful color or geometry product coherently; do not require their calculations to finish together.
+* Assemble one compatible presentation snapshot for the selected species before the card becomes visible.
+* Prevent late results for an outgoing species or a subsequent source revision from affecting the current card.
 * Retain last-good presentation during refresh validation and transient analysis failures.
-* Do not cause a second visible layout pass merely because background analysis completed.
-* Coordinate application of geometry and theme data with existing card readiness behavior.
-* Avoid adding competing lifecycle observers or card-reconstruction machinery.
+* Do not cause a second visible theme or hero-layout pass merely because a background analysis finishes.
+* Coordinate the initial application of color/geometry/auto-corner metadata with existing card readiness, honoring source identity and current layout measurements.
+* Avoid competing lifecycle observers, card-reconstruction machinery and compensating redraw loops.
 
 PRES-REGRESSION — Card and shiny-transition continuity
 
@@ -697,6 +723,7 @@ Requirements
 * Make focused changes on authorized development branches.
 * Commit logically separable implementation work with traceable messages.
 * Syntax-check and run targeted regressions.
+* Regression tests must verify retained production behavior; retire tests and reference gates that exclusively serve removed subsystems, while preserving frozen historical data needed for explicit algorithm comparisons.
 * Test all three themes, Pokémon/Fakémon, mobile and desktop layouts, loading transitions, and independent script operation where relevant.
 * Explicitly separate automated tests, headless browser results and user-device verification.
 * Deliver the exact commit/build selected for installation and browser testing.
@@ -708,9 +735,9 @@ Implementation record
 
 Current experimental branch: dev/hero-restoration-2026-10-14
 
-Verified HEAD: 3c82480ec9ef8bf4d547c3df40228800362bfcd7
+ART-02-R01 implementation baseline: 3c82480ec9ef8bf4d547c3df40228800362bfcd7
 
-Branch comparison: 13 commits ahead of main at the verified HEAD.
+Workboard alignment reviewed against dev HEAD 236b6095fa9d99c1dadb4959b268b11d95d9ec77 (before this documentation change). Branch comparison and current HEAD must be checked live before any code edit; historical counts are not treated as current.
 
 Existing restoration commits
 
@@ -742,7 +769,7 @@ Current integration state
 * Theme and biology restoration work precedes the Artwork Intelligence implementation on the same development branch.
 * The current branch is not equivalent to an accepted production release.
 
-Next work: Review the current Artwork Intelligence implementation against ART-COLOR, ART-GEO, ART-PREFETCH and ART-CACHE; evaluate color-scoring alternatives; measure performance; verify browser behavior; identify obsolete machinery; and review the restoration candidates before authorizing further code changes.
+Next work: (1) baseline and profile ART-02-R01; (2) evaluate/approve a cheaper two-type color decision against real artwork; (3) replace unnecessary full-canvas pixel collision/hole machinery with verified exterior contours for all Fakémon; (4) implement one bounded list/intent/neighbor prefetch queue; (5) streamline cache and independent product readiness; (6) settle the cold-first-reveal policy; (7) integrate Theme Overlay, QoL and Species Card through one stable presentation; (8) run targeted regression and user-browser acceptance. This is planning, not authorization to implement or deploy.
 
 ⸻
 
