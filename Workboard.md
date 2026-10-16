@@ -213,7 +213,7 @@ Requirements
 
 HERO-GRAMMAR — Content-driven adaptive composition
 
-Status: Implemented; current candidate requires browser acceptance.
+Status: Implemented candidate; Nosepass promotion oscillation reported, browser acceptance outstanding.
 
 Requirements
 
@@ -228,6 +228,32 @@ Requirements
 * Keep layout decisions stable during resize, navigation and asynchronous rendering.
 
 Current implementation: GEO-01-R01 and GEO-01-R02, through Species Card 0.1.26.
+
+HERO-OSCILLATION — Repeated self-triggered promotion/demotion on a stationary card
+
+Status: Ready for root-cause investigation; Safari recording supplied, no code fix approved.
+
+Observed behavior (2026-10-16)
+
+* Nosepass (#0299) repeatedly alternates between native and promoted hero arrangements while the selected species and browser-panel width remain unchanged. The animation visibly relocates ability scores, gender/egg bars and artwork, rather than showing a normal one-time load transition.
+* The recording shows the problem in desktop-style Safari with a narrow split browser panel. Other species shown after navigation do not establish that the defect is unique to Nosepass.
+* The recording proves repeated layout changes, but does not include live layout-state or computed-style telemetry. The full causal chain is not yet confirmed.
+
+Source inspection leads (Species Card 0.1.26 on `dev/hero-restoration-2026-10-14`)
+
+* `chooseStage()` uses measured native-versus-promoted footprint, stored previous promotion and retained-image constraints. Confirm that each candidate is measured under an invariant canonical style/state independent of the currently applied promotion.
+* `createMeasurer().nativeFootprints()` attaches measurement clones inside the presently styled article. In particular, `article.lab3-active` changes stats/banner margins; test whether this makes the displaced/native footprint depend on the previous selection and produces an alternating winner.
+* `rememberNativeHero()` retains `old.promotion` and `old.layout` when identity/width are unchanged, even after the actual DOM was restored to native. Correct the stale recorded identity when verifying the root cause, without sacrificing legitimate resize hysteresis.
+* The Hero `ResizeObserver` schedules a subsequent layout pass when the artwork/info height changes. Determine whether the script's own promotion/demotion initiates the next pass; an observer-triggered pass must not create an endless feedback cycle.
+* Inspect `geometryMemo` keys and `resizeMemory` for selection-dependent inputs, cached geometries or retained minimum image heights that change merely because an arrangement was applied.
+
+Requirements and acceptance
+
+* With unchanged route, card width, source data and font metrics, repeat evaluations must select the same stable arrangement. Do not rely on a delay, arbitrary cooldown, animation, hidden card or frozen layout to mask instability.
+* Distinguish genuine changes (viewport, text, portrait intrinsic dimensions, font readiness, theme) from self-generated layout changes. Ensure one coherent measurement basis for competing candidates.
+* Capture per-pass chosen promotion, biology mode, source identity, card/content widths, projected footprints, candidate costs, image height and reason for recalculation on live Safari.
+* Regression-test Nosepass near the recorded narrow split-pane width, as well as shorter/taller descriptions, different abilities, theme modes, refresh, next/previous navigation and manual resizing across thresholds.
+* Preserve adaptive promotions when actually beneficial; fix the input/state inconsistency rather than disabling a legitimate layout mode.
 
 HERO-BANNERS — Promoted Abilities heading
 
