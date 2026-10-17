@@ -10,29 +10,30 @@ These are working development candidates. Presence in GitHub does not establish 
 
 ART — Artwork Intelligence
 
-Agreed scope for the present Fakémon phase
+Current agreed scope (supersedes the earlier ART-02-R01 runtime color-selection plan)
 
-* Analyze normal/main portrait artwork only. Never analyze shiny artwork for either color or geometry.
-* Produce useful subject geometry for **all Fakémon**; perform theme color selection **only for dual-type Fakémon**. Monotypes retain their existing styling.
-* The aim is correct **initial** presentation, not mid-view corrections. Keep color and geometry computations independently useful, while reusing source acquisition and decoding when possible.
-* ART-02-R01 is a working implementation candidate, **not** authority to retain unnecessary algorithms, masks, or tests. The requirements below take precedence when the candidate differs from them.
-* Keep original Pokémon artwork decisions unchanged. The desired future original-Pokémon equivalent is offline-derived and deferred.
+* Analyze **normal/main portrait** artwork only for Fakémon subject geometry, including monotypes. Never analyze shiny artwork for geometry or color.
+* **Do not scan artwork to determine Fakémon theme colors.** A Fakémon creator selects its background type in the native create/edit workflow; persistence and exact editor integration still need implementation and verification.
+* The 613 original dual-type Pokémon/form assignments come from a **completed offline** color-analysis dataset, to be finalized through manual review. Original Pokémon do not require runtime color scanning.
+* Separate species color assignment from type-palette mixing and from the actual presentation surfaces. Theme Overlay owns presentation; Artwork Intelligence owns normal-portrait geometry/acquisition/analysis metadata; QoL owns canonical type colors.
+* The aim for geometry-dependent UI is correct **initial** presentation, not visible late corrections. ART-02-R01 remains a working geometry implementation candidate, not authority to retain obsolete color-processing, masks, or workers.
+* Keep monotype presentation and the existing functionality of all three established scripts intact until a replacement is separately implemented and verified.
 
-ART-COLOR — Dual-type color selection
+ART-COLOR — Offline color decisions and retirement of runtime scanning
 
-Status: Discussing scoring optimization; existing Python-parity JavaScript candidate available.
+Status: Requirements revised; runtime Fakémon color scanner retired from the target design. No production migration or editor integration yet.
 
 Requirements
 
-* Analyze only the normal/main artwork of dual-type Fakémon for **one purpose**: select which of the two established Scarlet/Violet type colors best matches the actual character's predominant/average color.
-* The selected closer type supplies the banner; the other supplies the tint. Retain the existing tint/banner styling strengths until separately reviewed.
-* Preserve existing monotype styling and all original Pokémon assignments.
-* Substantially reduce the user-observed ~569 ms full-color scan cost, with measured attribution to decoding, weighting, distance transform, clustering, worker overhead and other stages; do not assume every stage is necessary.
-* Compare inexpensive alternatives such as direct two-type comparison using a sampled perceptual mean or sampled majority of subject colors against the existing Python v1.0.0 decisions and representative **real** Fakémon artwork. A histogram is an option, not a decided prerequisite.
-* Test actual decision quality and speed, especially mixed hues, large neutral regions, outlines, transparent backgrounds and near ties. Do not silently change established selections or claim numerical parity for a replacement algorithm.
-* The current Python-equivalent scanner remains a comparison baseline until a production scoring algorithm and acceptable differences have been expressly selected; it need not remain runtime work if a simpler method is approved.
+* Treat the full original-Pokémon offline analysis as a **one-time seed**, not a runtime dependency. The selected baseline is Hue/Saturation + Neutral Lightness, covering 613 dual-type original Pokémon/forms. Preserve its exact result set for review rather than rerunning or silently changing its choices.
+* Manual review may override that seed for visual composition, contrast or form identity. Preserve the user's current local selections and exported corrections when migrating.
+* The earlier `matchedType` and temporary review-script `visualType` describe the history of the data. **`backgroundType` is the proposed durable name** for the final meaning: which of a species' types supplies its card background; confirm/export-migrate that name before deploying permanent consumers.
+* Default intended presentation: **backgroundType supplies the tint, the other type supplies the section banners**. Keep assignment and placement separately modeled; the temporary reviewer allows a global tint/banner inversion for comparison without mutating stored assignments.
+* A Fakémon's background type is **creator-selected**, limited to its actual typing, via Fakémon create/edit. Determine and test native persistence, cross-device behavior, missing/changed types, and preservation of existing notes. Monotypes require no choice.
+* Remove or disable color-only image analysis, per-pixel scoring, workers, caches, prefetch jobs, APIs and tests as part of a verified ART cleanup; do not retain them as unnecessary parallel systems. Keep reproducible historical datasets and comparisons when useful, without executing color scans in production.
+* **No per-type-pair mixing or corrections**: Fire's presentation is identical whether paired with Flying, Dark, Dragon or anything else. A Pokémon-specific backgroundType selection is allowed; a pair-specific color formula is not.
 
-Unresolved: Final color scorer, sampling/weighting choices, accepted differences from Python selections, and measured performance target.
+Open: Native editor persistence design, canonical export/assignment schema and placement consumer, final name migration, and browser acceptance. Color-scoring algorithm optimization is no longer a production task.
 
 ART-GEO — Subject geometry
 
@@ -47,7 +48,7 @@ Requirements
 * **Interior holes are not required** for overlap decisions or stored contour data; do not compute/persist them merely to satisfy the old ART-02 mask contract.
 * Do not require a permanent full-canvas bitmask or pixel-by-pixel affine collision engine when exterior contours meet the production needs. A temporary pixel mask used during accurate outline extraction is acceptable.
 * Map outline coordinates to the actual rendered scale and position for lightweight contour/rectangle clearance tests; do not repeatedly inspect individual source pixels when placing the shiny control.
-* If subject isolation is unreliable (for example an opaque background), retain dependable existing fitting/placement behavior without speculative segmentation. Color selection may still work for dual types.
+* If subject isolation is unreliable (for example an opaque background), retain dependable existing fitting/placement behavior without speculative segmentation. Do not fall back to runtime color scanning.
 
 Retire obsolete packed-mask, interior-hole and per-pixel collision runtime paths and tests when a verified replacement makes them unnecessary. Preserve tests that validate the retained exact exterior-outline behavior.
 
@@ -57,7 +58,7 @@ Status: Planned; three-priority scheduling approach agreed in principle, not yet
 
 Requirements
 
-* Produce artwork metadata **before a card is clicked whenever possible**, so its initial colors and geometry are ready on first reveal.
+* Produce **geometry** metadata before a card is clicked whenever possible, so subject-aware fitting and decoration can be ready on first reveal; theme assignments do not wait on ART.
 * Access species read keys directly from the native Fakémon list without opening each detail card; resolve normal portrait URLs and ordered types through the existing read-only `get_fakemon` pathway.
 * Use **one bounded, deduplicating priority queue**: (1) pointer hover/dwell, keyboard focus and feasible touch intent; (2) previous and next entries in the actual list order while a card is open; (3) idle warming of uncached Fakémon from the list.
 * Promote an already queued job rather than creating a duplicate. Keep scan and fetch concurrency conservative, prioritize interaction, and suspend/defer low-priority work during active loading or resource pressure.
@@ -67,20 +68,19 @@ Requirements
 
 Open implementation details: exact event attachment to the list, idle budget, concurrency limit and touch behavior. These are to be measured rather than guessed.
 
-ART-CACHE — Persistent analysis records
+ART-CACHE — Persistent geometry analysis records
 
-Status: Initial IndexedDB/snapshot candidate implemented; real-browser acceptance and streamlined schema outstanding.
+Status: Initial IndexedDB/snapshot candidate implemented; streamline to geometry-only records and verify in a real browser.
 
 Requirements
 
-* Use the existing species ID alone as the lookup identity within its namespace; source URL, source hash, ordered types and analysis versions remain record metadata.
-* Cache successful normal-artwork geometry for every Fakémon; cache color decisions only for dual types.
-* Keep color and geometry independently ready and reusable, but coordinate **one stable card presentation** from whatever validated outputs are available at reveal time.
-* Reuse previous successful results without unnecessary rescans. Revalidate authoritative normal artwork on the first relevant visit after refresh while keeping last-good data.
-* Recompute only an invalidated/changed analysis product; preserve last-good metadata on failure, interrupted requests and storage denial.
-* A changed successful analysis should not recolor or reposition a card already being viewed; apply new decisions at a subsequent coordinated presentation.
-* Avoid recomputation from shiny toggles, viewport resizing, theme changes or routine same-session navigation.
-* Migrate away from obsolete mask records/diagnostics and tests only when the new contour format and compatibility path are verified. Keep synchronous snapshots small and canonical persistent records in IndexedDB.
+* Use the existing Fakémon species ID alone as the lookup identity within its namespace; source URL, source hash and geometry-analysis version remain record metadata.
+* Cache successful **normal-artwork geometry** for every Fakémon, including monotypes. Do not cache or compute runtime artwork-derived type-color choices.
+* Coordinate one stable initial geometry presentation from validated results already available; no late repositioning flashes.
+* Reuse successful geometry without rescanning; revalidate authoritative normal artwork as needed while preserving last-good results on failures, interruptions or storage denial.
+* Avoid recomputation from shiny toggles, viewport resizing, theme changes or same-session navigation. Respond to size changes using previously extracted geometry.
+* Migrate obsolete color and full-canvas mask records, diagnostics and tests only when the replacement geometry format and compatibility path have been verified. Keep synchronous snapshots small and canonical records in IndexedDB.
+* Creator-selected backgroundType persistence belongs to species/editing data, **not** to the artwork-analysis cache.
 
 ART-MODULE — Standalone Artwork Intelligence userscript
 
@@ -89,7 +89,7 @@ Status: Implemented; integration and browser acceptance outstanding.
 Requirements
 
 * Keep Artwork Intelligence independent of QoL, Species Card and Theme Overlay.
-* Own artwork acquisition, analysis, records, geometry data and recommendations.
+* Own normal-artwork acquisition, geometry analysis, geometry records and layout recommendations; not color selection.
 * Expose a versioned, read-only public API for consumers.
 * Do not independently modify cards, shiny controls, theme styles or navigation.
 * Permit existing scripts to initialize and operate without Artwork Intelligence.
@@ -117,20 +117,20 @@ Current implementation: ART-02-R01 includes an independent acquisition coordinat
 
 ART-INTEGRATION — Shared analysis consumers
 
-Status: Planned; no consumer integration committed in ART-02-R01.
+Status: Planned; ART geometry consumer integration not yet committed.
 
 Requirements
 
-* Theme Overlay consumes validated dual-type Fakémon color decisions; monotypes and original Pokémon keep their existing styling.
+* Theme Overlay consumes **static original-Pokémon backgroundType assignments** and separately persisted, creator-selected Fakémon backgroundType; neither color source depends on an ART image scan.
 * Species Card consumes reliable visible bounds, exterior outlines and effective composition bounds for hero scaling/positioning and decorative overlap.
 * QoL consumes optional shiny-icon corner recommendations without relinquishing the button or manual preferences.
-* Color and geometry may analyze, finish and persist **independently**; neither analysis product must wait for the other merely to become available.
-* The **card presentation** is nevertheless coherent: select compatible completed results before first reveal, use them without a visible second-pass color or layout change, and freeze that presentation while the card remains on screen.
-* Reject outgoing-species, stale source, mismatched types and incompatible analysis revisions. Keep last-good results during background revalidation; apply newly changed decisions on a future presentation.
-* Existing script owners retain all display, interaction and styling responsibilities. Consumers do not fetch or reanalyze source pixels separately.
-* Preserve normal standalone behavior when Artwork Intelligence is absent, incomplete or unsuccessful, without hiding loading defects with replacement cards or corrective flashes.
+* Geometry may load or finish independently of native type/theme data. A failed or missing ART result must not prevent theme styling, navigation or shiny operation.
+* The card's **geometry presentation** must be coherent: use compatible completed geometry results before first reveal where available, and avoid a visible second-pass jump while the card remains onscreen.
+* Reject outgoing-species, stale artwork, mismatched identities and incompatible analysis revisions; keep last-good geometry while revalidating in the background.
+* Existing script owners retain all display, interaction and styling responsibilities. Consumers do not independently fetch or reanalyze source pixels.
+* Preserve normal standalone behavior when Artwork Intelligence is absent, incomplete or unsuccessful, without hiding loading defects behind replacement cards or corrective flashes.
 
-The cold direct-link / immediate uncached-click policy is **unresolved**, because instant correct first paint cannot be guaranteed before the required information exists.
+The cold direct-link / immediate uncached-click geometry policy remains unresolved; instant correct subject-aware fitting cannot be guaranteed before the source is available.
 
 ART-QOL — Optional shiny-control enhancement
 
@@ -159,25 +159,27 @@ Requirements
 * Keep expensive analysis off the UI thread wherever supported; verify Blob-worker behavior in the actual userscript extension/iPad Safari environment.
 * A worker-denied main-thread fallback must not cause an uninterrupted large UI stall. Measure any fallback and implement safe scheduling without delaying native card presentation.
 * Avoid decoding twice, competing scanners, excessive RGBA copies or retaining per-species temporary buffers after analysis.
-* Test inexpensive **candidate** color scorers against real-image quality, speed and the original Python reference; full-resolution Python parity is the existing candidate's baseline, not automatic authorization to retain unneeded production work after a scoring change is approved.
+* Remove retired runtime color-scoring costs and dependencies from ART rather than optimizing a feature no longer required. Retain offline source datasets and results independently of the production geometry runtime.
 * Preserve pixel-faithful exterior contours at whatever representation is chosen; do not claim approximate geometry is exact.
 * Report unsupported formats, decoding and color-management differences. Distinguish actual Safari measurements from desktop/Node or calculated memory proxies.
 * Remove retired production algorithms, masks, caches, worker code and tests rather than keeping them running or maintained for hypothetical reuse.
 
 Current implementation: ART-02-R01 includes a Blob worker and same-bundle fallback; actual Safari timing/persistence is unverified.
 
-ART-ORIGINAL — Future original-Pokémon metadata migration
+ART-ORIGINAL — Original-Pokémon background type assignment migration
 
-Status: Discussing; deferred.
+Status: Offline 613-entry baseline selected; manual review in progress outside GitHub; permanent consumer migration not yet implemented.
 
 Requirements
 
-* Eventually provide offline-generated artwork metadata for original Pokémon.
-* Preserve the existing 613 dual-type artwork assignments until an approved migration is verified.
-* Do not browser-scan original Pokémon as part of the current Fakémon implementation.
-* Support compatible geometry, color and icon metadata without changing existing original-Pokémon styling.
-* Consolidate redundant metadata and lookup machinery only after the replacement is validated.
-* Do not retain permanent duplicate authorities for the same artwork decisions.
+* The chosen offline seed is the **Hue/Saturation + Neutral Lightness** full set of 613 original dual-type Pokémon/forms (not the later 50/50 hybrid). No original-Pokémon runtime scanner is needed.
+* The temporary VisualType reviewer lets the user invert an individual assignment, globally preview **assignment → tint versus banner**, and export the entire corrected set. Its review script and local edits are not a committed permanent Theme Overlay migration.
+* Keep the exact reviewed/approved assignments, including form-specific identity, separate from visual mixing. Preserve user edits on import; check species ID/form mapping and that the selected type is one of the actual types.
+* Migrate legacy four-tuples `[primary,secondary,banner,tint]` and provisional `visualType` toward a single proposed `backgroundType` decision per original dual-type identity. The other color and its surface roles are resolved separately, not permanently baked into the assignment data.
+* Prefer **backgroundType → tint** for original dual types, with the other type used as banner. Monotypes retain their established single-type styling. The review toggle is a comparison control, not a requirement for a permanent user-facing global toggle.
+* Decide whether the static original-Pokémon data belongs in a small dedicated source file or remains embedded in Theme Overlay, based on maintainability, installation simplicity, startup cost and single source of truth. Do not create duplicate authorities.
+* Original-Pokémon geometry, if later supported, is independent of this frozen color assignment set.
+* Regress across form variants, Pokémon/Fakémon separation, local review export/import, all themes, shiny transitions and native navigation before deployment.
 
 ⸻
 
@@ -378,6 +380,42 @@ Current implementation: BIO-01-R01 and its subsequent correction.
 ⸻
 
 THEME — Visual Styling
+
+THEME-PALETTE — Canonical type palette and per-type derived treatments
+
+Status: Planned; current Theme Overlay already has scattered per-type tint strengths, shared white mixing (60% default, Electric 70%), and 60% type/40% black ink mixing. Consolidation and calibration have not been implemented.
+
+Requirements
+
+* QoL remains the **single source of truth for the canonical 18 Scarlet/Violet type colors** (`--skin-<type>-bg` currently). Do not duplicate or silently replace base colors in Theme Overlay or ART.
+* Define a **per-type presentation palette** derived from each canonical color using CSS variables and configurable mix parameters: `Type` (base), `TypeBg` (background tint), `TypeLight` (lightened treatment), and `TypeDark` (dark ink/outlines/allowed accents). `TypeRgb` is derived on demand only where an actual consumer needs RGB channels; never maintain a second manually edited RGB value.
+* Initially let `TypeBanner` and `TypeMove` both consume `TypeLight`; split them into **independent per-type treatments only if visual review justifies it**, without changing the underlying base color or altering move-type semantics.
+* Calibrate **each of the 18 types independently** for background strength, light strength, dark strength and, only where needed, separated banner/move strengths. Keep common formulas and shared defaults with explicit individual-type overrides. Derived values should update when a canonical color changes.
+* **Absolute constraint: no pairing-specific mixing, lookups, transforms, overrides or corrections.** A Fire banner/background/move/ink treatment must be the same regardless of the Pokémon's secondary type. No automatic pairwise contrast adjustment.
+* Type relationships affect **which two per-type treatments are chosen for a species**, not how either of those treatments is calculated. A manually chosen species backgroundType is a data decision, not a per-pair palette rule.
+* Preserve the original header gradient's canonical type identities and type badges. Maintain readable body text, banner text, icons, hidden ability indicators and move/TM pills while reusing actual native/site components.
+* **A new game's type palette requires visual recalibration.** Regenerating derivatives from 18 new base values is automatic, but existing mixing percentages are *not* assumed to remain aesthetically correct. Keep the parameters discoverable and reviewable for future game updates.
+* Avoid storing independent hard-coded derivative hex colors when CSS `color-mix()` from canonical base colors suffices. Record exact generated values only when a technical consumer demonstrably needs a resolved color.
+* Keep palette rules in the established Theme/QoL ownership boundary; do not add a new artwork scanner, per-species formula or per-pair special case as a workaround.
+
+Acceptance
+
+* Inspect representative monotype, dual-type and form cards, including Charizard (Fire/Flying), Cloyster/Dewgong (Water/Ice) and Hisuian Samurott (Water/Dark). Those are review examples, **not exceptions**.
+* Verify banner prominence, background harmony, text contrast, move-pill consistency, all three theme modes and dynamic palette replacement independently of Pokémon backgroundType selection.
+* Measure/verify theme transitions and absence of transient wrong-colored panels on iOS Safari and desktop before accepting.
+
+THEME-ASSIGNMENT — Separate backgroundType from palette mixing
+
+Status: Planned; a temporary VisualType review userscript demonstrates switching assignments and global tint/banner placement but is not the deployed consumer.
+
+Requirements
+
+* For each dual-type original Pokémon/form, persist one chosen background type from its actual ordered type set; creator-selected Fakémon follow the same semantic model after native create/edit persistence is implemented.
+* The currently favored placement is **backgroundType as tint; the other type as banners**, with assignment independent of any global presentation swap for comparison.
+* Keep original Pokémon and Fakémon data sources distinct; changing the original assignment set must never assign colors to Fakémon.
+* Use type-scoped treatments from THEME-PALETTE, not a precomputed per-Pokémon background or banner hex code. Preserve existing monotype behavior.
+* Migrate temporary `visualType` exports and current Theme Overlay four-tuples without losing reviewed human choices. Do not silently change names, semantics, or placement during import.
+* Review any proposed cross-device persistence mechanism for Fakémon with the native editor/source before code changes. Avoid exposing structured technical metadata in visible notes or corrupting existing notes.
 
 THEME-PROMOTION — Theme continuity for moved elements
 
@@ -784,7 +822,7 @@ Requirements
 * QoL owns navigation, shiny controls, relevant native enhancements and application-level interactions.
 * Species Card owns hero composition, responsive card geometry and placement.
 * Theme Overlay owns theme-dependent presentation.
-* Artwork Intelligence owns artwork-derived metadata and analysis.
+* Artwork Intelligence owns normal-artwork geometry metadata and analysis, not visual type-color choices.
 * Preserve all established standalone behavior; Artwork Intelligence enhancements must degrade safely when absent.
 * Prefer using existing native site elements and state.
 * Remove dead selectors, observers, caches, functions and compatibility machinery when a feature is replaced.
@@ -816,7 +854,7 @@ Current experimental branch: dev/hero-restoration-2026-10-14
 
 ART-02-R01 implementation baseline: 3c82480ec9ef8bf4d547c3df40228800362bfcd7
 
-Workboard alignment reviewed against dev HEAD 236b6095fa9d99c1dadb4959b268b11d95d9ec77 (before this documentation change). Branch comparison and current HEAD must be checked live before any code edit; historical counts are not treated as current.
+Prior workboard alignment referenced dev HEAD 236b6095fa9d99c1dadb4959b268b11d95d9ec77. This palette/assignment planning revision was prepared against dev HEAD e4eb9249daef3fc29f65b429db982fb41f717740. Branch comparison and current HEAD must be checked live before any code edit; historical counts are not treated as current.
 
 Existing restoration commits
 
@@ -843,12 +881,12 @@ The ART-02 report records successful Python/JavaScript parity tests, synthetic a
 Current integration state
 
 * Artwork Intelligence exists as a fourth standalone userscript.
-* Current QoL, Species Card and Theme Overlay do not yet consume its analysis results.
-* Existing official Pokémon artwork decisions remain in Theme Overlay.
+* Current QoL, Species Card and Theme Overlay do not yet consume its geometry results. Runtime ART color scanning is now obsolete by design.
+* Existing official Pokémon four-tuple artwork decisions remain in Theme Overlay; the selected 613-entry replacement and manual edits have **not** been integrated there.
 * Theme and biology restoration work precedes the Artwork Intelligence implementation on the same development branch.
 * The current branch is not equivalent to an accepted production release.
 
-Next work: (1) baseline and profile ART-02-R01; (2) evaluate/approve a cheaper two-type color decision against real artwork; (3) replace unnecessary full-canvas pixel collision/hole machinery with verified exterior contours for all Fakémon; (4) implement one bounded list/intent/neighbor prefetch queue; (5) streamline cache and independent product readiness; (6) settle the cold-first-reveal policy; (7) integrate Theme Overlay, QoL and Species Card through one stable presentation; (8) run targeted regression and user-browser acceptance. This is planning, not authorization to implement or deploy.
+Next work: (1) preserve the chosen original-Pokémon Hue/Sat + Neutral Lightness dataset and the user's manual review/export edits; (2) design the creator-selected Fakémon backgroundType editor and persistence path; (3) migrate static assignments to a single color decision per species/form, independent of tint/banner placement; (4) consolidate and visually calibrate the 18 per-type derived palettes under THEME-PALETTE with **no pair-based rules**; (5) remove retired ART color-scanning machinery; (6) replace unnecessary full-canvas pixel collision/hole machinery with verified exterior contours for every Fakémon; (7) implement bounded geometry list/intent/neighbor prefetch and streamlined caching; (8) settle cold-first-reveal geometry behavior; (9) integrate geometry consumers and run full browser regressions. This is planning, not authorization to implement or deploy.
 
 ⸻
 
