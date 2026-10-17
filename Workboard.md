@@ -571,10 +571,10 @@ Source-grounded integration
 
 First presentation candidate
 
-* Put a small normal sprite immediately before the species name **inside the existing clickable Name-cell link**. Preserve native sorting, searching, navigation, link hit targets, responsive columns and table row geometry on Pokémon and Fakémon lists.
+* Place the small normal sprite **after the species name, aligned at the existing black-to-white color transition of the list bar** (the boundary between its dark name region and light region), not before the name or merely adjacent to the final letter. Keep the name's current placement and the native row/link click behavior; inspect the actual row structure and styling to anchor the sprite without changing sorting, searching, navigation, responsive columns or row geometry on Pokémon and Fakémon lists.
 * Resolve actual canonical and uploaded sprite URLs from native metadata and established asset origins; never invent asset filenames, hue-shift synthetic sprites or show miniature full portraits for sprite-less species.
 * Start by evaluating normal-only thumbnails. Provisional 28–32 px artwork treatment is a prototype size for visual review, not an approved fixed specification. Shiny/female variant behavior, any sprite preference control, and use beyond the two native lists remain open.
-* Compare reserved empty slots (uniform text alignment) against no slot for sprite-less entries. Do not decide this silently before reviewing mobile/desktop results.
+* For sprite-less rows, preserve the normal name position and bar transition. Compare reserving a visually empty sprite location at that transition against omitting the sprite element entirely; resolve alignment, overlap and responsive behavior through mobile/desktop review.
 * Reuse the current QoL row-decorating lifecycle with a bounded metadata cache, incremental row updates and lazy/near-viewport image loading. Avoid an independent list observer or 1,139 detail requests; evaluate decode/memory and the transient transition as sprite metadata becomes available.
 
 Verification and acceptance
