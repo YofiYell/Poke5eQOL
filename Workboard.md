@@ -155,7 +155,7 @@ Status: Discussing optimization; ART-02-R01 worker and full-scan fallback exist.
 
 Requirements
 
-* Separate and profile native metadata retrieval, image transfer, decoding, geometry extraction, color scoring, hashing, worker transfer and storage writes.
+* Separate and profile native metadata retrieval, image transfer, decoding, geometry extraction, hashing, worker transfer and storage writes. Retired color scoring is not part of the runtime performance budget.
 * Keep expensive analysis off the UI thread wherever supported; verify Blob-worker behavior in the actual userscript extension/iPad Safari environment.
 * A worker-denied main-thread fallback must not cause an uninterrupted large UI stall. Measure any fallback and implement safe scheduling without delaying native card presentation.
 * Avoid decoding twice, competing scanners, excessive RGBA copies or retaining per-species temporary buffers after analysis.
