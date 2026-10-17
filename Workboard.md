@@ -299,6 +299,27 @@ Requirements
 * Keep color ownership with Theme Overlay and geometry ownership with Species Card.
 * Avoid hardcoded white lettering that conflicts with Type-theme ink.
 
+HERO-VITALS-CELLS — Reuse existing vitals SVGs in compact and promoted presentations
+
+Status: Ready for a first implementation candidate; geometry and compact visual baseline agreed, not yet built or accepted.
+
+Goal
+
+* Begin icon-based information presentation with the existing four vitals (SR, AC, HP, MinLvl), because their icons and promoted hero treatment already exist. Preserve the existing SR silhouette, HP heart, AC shield and minimum-level graphic; do not replace the approved SVGs with generic approximations.
+* In compact/unpromoted presentation, replace visible text labels with the corresponding small icon followed by the native value: SR, AC, HP including hit die, and MinLvl including the established level suffix/range rules. Preserve semantic/accessibility names.
+* **Initial compact treatment: unboxed.** No individual fill, border or decorative framing; use spacing and alignment alone. Only after browser review explore optional low-opacity frames, subtle outlines or a shared understated container. None of those are approved initial requirements.
+* Compact icons initially inherit the actual species/card body-text color in Light, Dark and Type modes. Existing separately colored icons remain available for sufficiently roomy promoted tiles. Choose monochrome versus semantic color according to final cell size/visual density, not a fixed viewport breakpoint.
+* Every icon/value pair remains an independent content cell in all layouts. Placement, dimensions and visual presentation are separable decisions; cells may appear inline, arranged across multiple rows, or enlarged as existing hero tiles when that improves total composition. Promotion must not force a particular icon/value presentation.
+* Aim to keep all four compact cells in one row when their measured final content fits. Permit unequal width allocations (HP/hit dice often require more width); evaluate alternatives only when necessary. Never allow collisions, truncation or panel overflow.
+* Reuse the native value nodes/data and one canonical SVG definition/mapping wherever feasible; do not add a second independently maintained vitals icon set or duplicate native state. Preserve existing tile behavior and navigation until a replacement is verified.
+
+Implementation/acceptance notes
+
+* First investigate how `.yofi-vitals-row` native fields and `.lab3-vital` promoted tiles consume their data, and consolidate the common presentation without breaking existing native ownership or the layout selector's measured geometry.
+* Measure and validate the final icon/value cells before layout choice, not by swapping labels after the chosen geometry has been scored. No extra late paint or compensating observer.
+* Test narrow iPhone cards, iPad split panels and wide cards; native versus promoted; long HP values, varying MinLvl text, Light/Dark/Type, transitions and browser refresh. Inspect optical alignment of the four existing SVGs at compact sizes.
+* This is the **first icon implementation task**, ahead of movement/effectiveness/senses. A compact unboxed cell row is the baseline for user visual testing, not blanket authorization to replace all existing vitals arrangements.
+
 HERO-BIOLOGY — Adaptive gender/egg arrangement
 
 Status: Implemented candidate; paired-size and column-boundary regressions reported, browser acceptance outstanding.
@@ -432,7 +453,7 @@ Requirements
 
 THEME-VITALS — Light-theme hero tile contrast
 
-Status: Implemented candidate; target discrepancy requires review.
+Status: Implemented candidate; target discrepancy requires review. Compact monochrome vitals treatment is specified separately under HERO-VITALS-CELLS.
 
 Requirements
 
@@ -686,56 +707,70 @@ Existing implementation: QoL contains decorateEvolutionSexNames(). Its actual ex
 
 DETAIL — Species Information Region
 
+DETAIL-CELLS — Reusable icon/value-cell grammar
+
+Status: Design direction agreed; build and final artwork selection pending.
+
+Requirements
+
+* Treat each speed mode and, if individual-sense icons are adopted, each sense as an independently measurable **icon + numeric value cell**. This remains true in compact rows, wider multi-column placements, promoted regions or a shared/background bar. Promotion changes cell arrangement, not what constitutes a cell.
+* Permit cell tracks, row/column gaps, shared containers and wrapping to respond to actual content and available component dimensions rather than fixed viewport thresholds. Avoid artificial mandatory stages.
+* Keep the visible numeric values exact. Preserve full descriptive names, measurement units and meaning in accessible text and appropriate title/tooltip/expanded labels even when visible labels disappear.
+* Establish common sizing, SVG optical alignment, spacing and density conventions after candidate icon artwork is selected; do not pre-approve uncertain icons solely because a generic glyph exists.
+* Reuse existing native semantic data and DOM where feasible. The layout fitter must evaluate final icon/cell geometry before committing to placement; do not replace measured text with icons in a later pass.
+* Start implementation with HERO-VITALS-CELLS to validate the shared cell approach before extending it to movement or senses.
+
 DETAIL-SCALE — Wide-card information readability
 
-Status: Discussing.
+Status: Discussing; shared icon/value-cell architecture agreed.
 
 Requirements
 
 * Scale Speed, Senses, Skills, Saves and effectiveness information as card space increases.
-* Scale typography, icons, spacing and type badges coherently.
+* Scale typography, icons, spacing and type badges coherently, including the final icon-based presentation rather than obsolete text-label measurements.
 * Preserve readable proportions and alignment at narrow widths.
-* Make the layout fitter evaluate the content at its final intended scale.
+* Make the layout fitter evaluate the content at its final intended scale and cell geometry.
 * Prefer card/content geometry over arbitrary viewport breakpoints.
 * Avoid leaving unusually small detail typography beneath a large hero.
+* Explore alternative tracks/wrapping and possible conditional promotion into genuinely free hero space only after component content and measurements are stable; never mandate a specific promotion solely because icons are present.
 
 DETAIL-SPEED — Movement icons
 
-Status: Discussing.
+Status: Cell semantics and visible-unit rule agreed; SVG choice and visual acceptance pending.
 
 Requirements
 
-* Evaluate replacing repeated Speed labels with recognizable movement icons.
-* Cover native walking, flying, swimming, climbing, burrowing and hovering movement.
-* Preserve exact movement values and labels in accessible descriptions.
-* Use consistent icon size, stroke weight and alignment.
-* Verify whether the icon language remains understandable without visible text labels.
+* Represent each existing movement speed as its own icon/value cell rather than a single Speed category icon. Cover walking, swimming, flying, climbing, burrowing and hovering without altering native semantics.
+* Prospective visual metaphors (not approved final SVGs): shoe for walk; ripples/water/fish for swim; wing for fly; vine/hand for climb; shovel for burrow; UFO for hover.
+* Show each mode's numeric movement distance with **no visible “ft” suffix**; feet are currently implicit under Poké5e's D&D movement rules. Retain exact distances, full mode names and feet units in accessible metadata. No mechanics/data conversion.
+* Remove redundant visible individual mode words once the final icons are chosen and visually verified; choose legible fallback labels for any mode whose artwork remains ambiguous.
+* Movement icon/value cells can flow side by side, wrap, use grid tracks or share a subtle container regardless of whether they are in native details or a promoted region. Keep icon and its value together.
+* Select and inspect actual SVG shapes, stroke weight, optical height and consistency before committing to label-free visual presentation.
 
 DETAIL-SENSES — Sense identification
 
-Status: Discussing.
+Status: Discussing; individual icon artwork and label removal not approved.
 
 Requirements
 
-* Explore one recognizable category icon, potentially an eye, representing Senses.
-* Retain the actual sense names and distances where icons alone would be ambiguous.
-* Account for darkvision, blindsight, tremorsense and truesight.
-* Preserve the existing rule that missing Senses should not reserve blank layout space.
+* Consider darkvision, blindsight, tremorsense and truesight individually. A generic eye icon for the entire Senses category was an earlier fallback, not a settled final solution.
+* Desired direction is potentially label-free **sense icon/value cells**, but the symbols are harder to distinguish; inspect previously explored SVG candidates or create a comparable set, then test at intended small sizes before hiding the sense names.
+* If individual icons prove recognizable, each sense/distance remains its own independent measurable cell and uses DETAIL-CELLS layout rules. Otherwise keep meaningful text labels alongside a generic category marker; do not trade mechanical clarity for visual density.
+* Preserve full sense labels, exact distances and accessibility in either treatment.
+* Preserve the existing rule that missing Senses must not reserve blank layout space; do not invent a sense icon for absent data.
 
 DETAIL-EFFECTIVENESS — Weakness, resistance and immunity presentation
 
-Status: Discussing.
+Status: Discussing; candidate symbols and responsive badge concept identified, final SVGs and behavior pending.
 
 Requirements
 
-* Explore icon replacements for Weak To, Resists and Immune.
-* Candidate symbols: red double-circle/target, grey triangle and black X.
-* Preserve accessible descriptions and mechanical meaning.
-* Explore scaling the native type badges with available panel width.
-* Consider omitting the badge name cell at larger sizes when the type icon is sufficiently recognizable.
-* Explore an effectiveness strip and conditional promotion into unused hero space.
-* Do not duplicate native type badges unnecessarily.
-* Treat hero promotion as a content-and-space decision, not a rigid breakpoint.
+* Explore a compact visual relationship marker for each of Weak To, Resists and Immune using the proposed **target, triangle and X** symbols. The earlier workboard candidate associates target with Weak To, triangle with Resists and X with Immune; verify that mapping explicitly during actual icon review rather than treating the icon order as final approval.
+* Preserve accessible descriptions and the true effectiveness relationship independently of visual badge treatment.
+* Explore scaling the **existing native type glyph badges** up at certain measured card/panel widths, keeping their canonical type colors. Consider removing the small letter/name cell only when a larger SVG remains identifiable; do not unconditionally delete that information in compact layouts.
+* Compare compact icon/badge rows, larger symbol-dominant treatments and potentially a shared effectiveness strip; decide placement through actual available geometry rather than a fixed breakpoint.
+* Explore conditional promotion into unused hero space only after component fit and the hero-selection lifecycle are reliable. Do not duplicate native type badges or preempt other higher-value hero content.
+* Preserve a consistent icon scale, optical alignment and visual hierarchy between the relationship marker and nearby type badges, without assuming they must be the same physical size.
 
 ⸻
 
