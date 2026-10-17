@@ -33,7 +33,7 @@ Requirements
 * Remove or disable color-only image analysis, per-pixel scoring, workers, caches, prefetch jobs, APIs and tests as part of a verified ART cleanup; do not retain them as unnecessary parallel systems. Keep reproducible historical datasets and comparisons when useful, without executing color scans in production.
 * **No per-type-pair mixing or corrections**: Fire's presentation is identical whether paired with Flying, Dark, Dragon or anything else. A Pokémon-specific backgroundType selection is allowed; a pair-specific color formula is not.
 
-Open: Native editor persistence design, canonical export/assignment schema and placement consumer, final name migration, and browser acceptance. Color-scoring algorithm optimization is no longer a production task.
+Remaining: Native Fakémon editor persistence, ART geometry integration, retirement of runtime ART color-scoring code, and repository integration of approved v0.3.50 only when expressly authorized. Original-Pokémon assignment and presentation are accepted in the standalone v0.3.50; no further color-scoring algorithm work is required.
 
 ART-GEO — Subject geometry
 
@@ -168,7 +168,7 @@ Current implementation: ART-02-R01 includes a Blob worker and same-bundle fallba
 
 ART-ORIGINAL — Original-Pokémon background type assignment migration
 
-Status: Offline 613-entry baseline selected; manual review in progress outside GitHub; permanent consumer migration not yet implemented.
+Status: **Accepted — 613 user-curated original-Pokémon backgroundType assignments in standalone Theme Overlay v0.3.50.** The approved candidate is separate from GitHub's older v0.3.49.
 
 Requirements
 
@@ -383,7 +383,7 @@ THEME — Visual Styling
 
 THEME-PALETTE — Canonical type palette and per-type derived treatments
 
-Status: Planned; current Theme Overlay already has scattered per-type tint strengths, shared white mixing (60% default, Electric 70%), and 60% type/40% black ink mixing. Consolidation and calibration have not been implemented.
+Status: **Accepted — standalone Theme Overlay v0.3.50 (user-approved 2026-10-17).** The accepted build was delivered separately; GitHub dev still contains v0.3.49 until a separately authorized code commit.
 
 Requirements
 
@@ -406,7 +406,7 @@ Acceptance
 
 THEME-ASSIGNMENT — Separate backgroundType from palette mixing
 
-Status: Planned; a temporary VisualType review userscript demonstrates switching assignments and global tint/banner placement but is not the deployed consumer.
+Status: **Accepted — original-Pokémon backgroundType assignment in standalone Theme Overlay v0.3.50 (2026-10-17).** Fakémon creator-selection persistence remains planned. The dev branch has not yet integrated the approved build.
 
 Requirements
 
@@ -878,21 +878,29 @@ ART-02-R01: JavaScript analyzer candidate committed at 3c82480. Not yet accepted
 
 The ART-02 report records successful Python/JavaScript parity tests, synthetic and real-image validation, and local Chromium checks. Live Poké5e acquisition, real-origin persistence, Safari behavior and consumer integration remain unverified.
 
+Accepted Theme Overlay milestone — 2026-10-17
+
+* **Theme Overlay v0.3.50 BackgroundType + Type Palette is explicitly user-accepted.** This approval concerns the separately delivered candidate files, not a version already committed to GitHub.
+* Includes the user's authoritative 613 original dual-type species/form `backgroundType` selections, with backgroundType → tint, the other type → banner, and no pairing-specific transformations.
+* The CSS groups all 18 types' mixing percentages together **above** the 18 individual derived-type color blocks. Previous percentage values were not retuned; banner and move treatments share the light mix initially.
+* Reported local candidate verification: JavaScript syntax, 613 IDs and valid typings, and Chromium fixtures for representative species, themes, and dynamic canonical-color changes. Live iPad Safari verification was **not independently recorded**; do not imply it was.
+* **GitHub still has Theme Overlay v0.3.49.** Do not commit/promote v0.3.50 without express instruction. Acceptance of this candidate does not mark Fakémon creator-selected color persistence, ART color-code retirement, or ART geometry integration complete.
+
 Current integration state
 
 * Artwork Intelligence exists as a fourth standalone userscript.
 * Current QoL, Species Card and Theme Overlay do not yet consume its geometry results. Runtime ART color scanning is now obsolete by design.
-* Existing official Pokémon four-tuple artwork decisions remain in Theme Overlay; the selected 613-entry replacement and manual edits have **not** been integrated there.
+* GitHub dev Theme Overlay v0.3.49 still contains the old four-tuple original-Pokémon assignments. The separately delivered, **user-accepted Theme Overlay v0.3.50** contains all 613 finalized `backgroundType` choices and the derived type palette. Do not conflate acceptance of the standalone candidate with an uploaded, merged, or deployed repository revision.
 * Theme and biology restoration work precedes the Artwork Intelligence implementation on the same development branch.
 * The current branch is not equivalent to an accepted production release.
 
-Next work: (1) preserve the chosen original-Pokémon Hue/Sat + Neutral Lightness dataset and the user's manual review/export edits; (2) design the creator-selected Fakémon backgroundType editor and persistence path; (3) migrate static assignments to a single color decision per species/form, independent of tint/banner placement; (4) consolidate and visually calibrate the 18 per-type derived palettes under THEME-PALETTE with **no pair-based rules**; (5) remove retired ART color-scanning machinery; (6) replace unnecessary full-canvas pixel collision/hole machinery with verified exterior contours for every Fakémon; (7) implement bounded geometry list/intent/neighbor prefetch and streamlined caching; (8) settle cold-first-reveal geometry behavior; (9) integrate geometry consumers and run full browser regressions. This is planning, not authorization to implement or deploy.
+Next work: (1) preserve the exact **user-accepted v0.3.50 standalone candidate**, committing it to dev only upon explicit instruction; (2) design and implement creator-selected Fakémon backgroundType editor persistence; (3) retire unused ART color processing and replace pixel-mask/hole machinery with faithful exterior contours; (4) implement bounded geometry-only prefetch and streamlined caches; (5) settle cold-first-reveal geometry behavior; (6) integrate ART geometry consumers and run appropriate browser regressions. Do not redo or recalibrate accepted original-Pokémon backgroundType data and per-type mixes without a new request.
 
 ⸻
 
 Completion rule
 
-A work item is marked Accepted only after its defined behavior is implemented and the relevant verification is complete, including user browser testing where required.
+A work item is marked Accepted upon explicit user acceptance of the implemented feature with relevant verification documented. Distinguish accepted standalone builds from code committed or deployed to GitHub; do not claim browser tests that were not actually witnessed.
 
 Items may be reopened if subsequent testing reveals defects or regressions.
 
