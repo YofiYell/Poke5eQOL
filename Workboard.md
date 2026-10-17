@@ -231,19 +231,23 @@ Requirements
 
 Current implementation: GEO-01-R01 and GEO-01-R02, through Species Card 0.1.26.
 
-HERO-OSCILLATION — Repeated self-triggered promotion/demotion on a stationary card
+HERO-OSCILLATION — Repeated or width-sensitive hero promotion/demotion
 
-Status: Ready for Nosepass-specific root-cause investigation and cause-driven corrective work; no userscript changes yet.
+Status: Ready for cross-species, width-sensitive root-cause investigation and cause-driven corrective work; no userscript changes yet.
 
-Observed behavior (2026-10-16)
+Observed behavior (2026-10-16 to 2026-10-17)
 
 * Nosepass (#0299) repeatedly alternates between native and promoted hero arrangements while the selected species and browser-panel width remain unchanged. The animation visibly relocates ability scores, gender/egg bars and artwork, rather than showing a normal one-time load transition.
 * The recording shows the problem in desktop-style Safari with a narrow split browser panel. Other species shown after navigation do not establish that the defect is unique to Nosepass.
 * The recording proves repeated layout changes, but does not include live layout-state or computed-style telemetry. The full causal chain is not yet confirmed.
-* Nosepass is the first and so far only species reported to oscillate. Explain the species-specific trigger rather than treating generic layout feedback as a sufficient explanation; do not claim that other species cannot reproduce it.
+* Additional user report (2026-10-17): another, as-yet-unidentified Pokémon exhibited Nosepass-like flicker at an approximately 624 px panel width. After resizing the window away from that width and back, the flicker stopped in that session. The width is approximate; no live state/geometry trace was supplied for this case. This is a second reported affected species, not evidence of a confirmed root cause or permanent resolution.
+* Nosepass is the first identified species; at least one additional, unnamed species is now reported. Compare shared width/selection-history behavior and species-specific content rather than assuming the issue is unique to Nosepass or universal at every width.
 * The clip visibly alternates between native scores and a scores-promoted arrangement; confirm the exact promotion flags by instrumenting the real layout selector. A near-tie between candidates is a hypothesis, not a measured finding.
 
-Nosepass-specific investigation
+Cross-species and reproduction investigation
+
+* Identify the second affected Pokémon when available; record whether ~624 px refers to the outer viewport, detail card, or an interior panel, without assuming these are interchangeable.
+* Reproduce a direct entry at the affected width, resizing across the boundary, returning to the same width, refreshing there, and changing species/theme. Compare initial and subsequent candidate decisions to test whether prior selections or remembered geometry affect stability.
 
 * Record Nosepass's actual description text and rendered line count, gender/egg field values (including the short Mineral label), normal portrait intrinsic dimensions/aspect ratio and displayed size, Abilities content, card inner width, font state and layout measurements. Compare against representative species that stay stable at the same width and theme.
 * Capture the entire candidate table before and after each flip: promotion tuple (especially native versus scores-only), biology arrangement, track widths, content/section heights, displaced native-footprint measurements, feasibility constraints, image minimums, quality score and chosen winner.
@@ -264,7 +268,7 @@ Requirements and acceptance
 * With unchanged route, card width, source data and font metrics, repeat evaluations must select the same stable arrangement. Do not rely on a delay, arbitrary cooldown, animation, hidden card or frozen layout to mask instability.
 * Distinguish genuine changes (viewport, text, portrait intrinsic dimensions, font readiness, theme) from self-generated layout changes. Ensure one coherent measurement basis for competing candidates.
 * Capture per-pass chosen promotion, biology mode, source identity, card/content widths, projected footprints, candidate costs, image height and reason for recalculation on live Safari.
-* Regression-test Nosepass near the recorded narrow split-pane width, as well as shorter/taller descriptions, different abilities, theme modes, refresh, next/previous navigation and manual resizing across thresholds.
+* Regression-test Nosepass near the recorded narrow split-pane width and the second reported case near approximately 624 px panel width, including a resize away and back. Also cover shorter/taller descriptions, different abilities, theme modes, refresh, next/previous navigation and manual resizing across thresholds.
 * Preserve adaptive promotions when actually beneficial; fix the input/state inconsistency rather than disabling a legitimate layout mode.
 * After tracing the actual cause, correct the offending geometry measurement, native-state restoration, memory invalidation or observer dependency at its owner; remove obsolete logic superseded by the correction. Do not add delays, a cooldown, arbitrary threshold hysteresis or a Nosepass-specific exemption.
 * Confirm that the chosen native or promoted scores layout is stable across repeated evaluations while inputs are unchanged, and changes appropriately when text, fonts, dimensions or portrait data genuinely change. Validate with the actual Nosepass content, not only synthetic test fixtures.
@@ -478,6 +482,34 @@ Requirements
 
 ⸻
 
+FAKEMON-EDITOR — Native Fakémon Editor Extensions
+
+FAKEMON-EDITOR-METADATA — Versioned species metadata through native Notes
+
+Status: Discussing; architecture candidate only. No editor modification, live save/round-trip test or persistence implementation. Cross-reference THEME-ASSIGNMENT for backgroundType, CM-WORKFLOW for editor continuity, and CM-LIBRARY for the distinct reusable move registry.
+
+Source-grounded constraints
+
+* Native `FakemonEditor.svelte` submits fixed species fields; `SupabaseFakemonDataProvider.ts` explicitly maps fields into `new_fakemon`/`update_fakemon` RPC arguments. There is no demonstrated arbitrary metadata field.
+* The species Notes field is server-persisted and read back with the normal Fakémon record. Notes display uses Markdown and DOMPurify, so a namespaced HTML-comment marker is plausible, but exact Markdown-editor round-trip and display behavior require verification.
+* Save/edit permissions still require the native write key. Cross-device loading through the existing read-key path is a goal, not a tested feature.
+
+Candidate requirements and approach
+
+* Begin with creator-selected `backgroundType`, restricted to the Fakémon's actual type(s), without runtime portrait color-scanning. Allow future supplementary editor controls to reuse one versioned per-species metadata contract rather than independent ad hoc storage.
+* Investigate a single namespaced metadata block in Notes (for example a versioned HTML comment), with centralized parse, validate, merge, migrate and serialize operations. Preserve all user-authored Notes and unrelated data verbatim; do not expose metadata in the rendered species card.
+* Prefer synchronizing supplemental controls with the **native Svelte-bound Notes state and save lifecycle**. Blindly injecting metadata into only the outgoing RPC can cause a subsequent native save to overwrite it; avoid unverified synthetic event assumptions.
+* Handle missing/malformed/duplicated blocks, outdated formats, typing changes, cancel/reopen, refresh, bare Poké5e editing, stale cross-device edits and conflict recovery. Back up the complete species record before high-risk experiments.
+* Keep the reusable custom-move definition library separate from per-species metadata. Storing metadata in Notes does not, by itself, register move IDs in native Pokémon move resolution.
+
+Verification before implementation/acceptance
+
+* Inspect the actual Notes textarea/textarea-markdown event-to-Svelte binding, native create/edit submit and post-save store behavior on the current site, including iOS Safari.
+* Prove markup survival and correct invisibility in display/preview, user Notes preservation, write-key behavior, refresh and second-device read, type changes, repeated native saves and failure/cancellation recovery.
+* Check server text-size constraints and stale/concurrent-edit behavior. Do not claim cross-device persistence or a working custom move editor without an executed round trip.
+
+⸻
+
 TM — Technical Machines
 
 TM-FIT — Responsive TM pill column geometry
@@ -522,6 +554,34 @@ Requirements
 * Match the established numbered TM-pill presentation.
 * Preserve actual TM identifiers, names, links and sorting data.
 * Avoid altering the underlying native records.
+
+⸻
+
+LIST — Pokémon and Fakémon List Presentation
+
+LIST-SPRITES — Real normal-sprite thumbnails within native list rows
+
+Status: Discussing; source-backed design candidate, no prototype, code changes or Safari performance results.
+
+Source-grounded integration
+
+* The canonical Pokémon SSR listing projects away media/sprites, but the complete client Pokémon dataset includes sprite references. QoL already requests that full canonical dataset for type information; gather sprite metadata from the **existing** response instead of per-row detail fetches.
+* Native Fakémon list DOM currently exposes only Name, while Fakémon records have optional uploaded media. QoL 0.13.4 already augments Fakémon list rows with Type/SR and deduplicated read-key lookups; extend that existing ownership/data path to obtain `normal_sprite_filename` where available.
+* Native `SpeciesMedia.sprite()` can fall back to portrait artwork. Do not use that fallback when deciding whether a list thumbnail exists: only real sprites qualify.
+
+First presentation candidate
+
+* Put a small normal sprite immediately before the species name **inside the existing clickable Name-cell link**. Preserve native sorting, searching, navigation, link hit targets, responsive columns and table row geometry on Pokémon and Fakémon lists.
+* Resolve actual canonical and uploaded sprite URLs from native metadata and established asset origins; never invent asset filenames, hue-shift synthetic sprites or show miniature full portraits for sprite-less species.
+* Start by evaluating normal-only thumbnails. Provisional 28–32 px artwork treatment is a prototype size for visual review, not an approved fixed specification. Shiny/female variant behavior, any sprite preference control, and use beyond the two native lists remain open.
+* Compare reserved empty slots (uniform text alignment) against no slot for sprite-less entries. Do not decide this silently before reviewing mobile/desktop results.
+* Reuse the current QoL row-decorating lifecycle with a bounded metadata cache, incremental row updates and lazy/near-viewport image loading. Avoid an independent list observer or 1,139 detail requests; evaluate decode/memory and the transient transition as sprite metadata becomes available.
+
+Verification and acceptance
+
+* Test sprites present, sprites absent, missing/broken URLs, original 2018/2024 data, uploaded Fakémon sprites, resort/filter/search and navigation after list updates.
+* Measure first list paint, scrolling, network/image memory and row-height shifts on iOS Safari and desktop/narrow panels. Preserve continuous list/card rendering during navigation and check Light, Dark and Type themes.
+* Keep implementation and real-device acceptance separate. No scripts or lists have yet been modified.
 
 ⸻
 
