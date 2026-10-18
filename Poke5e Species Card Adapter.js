@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Species Card [v0.1.27]
+// @name         Species Card [v0.1.28 Unified Subject Layout]
 // @namespace    yofi.poke5e.species.card
-// @version      0.1.27
-// @description  Pokemon/Fakemon adaptive card presentation with direct native navigation.
+// @version      0.1.28
+// @description  Adaptive species layouts with measured normal-artwork subject bounds for compact and expanded presentations.
 // @match        https://poke5e.app/*
 // @run-at       document-start
 // @grant        none
@@ -138,7 +138,7 @@
     window.addEventListener('load',detectQol,{once:true});
     return {register,status,requireQol,report,notice,ready:publishReady};
   })());
-  const registration = modules.register('Species Card','0.1.27');
+  const registration = modules.register('Species Card','0.1.28');
   modules.requireQol(registration,runSpeciesCard);
   function runSpeciesCard() {
   // Standalone companion. Disable earlier Hero Layout Lab builds, not the QOL script.
@@ -148,15 +148,15 @@
   // the same nodes and both install recurring timers.
   if (window.__yofiHeroLayoutLab) {
     const active = window.__yofiHeroLayoutLab;
-    console.error('[Species Card v0.1.27] Conflicting adapter is already active:',
+    console.error('[Species Card v0.1.28] Conflicting adapter is already active:',
       active, 'Disable ALL earlier Hero Layout Lab / Adapter userscripts and reload.');
     modules.notice('yofi-userscript-version-conflict','Species Card conflict: disable extra Hero Layout Adapters / Species Card userscripts and reload.');
     return false;
   }
-  window.__yofiHeroLayoutLab = '0.1.27';
-  window.__yofiSpeciesCard = '0.1.27';
+  window.__yofiHeroLayoutLab = '0.1.28';
+  window.__yofiSpeciesCard = '0.1.28';
 
-  const VERSION = '0.1.27';
+  const VERSION = '0.1.28';
   const STYLE_ID = 'yofi-species-card-hero-css';
   const PREPARE_EVENT = 'yofi:species-card-prepare-before-reveal';
   const PRE_REVEAL_EVENT = 'yofi:species-card-before-reveal';
@@ -166,6 +166,103 @@
   const portraitLayoutRatios = new WeakMap();
   const portraitLoadHandlers = new WeakMap();
   const MAX_ENCOUNTER_LEVEL = 20; // Current level-range display assumption.
+  // Precomputed subject rectangles: archived normal portraits. Form/source identity
+  // is checked before any art-size changes. Contour collision is not used.
+  // BBox records are from the archived Poke5e normal PNG catalog
+  // (475x475 source canvases, alpha>=1 extents). Contours are intentionally
+  // not used here; this is an occupied-rectangle-only visual A/B test.
+  const BBOX_TEST_SOURCE = 'Poke5e archive / upstream 881f3cae / alpha>=1';
+  const BBOX_TEST_TABLE = Object.freeze({"abomasnow":[22,22,453,453],"abra":[22,86,453,389],"absol":[93,22,381,453],"accelgor":[22,42,453,432],"aegislash":[58,22,416,453],"aerodactyl":[22,103,453,371],"aggron":[22,22,452,453],"aipom":[22,54,453,421],"alakazam":[22,46,453,429],"alcremie":[91,41,382,424],"alolan-diglett":[82,58,389,415],"alolan-dugtrio":[31,53,453,423],"alolan-exeggutor":[135,21,360,454],"alolan-geodude":[18,101,440,366],"alolan-golem":[64,41,390,437],"alolan-graveler":[20,102,460,422],"alolan-grimer":[26,60,446,418],"alolan-marowak":[105,19,380,435],"alolan-meowth":[98,47,345,426],"alolan-muk":[10,116,461,351],"alolan-ninetales":[21,79,455,411],"alolan-persian":[48,79,428,418],"alolan-raichu":[62,45,405,427],"alolan-raticate":[48,99,428,397],"alolan-rattata":[47,88,425,368],"alolan-sandshrew":[33,75,414,418],"alolan-sandslash":[54,34,418,438],"alolan-vulpix":[74,38,437,418],"alomomola":[122,22,353,453],"altaria":[43,22,432,453],"amaura":[77,22,398,453],"ambipom":[22,62,453,413],"amoonguss":[22,44,453,431],"ampharos":[79,22,396,453],"annihilape":[43,23,411,427],"anorith":[27,22,448,453],"appletun":[36,71,432,414],"applin":[132,95,358,369],"araquanid":[34,60,441,418],"arbok":[44,22,430,453],"arboliva":[13,68,466,426],"arcanine":[22,34,453,440],"arcanine-hisui":[9,62,466,424],"arceus":[76,22,398,453],"archaludon":[52,13,422,462],"archen":[22,93,453,381],"archeops":[81,22,394,453],"arctibax":[40,83,461,437],"arctovish":[100,80,403,399],"arctozolt":[59,54,378,440],"ariados":[22,42,453,432],"armaldo":[22,47,453,427],"armarouge":[100,13,374,462],"aromatisse":[84,22,390,453],"aron":[22,32,453,443],"arrokuda":[26,111,443,322],"articuno":[46,22,428,453],"articuno-galar":[39,32,434,465],"audino":[59,22,415,453],"aurorus":[41,22,433,453],"avalugg":[50,22,432,438],"avalugg-hisui":[51,69,427,399],"axew":[76,22,398,453],"azelf":[86,22,388,453],"azumarill":[29,22,446,453],"azurill":[51,22,424,453],"bagon":[97,22,378,453],"baltoy":[22,22,453,453],"banette":[22,34,453,440],"barbaracle":[22,41,453,425],"barboach":[22,123,453,352],"barraskewda":[17,142,462,326],"basculegion-f":[20,120,463,384],"basculegion-m":[21,103,469,355],"basculin":[22,51,453,424],"basculin-blue-striped":[22,58,453,416],"basculin-white-striped":[60,79,416,396],"bastiodon":[22,45,453,429],"baxcalibur":[96,23,390,456],"bayleef":[110,22,364,453],"beartic":[22,38,453,437],"beautifly":[22,30,453,445],"beedrill":[59,22,416,453],"beheeyem":[96,22,379,453],"beldum":[22,124,453,350],"bellibolt":[56,80,364,391],"bellossom":[42,22,432,453],"bellsprout":[52,22,422,453],"bergmite":[43,22,432,453],"bewear":[63,46,428,428],"bibarel":[22,51,453,424],"bidoof":[22,47,453,428],"binacle":[42,22,432,453],"bisharp":[121,22,354,453],"blacephalon":[43,0,432,475],"black-kyurem":[22,58,453,417],"blastoise":[38,22,436,453],"blaziken":[75,22,400,453],"blipbug":[133,67,328,390],"blissey":[32,22,442,453],"blitzle":[109,22,365,453],"boldore":[22,53,453,421],"boltund":[24,75,461,404],"bombirdier":[49,49,457,442],"bonsly":[100,22,375,453],"bouffalant":[22,56,453,419],"bounsweet":[46,47,430,413],"braixen":[95,22,379,453],"brambleghast":[15,33,453,432],"bramblin":[33,49,458,434],"braviary":[22,41,453,433],"braviary-hisui":[18,35,444,426],"breloom":[60,22,415,453],"brionne":[35,84,439,387],"bronzong":[22,119,453,356],"bronzor":[65,22,410,453],"brute-bonnet":[50,99,424,425],"bruxish":[34,87,439,344],"budew":[106,22,369,453],"buizel":[22,108,453,367],"bulbasaur":[22,36,453,438],"buneary":[128,22,346,453],"bunnelby":[98,22,376,453],"burmy":[119,22,355,453],"butterfree":[22,41,453,434],"buzzwole":[67,46,412,435],"cacnea":[22,91,453,384],"cacturne":[31,22,444,453],"calyrex":[68,4,402,475],"calyrex-ice":[88,30,399,445],"calyrex-shadow":[56,30,447,470],"camerupt":[22,63,453,412],"capsakid":[92,25,382,450],"carbink":[22,31,453,443],"carkol":[88,70,392,425],"carnivine":[22,61,453,414],"carracosta":[22,61,453,414],"carvanha":[71,22,404,453],"cascoon":[22,64,453,411],"castform":[104,22,371,453],"caterpie":[22,22,453,453],"celebi":[22,50,453,425],"celesteela":[18,45,462,433],"centiskorch":[23,50,445,387],"ceruledge":[33,8,438,463],"cetitan":[17,112,458,364],"cetoddle":[32,82,463,389],"chandelure":[47,22,428,453],"chansey":[22,48,453,427],"charcadet":[109,13,343,466],"charizard":[22,68,453,406],"charjabug":[47,99,426,379],"charmander":[46,22,428,453],"charmeleon":[53,22,421,453],"chatot":[41,22,434,453],"cherrim":[62,22,412,453],"cherubi":[46,22,429,453],"chesnaught":[22,58,453,417],"chespin":[87,22,387,453],"chewtle":[111,51,331,402],"chi-yu":[36,71,452,388],"chien-pao":[14,68,469,406],"chikorita":[72,22,402,453],"chimchar":[109,22,366,453],"chimecho":[136,22,339,453],"chinchou":[22,68,453,406],"chingling":[22,49,453,426],"cinccino":[22,27,453,448],"cinderace":[124,15,364,463],"clamperl":[43,22,431,453],"clauncher":[22,93,453,382],"clawitzer":[22,125,453,349],"claydol":[34,22,440,453],"clefable":[22,24,453,450],"clefairy":[22,22,452,453],"cleffa":[22,38,453,437],"clobbopus":[50,96,429,354],"clodsire":[19,146,463,368],"cloyster":[22,31,453,444],"coalossal":[72,33,417,451],"cobalion":[98,22,376,453],"cofagrigus":[22,65,453,410],"combee":[22,116,453,358],"combusken":[22,29,453,445],"comfey":[73,45,401,427],"conkeldurr":[22,59,453,415],"copperajah":[60,61,414,399],"corphish":[22,27,453,447],"corsola":[22,34,453,440],"corviknight":[44,44,366,447],"corvisquire":[84,49,425,433],"cosmoem":[55,68,420,391],"cosmog":[47,60,428,417],"cottonee":[22,109,453,365],"crabominable":[18,95,457,362],"crabrawler":[48,69,428,408],"cradily":[61,22,413,453],"cramorant":[74,42,390,445],"cranidos":[59,22,416,453],"crawdaunt":[22,40,453,435],"cresselia":[36,22,438,453],"croagunk":[61,22,414,453],"crobat":[22,110,453,365],"crocalor":[75,78,405,423],"croconaw":[40,22,434,453],"crustle":[22,64,453,410],"cryogonal":[25,22,450,453],"cubchoo":[72,22,403,453],"cubone":[56,22,419,453],"cufant":[62,76,420,405],"cursola":[38,63,421,445],"cutiefly":[50,39,425,419],"cyclizar":[41,45,424,459],"cyndaquil":[22,73,453,402],"dachsbun":[9,49,461,421],"darkrai":[31,22,443,453],"darmanitan":[43,22,432,453],"dartrix":[47,70,428,408],"darumaka":[22,33,453,442],"dawn-wings-necrozma":[0,60,475,416],"decidueye":[47,67,427,406],"decidueye-hisui":[53,19,445,454],"dedenne":[22,49,453,425],"deerling":[103,22,372,453],"deino":[77,22,397,453],"delcatty":[71,22,403,453],"delibird":[74,22,400,453],"delphox":[22,64,453,410],"deoxys":[22,56,453,418],"dewgong":[22,23,453,452],"dewott":[96,22,378,453],"dewpider":[109,55,370,425],"dhelmise":[117,24,407,436],"dialga":[41,22,434,453],"dialga-origin":[65,16,406,458],"diancie":[53,13,422,463],"diggersby":[22,61,453,413],"diglett":[22,38,453,437],"dipplin":[114,8,360,467],"ditto":[22,55,453,420],"dodrio":[61,22,414,453],"doduo":[107,22,368,453],"dolliv":[93,32,368,449],"dondozo":[22,99,453,376],"donphan":[22,115,453,360],"dottler":[63,109,423,391],"doublade":[22,75,453,399],"dracovish":[61,70,363,428],"dracozolt":[41,91,462,391],"dragalge":[22,50,453,424],"dragapult":[30,44,450,443],"dragonair":[39,22,436,453],"dragonite":[70,22,405,453],"drakloak":[27,58,446,418],"drampa":[25,96,449,361],"drapion":[22,116,453,358],"dratini":[22,28,453,447],"drednaw":[31,111,461,369],"dreepy":[39,122,443,371],"drifblim":[22,22,452,453],"drifloon":[105,22,369,453],"drilbur":[22,22,453,453],"drizzile":[15,8,455,462],"drowzee":[76,22,399,453],"druddigon":[22,53,453,421],"dubwool":[78,53,403,434],"ducklett":[71,22,403,453],"dudunsparce":[60,132,408,395],"dugtrio":[22,29,453,445],"dunsparce":[48,22,426,453],"duosion":[40,22,435,453],"duraludon":[71,47,387,429],"durant":[22,115,453,359],"dusclops":[22,50,453,424],"dusk-mane-necrozma":[0,18,475,457],"dusknoir":[22,77,453,397],"duskull":[53,22,421,453],"dustox":[22,101,453,374],"dwebble":[22,41,453,434],"eelektrik":[71,22,404,453],"eelektross":[22,122,453,352],"eevee":[62,22,413,453],"eiscue":[103,47,356,432],"ekans":[22,24,453,451],"eldegoss":[66,52,395,442],"electabuzz":[22,26,453,448],"electivire":[22,71,453,403],"electrike":[22,93,453,382],"electrode":[23,22,452,453],"electrode-hisui":[0,0,475,474],"elekid":[22,92,453,383],"elgyem":[97,22,377,453],"emboar":[22,22,453,453],"emolga":[22,90,453,385],"empoleon":[64,22,411,453],"enamorus":[98,34,337,436],"enamorus-therian":[26,107,428,411],"entei":[39,22,436,453],"escavalier":[60,22,414,453],"espathra":[50,21,430,462],"espeon":[22,31,453,444],"espurr":[70,22,404,453],"eternatus":[12,78,463,433],"eternatus-eternamax":[10,76,466,400],"excadrill":[22,65,453,409],"exeggcute":[22,68,453,406],"exeggutor":[22,26,453,448],"exploud":[22,24,453,451],"falinks":[20,68,439,434],"farfetchd":[57,22,418,453],"farigiraf":[148,18,347,441],"fearow":[22,37,453,437],"feebas":[79,22,396,453],"fennekin":[91,22,383,453],"feraligatr":[48,22,426,453],"ferroseed":[51,22,423,453],"ferrothorn":[22,80,453,395],"fezandipiti":[0,0,474,475],"fidough":[52,109,414,402],"finizen":[60,106,436,334],"finneon":[22,46,453,428],"flaaffy":[66,22,408,453],"flabebe":[31,22,444,453],"flamigo":[146,18,328,457],"flapple":[68,74,432,399],"flareon":[22,45,453,429],"fletchinder":[22,35,453,440],"fletchling":[22,54,453,420],"flittle":[59,44,416,445],"floatzel":[68,22,406,453],"floette":[59,22,415,453],"floette-eternal":[45,9,410,462],"floragato":[107,40,379,446],"florges":[60,24,414,436],"flutter-mane":[26,61,449,414],"flygon":[22,75,453,400],"fomantis":[104,47,365,427],"foongus":[37,22,438,453],"forretress":[22,68,453,407],"fraxure":[22,30,453,444],"frigibax":[37,95,381,434],"frillish":[22,27,453,448],"froakie":[32,22,443,453],"frogadier":[22,68,453,407],"froslass":[131,22,344,453],"frosmoth":[20,84,464,388],"fuecoco":[53,16,419,459],"furfrou":[83,22,391,453],"furret":[58,22,417,453],"gabite":[23,22,452,453],"galarian-corsola":[71,94,375,388],"galarian-darmanitan":[92,36,399,435],"galarian-darumaka":[93,89,395,398],"galarian-farfetchd":[33,117,428,358],"galarian-linoone":[33,64,447,351],"galarian-meowth":[47,82,413,406],"galarian-mr-mime":[33,45,427,465],"galarian-ponyta":[92,87,402,373],"galarian-rapidash":[73,43,421,421],"galarian-slowbro":[44,76,449,431],"galarian-slowking":[69,0,406,475],"galarian-slowpoke":[42,221,444,378],"galarian-stunfisk":[40,127,423,367],"galarian-weezing":[64,30,431,434],"galarian-yamask":[39,74,429,402],"galarian-zigzagoon":[35,76,427,373],"gallade":[61,22,414,453],"galvantula":[22,72,453,403],"garbodor":[22,49,453,425],"garchomp":[31,22,444,453],"gardevoir":[22,24,453,450],"garganacl":[42,26,372,434],"gastly":[22,23,453,452],"gastrodon":[63,22,411,453],"genesect":[58,22,416,453],"gengar":[26,22,448,453],"geodude":[22,156,453,319],"gholdengo":[84,25,323,446],"gible":[22,26,453,449],"gigalith":[36,22,439,453],"gimmighoul":[115,37,378,458],"gimmighoul-roaming":[11,19,466,455],"girafarig":[102,22,373,453],"giratina-altered-forme":[0,46,475,429],"giratina-origin-forme":[0,18,475,457],"glaceon":[22,59,453,416],"glalie":[22,40,453,434],"glameow":[36,22,438,453],"glastrier":[90,10,406,469],"gligar":[22,22,452,453],"glimmet":[143,37,321,431],"glimmora":[25,89,470,398],"gliscor":[42,22,432,453],"gloom":[22,61,453,413],"gogoat":[49,22,425,453],"golbat":[22,52,453,422],"goldeen":[22,117,453,358],"golduck":[22,25,453,450],"golem":[22,35,453,440],"golett":[28,22,447,453],"golisopod":[31,30,428,428],"golurk":[37,22,438,453],"goodra":[41,42,434,453],"goodra-hisui":[28,69,431,428],"goomy":[22,22,453,453],"gorebyss":[22,75,453,399],"gossifleur":[64,61,433,411],"gothita":[89,22,385,453],"gothitelle":[88,22,386,453],"gothorita":[92,22,383,453],"gouging-fire":[13,30,462,445],"gourgeist":[51,22,424,446],"grafaiai":[36,82,433,433],"granbull":[70,22,404,453],"grapploct":[52,49,404,426],"graveler":[22,130,453,344],"great-tusk":[16,107,460,368],"greavard":[72,24,401,447],"greedent":[46,55,364,406],"greninja":[22,110,453,365],"grimer":[22,89,453,386],"grimmsnarl":[16,49,460,445],"grookey":[82,32,392,443],"grotle":[22,22,452,453],"groudon":[22,90,453,385],"groudon-primal":[5,92,469,383],"grovyle":[22,51,453,424],"growlithe":[86,22,388,453],"growlithe-hisui":[42,39,432,424],"grubbin":[47,142,425,336],"grumpig":[22,27,453,447],"gulpin":[22,58,453,417],"gumshoos":[47,70,424,407],"gurdurr":[22,35,453,439],"guzzlord":[25,81,455,394],"gyarados":[60,22,414,453],"hakamo-o":[94,35,419,439],"happiny":[96,22,379,453],"hariyama":[22,28,453,447],"hatenna":[70,86,389,380],"hatterene":[92,7,354,453],"hattrem":[21,61,464,409],"haunter":[22,50,453,425],"hawlucha":[22,80,451,395],"haxorus":[67,22,407,453],"heatmor":[22,74,453,400],"heatran":[22,107,453,367],"heliolisk":[22,72,453,403],"helioptile":[22,77,453,398],"heracross":[24,22,450,453],"herdier":[35,22,439,453],"hippopotas":[22,79,453,395],"hippowdon":[22,85,453,390],"hitmonchan":[75,22,400,453],"hitmonlee":[22,51,453,424],"hitmontop":[22,28,453,447],"ho-oh":[42,22,433,453],"honchkrow":[22,90,453,385],"honedge":[100,22,374,453],"hoopa-confined":[31,20,461,462],"hoopa-unbound":[8,46,463,431],"hoothoot":[25,22,450,453],"hoppip":[22,62,453,412],"horsea":[41,22,434,453],"houndoom":[32,22,443,453],"houndour":[61,22,414,453],"houndstone":[29,72,456,408],"huntail":[22,62,453,413],"hydrapple":[118,12,357,463],"hydreigon":[22,25,453,450],"hypno":[35,22,439,453],"igglybuff":[71,22,404,453],"illumise":[69,22,405,453],"impidimp":[52,91,423,419],"incineroar":[136,34,360,440],"indeedee-f":[99,73,369,436],"indeedee-m":[121,40,354,430],"infernape":[22,55,453,419],"inkay":[34,22,440,453],"inteleon":[136,14,348,460],"iron-boulder":[12,32,462,443],"iron-bundle":[26,104,383,441],"iron-crown":[133,12,342,462],"iron-hands":[5,81,470,393],"iron-jugulis":[25,64,456,448],"iron-leaves":[124,17,374,458],"iron-moth":[16,72,468,472],"iron-thorns":[81,50,409,451],"iron-treads":[11,100,460,415],"iron-valiant":[32,13,451,466],"ivysaur":[22,36,453,438],"jangmo-o":[46,48,426,424],"jellicent":[22,41,453,434],"jigglypuff":[22,33,453,441],"jirachi":[22,75,453,400],"jolteon":[47,22,428,453],"joltik":[22,70,453,404],"jumpluff":[101,22,374,453],"jynx":[22,62,453,412],"kabuto":[22,79,453,396],"kabutops":[46,22,428,453],"kadabra":[53,22,421,453],"kakuna":[121,22,354,453],"kangaskhan":[26,22,448,453],"karrablast":[98,22,376,453],"kartana":[29,35,445,439],"kecleon":[41,22,434,453],"keldeo":[22,31,453,443],"kilowattrel":[8,32,459,377],"kingambit":[102,11,410,451],"kingdra":[43,22,432,453],"kingler":[22,104,453,371],"kirlia":[108,22,366,453],"klang":[22,58,453,417],"klawf":[42,88,447,408],"kleavor":[42,34,456,443],"klefki":[22,83,439,386],"klink":[22,55,453,419],"klinklang":[22,108,453,366],"koffing":[22,57,453,418],"komala":[48,67,428,407],"kommo-o":[28,68,447,408],"koraidon":[47,38,420,434],"krabby":[22,106,453,369],"kricketot":[110,22,365,453],"kricketune":[93,22,381,453],"krokorok":[39,22,435,453],"krookodile":[30,22,444,453],"kubfu":[114,25,375,433],"kyogre":[22,139,453,336],"kyogre-primal":[5,59,469,417],"kyurem":[22,41,453,433],"lairon":[22,58,453,417],"lampent":[67,22,407,453],"landorus":[58,22,416,453],"landorus-therian":[61,22,414,453],"lanturn":[22,110,453,364],"lapras":[22,30,453,445],"larvesta":[24,22,451,453],"larvitar":[112,22,362,453],"latias":[22,55,453,419],"latios":[22,93,453,382],"leafeon":[53,22,422,453],"leavanny":[130,22,345,453],"lechonk":[53,112,387,391],"ledian":[95,22,380,453],"ledyba":[51,22,424,453],"lickilicky":[34,22,441,453],"lickitung":[22,38,453,437],"liepard":[22,51,453,424],"lileep":[41,22,433,453],"lilligant":[77,22,398,453],"lilligant-hisui":[97,55,380,458],"lillipup":[73,22,401,453],"linoone":[22,148,453,327],"litleo":[22,28,453,446],"litten":[98,47,377,428],"litwick":[103,22,371,453],"lokix":[126,9,399,457],"lombre":[51,22,424,453],"lopunny":[55,22,419,453],"lotad":[22,54,453,420],"loudred":[33,22,441,453],"lucario":[97,22,377,453],"ludicolo":[59,22,415,453],"lugia":[22,70,453,405],"lumineon":[49,22,426,453],"lunala":[45,28,422,443],"lunatone":[38,22,437,453],"lurantis":[124,33,371,437],"luvdisc":[124,22,351,453],"luxio":[22,43,453,432],"luxray":[22,38,453,437],"lycanroc-dusk-form":[14,100,466,374],"lycanroc-midday-form":[47,94,426,383],"lycanroc-midnight-form":[91,47,384,427],"mabosstiff":[67,79,443,422],"machamp":[48,22,427,453],"machoke":[57,22,418,453],"machop":[58,22,416,453],"magby":[83,22,391,453],"magcargo":[54,22,420,453],"magearna":[95,46,380,428],"magikarp":[44,22,430,453],"magmar":[22,27,453,447],"magmortar":[35,22,440,453],"magnemite":[22,120,453,355],"magneton":[22,41,453,434],"magnezone":[22,86,453,389],"makuhita":[62,22,413,453],"malamar":[54,22,420,453],"mamoswine":[22,71,453,403],"manaphy":[22,110,453,365],"mandibuzz":[102,22,373,453],"manectric":[82,22,392,453],"mankey":[22,85,453,390],"mantine":[22,120,453,354],"mantyke":[22,81,453,394],"maractus":[73,22,401,453],"mareanie":[57,44,433,398],"mareep":[59,22,415,453],"marill":[22,69,453,406],"marowak":[59,22,416,453],"marshadow":[84,0,390,475],"marshtomp":[50,22,424,453],"maschiff":[81,144,426,354],"masquerain":[22,73,453,401],"maushold":[25,140,443,378],"mawile":[22,70,453,405],"medicham":[119,22,356,453],"meditite":[30,22,445,453],"meganium":[117,22,357,453],"melmetal":[18,110,459,379],"meloetta---aria":[98,22,376,453],"meloetta---pirouette":[108,22,366,453],"meltan":[101,63,351,414],"meowscarada":[65,10,425,465],"meowstic-f":[58,22,417,453],"meowstic-m":[42,22,433,453],"meowth":[73,22,401,453],"mesprit":[84,22,391,453],"metagross":[22,97,453,377],"metang":[22,70,453,405],"metapod":[48,22,427,453],"mew":[25,22,450,453],"mewtwo":[61,22,414,453],"mienfoo":[34,22,441,453],"mienshao":[22,31,453,444],"mightyena":[26,22,449,453],"milcery":[49,112,410,355],"milotic":[30,22,445,453],"miltank":[54,22,421,453],"mime-jr":[89,22,386,453],"mimikyu":[96,47,399,428],"minccino":[22,51,453,424],"minior-core-form":[73,65,400,414],"minior-meteor-form":[73,65,400,414],"minun":[71,22,403,453],"miraidon":[90,21,365,453],"misdreavus":[22,40,453,435],"mismagius":[95,22,380,453],"moltres":[22,136,453,339],"moltres-galar":[20,38,460,434],"monferno":[22,55,453,419],"morelull":[146,48,311,425],"morgrem":[68,56,391,412],"morpeko":[116,82,350,399],"mothim":[22,120,453,354],"mr-mime":[22,32,453,443],"mr-rime":[44,35,437,424],"mudbray":[89,47,386,426],"mudkip":[32,22,443,453],"mudsdale":[48,53,428,426],"muk":[22,128,453,346],"munchlax":[79,22,395,453],"munkidori":[114,7,360,467],"munna":[22,24,453,451],"murkrow":[43,22,431,453],"musharna":[31,22,444,453],"nacli":[74,102,380,411],"naclstack":[40,95,444,413],"naganadel":[0,114,475,361],"natu":[22,22,452,453],"necrozma":[14,64,444,395],"nickit":[20,27,450,441],"nidoking":[22,71,453,403],"nidoqueen":[28,22,446,453],"nidoran-f":[22,31,453,444],"nidoran-m":[42,22,432,453],"nidorina":[47,22,428,453],"nidorino":[43,22,431,453],"nihilego":[112,37,354,437],"nincada":[22,129,453,346],"ninetales":[22,30,453,445],"ninjask":[22,82,453,392],"noctowl":[113,22,361,453],"noibat":[22,47,453,427],"noivern":[22,80,453,395],"nosepass":[22,39,453,436],"numel":[24,22,450,453],"nuzleaf":[34,22,440,453],"nymble":[99,92,381,426],"obstagoon":[93,40,389,459],"octillery":[22,53,453,421],"oddish":[42,22,432,453],"ogerpon":[29,12,446,463],"ogerpon-cornerstone-mask":[36,12,438,463],"ogerpon-heartflame-mask":[26,12,449,462],"ogerpon-wellspring-mask":[33,12,441,462],"oinkologne-female":[41,34,388,430],"oinkologne-male":[31,35,425,424],"okidogi":[0,30,475,444],"omanyte":[48,22,426,453],"omastar":[22,48,453,427],"onix":[32,22,443,453],"oranguru":[20,85,450,408],"orbeetle":[80,43,395,448],"oricorio-baile-style":[72,47,403,428],"oricorio-pau-style":[47,65,425,413],"oricorio-pom-pom-style":[37,128,438,388],"oricorio-sensu-style":[47,94,426,399],"orthworm":[14,48,462,427],"oshawott":[70,22,405,453],"overqwil":[64,31,420,450],"pachirisu":[62,22,412,453],"palafin":[60,106,436,334],"palkia":[22,36,453,439],"palkia-origin":[74,15,400,460],"palossand":[27,77,449,378],"palpitoad":[60,22,415,453],"pancham":[92,22,383,453],"pangoro":[22,57,453,417],"panpour":[45,22,429,453],"pansage":[56,22,418,453],"pansear":[56,22,418,453],"paras":[22,60,453,414],"parasect":[22,34,453,440],"passimian":[74,50,448,437],"patrat":[33,22,441,453],"pawmi":[8,56,454,448],"pawmo":[58,10,426,461],"pawmot":[30,14,429,468],"pawniard":[22,70,453,405],"pecharunt":[12,67,463,408],"pelipper":[27,22,447,453],"perrserker":[37,49,400,429],"persian":[22,44,453,430],"petilil":[113,22,361,453],"phanpy":[22,31,453,444],"phantump":[29,28,453,443],"pheromosa":[83,29,392,449],"phione":[22,83,453,391],"pichu":[49,22,426,453],"pidgeot":[31,22,444,453],"pidgeotto":[51,22,424,453],"pidgey":[36,22,438,453],"pidove":[23,22,452,453],"pignite":[44,22,431,453],"pikachu":[22,35,453,440],"pikipek":[47,61,425,399],"piloswine":[42,22,432,453],"pincurchin":[30,67,429,371],"pineco":[52,22,423,453],"pinsir":[30,22,444,453],"piplup":[93,22,381,453],"plusle":[90,22,385,453],"poipole":[122,0,353,475],"politoed":[90,22,385,453],"poliwag":[22,68,453,406],"poliwhirl":[22,49,453,426],"poliwrath":[22,91,453,384],"poltchageist":[27,73,447,402],"polteageist":[39,41,449,424],"ponyta":[70,22,405,453],"poochyena":[22,46,453,428],"popplio":[47,84,426,410],"porygon":[32,22,443,453],"porygon-z":[67,22,408,453],"porygon2":[22,27,453,448],"primarina":[37,54,437,428],"primeape":[30,22,444,453],"prinplup":[41,22,433,453],"probopass":[41,22,434,453],"psyduck":[71,22,404,453],"pumpkaboo":[36,22,438,453],"pupitar":[66,22,408,453],"purrloin":[75,22,399,453],"purugly":[41,22,434,453],"pyroar":[38,22,437,453],"pyukumuku":[47,86,428,361],"quagsire":[55,22,419,453],"quaquaval":[114,30,378,461],"quaxly":[105,40,359,439],"quaxwell":[110,23,365,459],"quilava":[107,22,368,453],"quilladin":[22,30,453,445],"qwilfish":[25,22,449,453],"qwilfish-hisui":[65,95,435,366],"raboot":[52,19,413,433],"rabsca":[90,7,413,467],"raging-bolt":[71,10,405,461],"raichu":[22,46,453,429],"raikou":[22,61,453,414],"rainy-castform":[103,3,442,475],"ralts":[106,22,368,453],"rampardos":[22,69,453,406],"rapidash":[51,22,423,453],"raticate":[22,26,453,449],"rattata":[22,47,453,427],"rayquaza":[22,42,453,433],"regice":[22,25,453,450],"regidrago":[59,50,446,416],"regieleki":[26,152,471,366],"regigigas":[22,92,453,383],"regirock":[22,25,453,450],"registeel":[22,79,453,396],"relicanth":[22,89,453,386],"rellor":[70,172,415,401],"remoraid":[61,22,414,453],"reshiram":[41,22,434,453],"reuniclus":[22,134,453,340],"revavroom":[30,71,436,423],"rhydon":[22,59,453,415],"rhyhorn":[39,22,436,453],"rhyperior":[22,92,453,382],"ribombee":[94,47,428,428],"rillaboom":[51,65,422,429],"riolu":[36,22,438,453],"roaring-moon":[24,16,430,464],"rockruff":[81,50,394,428],"roggenrola":[105,22,369,453],"rolycoly":[90,128,375,366],"rookidee":[41,104,412,389],"roselia":[22,40,453,434],"roserade":[85,22,389,453],"rotom":[22,30,453,445],"rotom-fan":[22,67,453,408],"rotom-frost":[22,80,453,394],"rotom-heat":[61,22,414,453],"rotom-mow":[61,22,413,453],"rotom-wash":[22,69,453,406],"rowlet":[78,47,397,424],"rufflet":[101,22,374,453],"runerigus":[8,91,465,384],"sableye":[22,32,453,442],"salamence":[22,63,453,412],"salandit":[68,48,401,425],"salazzle":[70,38,384,428],"samurott":[22,32,453,443],"samurott-hisui":[76,21,415,454],"sandaconda":[46,111,425,373],"sandile":[22,89,453,385],"sandshrew":[41,22,434,453],"sandslash":[22,31,453,444],"sandy-shocks":[47,48,367,448],"sandygast":[47,66,427,384],"sawk":[59,22,415,453],"sawsbuck":[56,0,419,475],"scatterbug":[112,22,362,453],"sceptile":[36,22,439,453],"scizor":[63,22,412,453],"scolipede":[22,34,453,440],"scorbunny":[132,21,343,454],"scovillain":[56,44,425,454],"scrafty":[94,22,381,453],"scraggy":[73,22,401,453],"scream-tail":[38,94,438,406],"scyther":[46,22,428,453],"seadra":[22,51,453,424],"seaking":[22,36,453,438],"sealeo":[22,75,453,400],"seedot":[76,22,399,453],"seel":[22,40,453,434],"seismitoad":[22,45,453,430],"sentret":[143,22,332,453],"serperior":[64,22,411,453],"servine":[43,22,432,453],"seviper":[22,31,453,443],"sewaddle":[68,22,407,453],"sharpedo":[61,22,414,453],"shaymin-land":[22,54,453,420],"shaymin-sky":[22,36,453,438],"shedinja":[22,34,453,440],"shelgon":[43,22,431,453],"shellder":[22,27,453,447],"shellos":[75,22,400,453],"shelmet":[22,36,453,438],"shieldon":[28,22,446,453],"shiftry":[22,38,453,437],"shiinotic":[35,57,439,428],"shinx":[22,41,453,434],"shroodle":[72,98,383,367],"shroomish":[22,70,453,405],"shuckle":[22,44,453,431],"shuppet":[55,22,420,453],"sigilyph":[67,22,408,453],"silcoon":[22,43,453,431],"silicobra":[75,97,380,389],"silvally":[83,46,413,427],"simipour":[37,22,438,453],"simisage":[58,22,417,453],"simisear":[25,22,450,453],"sinistcha":[81,13,394,462],"sinistea":[29,113,427,378],"sirfetchd":[127,15,355,456],"sizzlipede":[28,182,437,328],"skarmory":[22,85,453,389],"skeledirge":[22,128,454,348],"skiddo":[25,22,449,453],"skiploom":[22,70,453,405],"skitty":[22,56,453,419],"skorupi":[22,47,453,428],"skrelp":[70,22,405,453],"skuntank":[22,82,453,393],"skwovet":[92,33,359,418],"slaking":[22,86,453,389],"slakoth":[22,119,453,356],"sliggoo":[107,22,368,453],"sliggoo-hisui":[33,55,442,421],"slither-wing":[87,38,388,437],"slowbro":[42,22,433,453],"slowking":[108,22,366,453],"slowpoke":[22,64,453,411],"slugma":[55,22,419,453],"slurpuff":[44,22,431,453],"smeargle":[52,22,422,453],"smoliv":[118,66,385,431],"smoochum":[105,22,370,453],"sneasel":[23,22,452,453],"sneasel-hisui":[76,58,399,417],"sneasler":[53,31,357,456],"snivy":[49,22,425,453],"snom":[90,127,399,344],"snorlax":[22,65,453,409],"snorunt":[66,22,408,453],"snover":[22,80,453,395],"snowy-castform":[23,7,422,475],"snubbull":[61,22,414,453],"sobble":[99,29,375,445],"solgaleo":[56,43,418,429],"solosis":[22,27,453,447],"solrock":[22,24,453,450],"spearow":[27,22,447,453],"spectrier":[18,62,442,406],"spewpa":[22,48,453,427],"spheal":[22,62,453,412],"spidops":[44,92,455,421],"spinarak":[22,107,453,368],"spinda":[64,22,411,453],"spiritomb":[22,34,453,440],"spoink":[110,22,365,453],"sprigatito":[76,39,398,436],"spritzee":[49,22,426,453],"squawkabilly":[5,55,467,402],"squirtle":[29,22,446,453],"stakataka":[0,4,475,471],"stantler":[72,22,403,453],"staraptor":[60,22,415,453],"staravia":[92,22,382,453],"starly":[58,22,417,453],"starmie":[22,31,453,443],"staryu":[34,22,440,453],"steelix":[22,51,453,424],"steenee":[62,49,408,425],"stonjourner":[59,41,386,437],"stoutland":[22,81,453,393],"stufful":[50,47,426,426],"stunfisk":[22,110,453,365],"stunky":[22,51,453,424],"sudowoodo":[51,22,424,453],"suicune":[22,30,453,444],"sunflora":[41,22,434,453],"sunkern":[61,22,414,453],"sunny-castform":[51,14,439,466],"surskit":[22,63,453,412],"swablu":[22,108,453,366],"swadloon":[22,64,453,411],"swalot":[22,22,453,453],"swampert":[22,82,453,392],"swanna":[51,22,423,453],"swellow":[22,68,453,407],"swinub":[22,100,453,375],"swirlix":[86,22,389,453],"swoobat":[43,22,432,453],"sylveon":[79,22,395,453],"tadbulb":[151,73,339,393],"taillow":[22,71,453,404],"talonflame":[22,79,453,395],"tandemaus":[36,136,439,363],"tangela":[22,42,453,432],"tangrowth":[55,22,419,453],"tapu-bulu":[69,28,413,446],"tapu-fini":[89,35,398,435],"tapu-koko":[98,35,393,439],"tapu-lele":[100,30,362,439],"tarountula":[95,62,393,420],"tatsugiri":[113,92,386,389],"tauros":[22,39,453,435],"tauros-paldea-aqua-breed":[2,103,475,385],"tauros-paldea-blaze-breed":[81,43,467,429],"tauros-paldea-combat-breed":[31,82,475,411],"teddiursa":[94,22,381,453],"tentacool":[22,61,453,414],"tentacruel":[22,71,453,404],"tepig":[51,22,424,453],"terapagos":[32,67,422,435],"terapagos-stellar-form":[42,17,420,459],"terapagos-terastal-form":[13,87,462,388],"terrakion":[22,54,453,421],"thievul":[37,27,448,447],"throh":[22,53,453,422],"thundurus":[75,22,400,453],"thundurus-therian":[22,48,453,426],"thwackey":[135,27,343,395],"timburr":[22,63,453,412],"ting-lu":[32,24,449,428],"tinkatink":[29,76,471,410],"tinkaton":[18,43,472,436],"tinkatuff":[2,53,465,432],"tirtouga":[22,121,453,354],"toedscool":[97,83,371,369],"toedscruel":[63,42,389,445],"togedemaru":[67,46,420,429],"togekiss":[22,122,453,353],"togepi":[37,22,437,453],"togetic":[96,22,378,453],"torchic":[107,22,368,453],"torkoal":[22,28,453,446],"tornadus":[88,22,386,453],"tornadus-therian":[22,44,453,430],"torracat":[66,47,410,426],"torterra":[22,41,453,434],"totodile":[101,22,374,453],"toucannon":[62,67,418,418],"toxapex":[21,67,454,396],"toxel":[60,78,431,384],"toxicroak":[22,43,453,432],"toxtricity-amped":[133,64,339,411],"toxtricity-low-key":[142,46,333,428],"tranquill":[22,31,453,444],"trapinch":[58,22,416,453],"treecko":[32,22,443,453],"trevenant":[22,39,453,435],"tropius":[22,27,453,447],"trubbish":[22,38,453,437],"trumbeak":[40,103,428,399],"tsareena":[66,35,396,438],"turtonator":[59,63,440,428],"turtwig":[83,22,391,453],"tympole":[57,22,418,453],"tynamo":[22,81,453,394],"type-null":[80,47,393,427],"typhlosion":[92,22,383,453],"typhlosion-hisui":[57,20,385,450],"tyranitar":[39,22,435,453],"tyrantrum":[22,56,453,418],"tyrogue":[22,22,453,453],"tyrunt":[22,69,453,405],"ultra-necrozma":[4,70,471,415],"umbreon":[58,22,416,453],"unfezant":[76,22,399,453],"unown":[47,22,428,453],"ursaluna":[20,68,449,397],"ursaluna-bloodmoon":[40,12,434,462],"ursaring":[89,22,385,453],"urshifu-rapid":[113,35,379,438],"urshifu-single":[97,15,377,441],"uxie":[48,22,426,453],"vanillish":[87,22,388,453],"vanillite":[80,22,394,453],"vanilluxe":[34,22,441,453],"vaporeon":[41,22,434,453],"varoom":[79,120,418,380],"veluza":[22,87,444,407],"venipede":[22,68,453,407],"venomoth":[22,97,453,378],"venonat":[53,22,421,453],"venusaur":[22,70,453,405],"vespiquen":[54,22,421,453],"vibrava":[22,83,453,392],"victini":[64,22,411,453],"victreebel":[22,54,453,420],"vigoroth":[97,22,377,453],"vikavolt":[48,57,428,421],"vileplume":[22,41,453,433],"virizion":[84,22,391,453],"vivillon":[36,22,438,453],"volbeat":[88,22,386,453],"volcanion":[48,0,426,475],"volcarona":[22,51,453,424],"voltorb":[22,27,453,448],"voltorb-hisui":[0,9,475,465],"vullaby":[36,22,438,453],"vulpix":[22,46,453,428],"wailmer":[22,103,453,371],"wailord":[22,118,453,357],"walking-wake":[14,80,460,412],"walrein":[22,40,453,434],"wartortle":[25,22,450,453],"watchog":[141,22,334,453],"wattrel":[101,71,436,429],"weavile":[28,22,446,453],"weedle":[68,22,407,453],"weepinbell":[22,71,453,404],"weezing":[22,54,453,420],"whimsicott":[22,43,453,432],"whirlipede":[22,73,453,402],"whiscash":[22,73,453,402],"whismur":[22,28,453,446],"white-kyurem":[22,68,453,406],"wigglytuff":[60,22,415,453],"wiglett":[138,112,325,402],"wimpod":[16,95,419,365],"wingull":[22,86,453,388],"wishiwashi-school-form":[33,109,442,370],"wishiwashi-solo-form":[45,150,427,352],"wo-chien":[50,48,436,420],"wobbuffet":[97,22,377,453],"woobat":[22,103,453,372],"wooloo":[72,86,432,409],"wooper":[22,47,453,427],"wooper-paldea":[67,97,397,390],"wormadam-plant-cloak":[62,22,412,453],"wormadam-sand-cloak":[67,22,407,453],"wormadam-trash-cloak":[77,22,398,453],"wugtrio":[69,70,389,418],"wurmple":[61,22,413,453],"wynaut":[22,62,453,413],"wyrdeer":[105,11,405,466],"xatu":[88,22,387,453],"xerneas":[75,22,399,453],"xurkitree":[59,21,417,458],"yamask":[22,66,453,409],"yamper":[80,45,386,419],"yanma":[22,119,453,356],"yanmega":[22,73,453,401],"yungoos":[43,133,436,338],"yveltal":[22,41,453,434],"zacian":[10,70,462,410],"zacian-crowned":[11,15,462,450],"zamazenta":[36,24,447,467],"zamazenta-crowned":[44,12,431,459],"zangoose":[45,22,429,453],"zapdos":[22,88,453,386],"zapdos-galar":[35,61,418,428],"zarude":[61,17,413,440],"zebstrika":[59,22,415,453],"zekrom":[74,22,401,453],"zeraora":[15,48,464,439],"zigzagoon":[22,100,453,374],"zoroark":[22,34,453,441],"zoroark-hisui":[56,39,377,445],"zorua":[69,22,405,453],"zorua-hisui":[99,45,391,436],"zubat":[22,33,453,441],"zweilous":[22,22,453,453],"zygarde-10-forme":[47,79,428,397],"zygarde-50-forme":[23,23,447,453],"zygarde-complete-forme":[19,48,457,428]});
+  const bboxTestEnabled = true;
+  const SUBJECT_STYLE_VARS = ['--bbox-canvas-w','--bbox-canvas-h','--bbox-canvas-x',
+    '--bbox-canvas-y','--bbox-clip-top','--bbox-clip-right','--bbox-clip-bottom','--bbox-clip-left'];
+  function subjectBBoxFor(article,image) {
+    if (!bboxTestEnabled || !currentSpeciesRouteKey().startsWith('pokemon:')) return null;
+    const source = image?.getAttribute('src') || image?.currentSrc || '';
+    if (!source) return null;
+    let url;
+    try { url = new URL(source, location.href); } catch (_) { return null; }
+    // Look up geometry from the normal portrait for normal or shiny display.
+    // No shiny pixels are scanned; never substitute a Fakemon, avatar, or
+    // unrecognized form into this archive.
+    if (url.origin !== location.origin) return null;
+    const match = url.pathname.match(/\/assets\/pokemon\/([^/]+)\/main(?:-shiny)?\.png$/i);
+    if (!match) return null;
+    let slug;
+    try { slug = decodeURIComponent(match[1]).toLowerCase(); } catch (_) { return null; }
+    const b = BBOX_TEST_TABLE[slug];
+    if (!b) return null;
+    if (image.naturalWidth && (image.naturalWidth !== 475 || image.naturalHeight !== 475)) return null;
+    const [left,top,right,bottom] = b;
+    if (!(right>left && bottom>top)) return null;
+    return {slug,left,top,right,bottom,canvasWidth:475,canvasHeight:475,
+      width:right-left,height:bottom-top,ratio:(right-left)/(bottom-top)};
+  }
+  function clearBBoxRendering(article,hero) {
+    article?.classList.remove('yofi-subject-bounds-active');
+    if (hero) for (const prop of SUBJECT_STYLE_VARS) hero.style.removeProperty(prop);
+  }
+  function nativeSubjectLayout(article,hero,layout) {
+    const lane=hero.querySelector('.yofi-hero-art-lane .square-image');
+    const image=lane?.querySelector('img');
+    const b=subjectBBoxFor(article,image);
+    if(!b||!lane)return null;
+    const width=lane.getBoundingClientRect().width;
+    if(!(width>0))return null;
+    const usable=usablePanelHeight(article);
+    const limits=artLimits(usable,hero.getBoundingClientRect().width,b.ratio);
+    // Native-like placement uses the same subject ratio and preferred size
+    // policy as other candidates. Its existing description/metadata DOM stays
+    // in place; only the art transform is changed.
+    const imageHeight=Math.min(limits.max,width/b.ratio,limits.preferred);
+    return imageHeight>0?{imageHeight,imageWidth:imageHeight*b.ratio,laneWidth:width}:null;
+  }
+  function renderSubjectBBox(article,hero,layout) {
+
+    const image = hero.querySelector('.yofi-hero-art-lane .square-image img');
+    const b = subjectBBoxFor(article,image);
+    if (!b || !layout) {clearBBoxRendering(article,hero);return;}
+    const scale=layout.imageHeight/b.height;
+    if (!(scale>0 && Number.isFinite(scale))) {clearBBoxRendering(article,hero);return;}
+    // Preserve the complete original source image: align its visible rectangle
+    // with the geometry chosen by the unchanged layout selector. The native
+    // zoom element is relocated, not replaced or reparented.
+    const px=n=>n.toFixed(3)+'px';
+    const vars={
+      '--bbox-canvas-w':px(b.canvasWidth*scale),
+      '--yofi-subject-art-height':px(layout.imageHeight),
+      '--bbox-canvas-h':px(b.canvasHeight*scale),
+      '--bbox-canvas-x':px((layout.laneWidth-layout.imageWidth)/2-b.left*scale),
+      '--bbox-canvas-y':px(-b.top*scale),
+      '--bbox-clip-top':(100*b.top/b.canvasHeight).toFixed(4)+'%',
+      '--bbox-clip-right':(100*(b.canvasWidth-b.right)/b.canvasWidth).toFixed(4)+'%',
+      '--bbox-clip-bottom':(100*(b.canvasHeight-b.bottom)/b.canvasHeight).toFixed(4)+'%',
+      '--bbox-clip-left':(100*b.left/b.canvasWidth).toFixed(4)+'%'
+    };
+    for(const [prop,value] of Object.entries(vars))
+      if(hero.style.getPropertyValue(prop)!==value) hero.style.setProperty(prop,value);
+    article.classList.add('yofi-subject-bounds-active');
+  }
+  function bboxTestStatus() {
+    const article=document.querySelector('.page > main article.lab3-active')||
+      document.querySelector('.page > main article');
+    const hero=article?.querySelector('.yofi-species-hero');
+    const image=hero?.querySelector('.yofi-hero-art-lane .square-image img');
+    const b=subjectBBoxFor(article,image);
+    return {version:'0.1.28',enabled:bboxTestEnabled,route:currentSpeciesRouteKey(),
+      source:image?.getAttribute('src')||null,matched:b?.slug||null,
+      bounds:b?[b.left,b.top,b.right,b.bottom]:null,
+      subjectRatio:b?.ratio||null,canvasRatio:image?.naturalWidth&&image?.naturalHeight?
+        image.naturalWidth/image.naturalHeight:null,
+      promoted:!!article?.classList.contains('lab3-active'),
+      applied:!!article?.classList.contains('yofi-subject-bounds-active'),
+      stage:hero?.dataset.lab3Stage||'native',
+      artWidth:hero?.style.getPropertyValue('--lab3-art-width')||null,
+      artHeight:hero?.style.getPropertyValue('--lab3-art-height')||null,
+      sourceRevision:BBOX_TEST_SOURCE};
+  }
+  window.__yofiSubjectBoundsStatus = bboxTestStatus;
+
   const ICON = {
     hp: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"/></svg>',
     ac: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>',
@@ -1022,6 +1119,7 @@ article.yofi-scores-layout section.moves > dl + dl {
        the promoted tile already owns its surface and must not be doubled. */
     article:not(.lab3-active) .yofi-species-hero
       .yofi-hero-facts:not(.lab3-copy-facts) .yofi-hero-field-egg {
+      height:var(--yofi-compact-bio-height, 36px);
       min-height: 36px;
       border-radius: 13px;
       background: rgba(255,255,255,.49);
@@ -1050,19 +1148,23 @@ article.yofi-scores-layout section.moves > dl + dl {
        three-track toolbar places its center at the same x-coordinate as the
        type pill. Each colored segment uses the native --percent flex basis. */
     .yofi-hero-facts > .yofi-hero-gender {
+      min-height: var(--yofi-compact-bio-height, 36px);
+      width:100% !important;
       display: inline-flex !important;
       align-items: center;
       justify-content: flex-start;
       min-width: 0;
     }
     .yofi-hero-facts .yofi-hero-gender .gender-ratio-display {
+      height:var(--yofi-compact-bio-height, 36px) !important;
+      box-sizing:border-box !important;
       display: inline-flex !important;
       /* Between the previous 6.8em compact badge and native 10em badge.
          Same intended size in both hero modes, subject only to space. */
-      width: 8.5em !important;
+      width: 100% !important;
       max-width: 100% !important;
       flex-shrink: 1;
-      height: 1.35em !important;
+      height: var(--yofi-compact-bio-height, 36px) !important;
       border-radius: .25em;
       overflow: hidden;
       background: gray;
@@ -1174,7 +1276,7 @@ article.yofi-scores-layout section.moves > dl + dl {
       margin: 0;
     }
     .yofi-species-hero[data-yofi-facts-mode="short"] .yofi-hero-gender .gender-ratio-display {
-      width: 8.5em !important;
+      width: 100% !important;
       max-width: 100% !important;
     }
     .yofi-species-hero[data-yofi-facts-mode="short"] .yofi-hero-gender .bar {
@@ -2376,6 +2478,40 @@ article.yofi-scores-layout section.moves > dl + dl {
     article.lab3-scores .lab3-left-extra > dl.yofi-scores-strip > :nth-child(12){grid-row:5 !important;grid-column:3 !important;}
   `;
 
+  const SUBJECT_BOUNDS_CSS = `
+    /* Place the *full, unchanged source image* so its visible alpha
+       bounds occupy the candidate's image box in compact and expanded cards.
+       No contour collision yet. */
+    article.yofi-subject-bounds-active .yofi-hero-art-lane .square-image > figure {
+      position:relative!important;
+      box-sizing:border-box!important;
+      display:block!important;
+      padding:var(--yofi-subject-art-height) 0 0!important;
+      min-height:var(--yofi-subject-art-height)!important;
+      height:auto!important;
+      overflow:visible!important;
+    }
+    article.yofi-subject-bounds-active .yofi-hero-art-lane .square-image img-zoom {
+      position:absolute!important;
+      top:var(--bbox-canvas-y)!important;
+      left:var(--bbox-canvas-x)!important;
+      width:var(--bbox-canvas-w)!important;
+      height:var(--bbox-canvas-h)!important;
+      max-width:none!important;
+      max-height:none!important;
+      margin:0!important;
+      padding:0!important;
+      aspect-ratio:auto!important;
+      clip-path:inset(var(--bbox-clip-top) var(--bbox-clip-right) var(--bbox-clip-bottom) var(--bbox-clip-left));
+    }
+    article.yofi-subject-bounds-active .yofi-hero-art-lane .square-image img-zoom > img {
+      width:100%!important;height:100%!important;
+      max-width:none!important;max-height:none!important;
+      aspect-ratio:auto!important;object-fit:fill!important;
+      margin:0!important;padding:0!important;
+    }
+  `;
+
   function installCSS() {
     let node = document.getElementById(STYLE_ID);
     if (!node) {
@@ -2383,7 +2519,7 @@ article.yofi-scores-layout section.moves > dl + dl {
       node.id = STYLE_ID;
       (document.head || document.documentElement).appendChild(node);
     }
-    if (node.textContent !== CSS) node.textContent = CSS;
+    if (node.textContent !== CSS + SUBJECT_BOUNDS_CSS) node.textContent = CSS + SUBJECT_BOUNDS_CSS;
   }
 
   const cleanText = (node) => node?.textContent?.replace(/\s+/g, ' ').trim() || '';
@@ -2514,18 +2650,23 @@ article.yofi-scores-layout section.moves > dl + dl {
   const MIN_TILE = 82;
   const MAX_TILE = 112;
   const ART_WIDTH_PROGRESS = Object.freeze({
-    nativeAnchor: 620,
-    nativeFraction: .37,
-    wideGrowth: .18,
-    ceiling: 435,
-    shrinkTolerance: .045
+    ceiling: 435, shrinkTolerance: .045
   });
-
-  function artFloor(available, ratio) {
-    const anchor = ART_WIDTH_PROGRESS.nativeAnchor;
-    const compact = ART_WIDTH_PROGRESS.nativeFraction * Math.min(available,anchor) / ratio;
-    const growing = compact + ART_WIDTH_PROGRESS.wideGrowth * Math.max(0,available-anchor);
-    return Math.max(182,Math.min(growing,ART_WIDTH_PROGRESS.ceiling / ratio));
+  // Preferred heights are panel-relative guides; content can exceed the soft
+  // band, but a tall, narrow subject must not dictate the entire document.
+  function artLimits(panelHeight, available, ratio) {
+    const usable = Math.max(360,panelHeight || 750);
+    const min = Math.max(112,Math.min(182,usable*.215,available*.45/Math.max(ratio,.65)));
+    const preferred = Math.max(min,Math.min(340,usable*.35));
+    const max = Math.max(min,Math.min(465,usable*.48,ART_WIDTH_PROGRESS.ceiling/ratio));
+    return {min:Math.min(min,max),preferred:Math.min(preferred,max),max};
+  }
+  function artFloor(available, ratio, panelHeight) {
+    return artLimits(panelHeight,available,ratio).min;
+  }
+  function usablePanelHeight(article) {
+    const scroller=article.querySelector('.scrollable');
+    return scroller?.clientHeight || article.clientHeight || window.innerHeight || 750;
   }
 
   // This is a compact tuple of independent promotion decisions, not a list
@@ -2720,7 +2861,7 @@ article.yofi-scores-layout section.moves > dl + dl {
     };
   }
   function geometryFor(p, bioMode, tile, cols, copyWidth, hero, view, ratio,
-                       available, minImageHeight, measurer) {
+                       available, minImageHeight, measurer, art) {
     const gap = Math.max(12,Math.min(20,Math.round(available*.014)));
     const rightWidth = p.tiles ? cols*tile+(cols-1)*TILE_GAP : 0;
     const laneWidth = available-copyWidth-rightWidth-gap*(p.tiles?2:1);
@@ -2759,14 +2900,13 @@ article.yofi-scores-layout section.moves > dl + dl {
       (bioLeftHeight?(p.scores?TILE_GAP:9)+bioLeftHeight:0);
     const rightH=vitalH+(bioRightHeight?TILE_GAP+bioRightHeight:0)+
       (abilitiesH?TILE_GAP+abilitiesH:0);
-    const heroHeight=Math.max(minImageHeight+creditH,leftH,rightH);
-    const imageHeight=Math.min(heroHeight-creditH,laneWidth/ratio,
-      ART_WIDTH_PROGRESS.ceiling/ratio);
-    if(imageHeight<minImageHeight-.5)return null;
-    const imageWidth=imageHeight*ratio;
-    const leftSlack=Math.max(0,heroHeight-leftH);
-    const rightSlack=p.tiles?Math.max(0,heroHeight-rightH):0;
-    const artUnderfill=Math.max(0,heroHeight-creditH-imageHeight);
+    const maxArt = Math.min(laneWidth/ratio,art.max);
+    if(maxArt < minImageHeight-.5) return null;
+    const leftRight = Math.max(leftH,rightH);
+    const ideal = Math.max(minImageHeight,Math.min(maxArt,leftRight-creditH));
+    const heights=[minImageHeight,ideal,art.preferred,maxArt]
+      .map(h=>Math.min(maxArt,Math.max(minImageHeight,h)));
+    const distinct=[...new Set(heights.map(h=>Math.round(h*2)/2))];
     const copyPreferred=p.abilities?Math.max(280,Math.min(415,available*.29)):
       p.tiles?Math.max(245,Math.min(385,available*.31)):
       Math.max(225,Math.min(430,available*.43));
@@ -2776,21 +2916,34 @@ article.yofi-scores-layout section.moves > dl + dl {
     const genderWidth=inline?bioWidth:split?copyWidth:bioWidth;
     const genderFont=Math.min(18,Math.max(13,Math.min(genderWidth*.062,bioH*.42)));
     const bioPenalty=(18-eggFit.fontSize)*2+(18-genderFont);
-    const balancePenalty=(leftSlack+rightSlack)*.045;
-    // Empty space below the image is visually important even if moving native
-    // content upward reduces document height. This suppresses premature
-    // Abilities promotion while leaving a larger portrait eligible.
-    const visualCost=copyPenalty+tilePenalty+bioPenalty+balancePenalty+
-      artUnderfill*1.10;
-    return {stage:promotionStage(p),scores:p.scores,tiles:p.tiles,
-      abilities:p.abilities,promotion:promotionKey(p),bioMode,
-      cols, tile, gap,tileGap:TILE_GAP,rightWidth,copyWidth,laneWidth,
-      imageWidth,imageHeight,heroHeight,creditHeight:creditH,
-      bioHeight:bioH,scoreRowHeight,leftHeight:leftH,rightHeight:rightH,
-      leftSlack,rightSlack,artUnderfill,visualCost};
+    let best=null;
+    for(const imageHeight of distinct){
+      const imageWidth=imageHeight*ratio;
+      const heroHeight=Math.max(imageHeight+creditH,leftH,rightH);
+      const leftSlack=Math.max(0,heroHeight-leftH);
+      const rightSlack=p.tiles?Math.max(0,heroHeight-rightH):0;
+      const artUnderfill=Math.max(0,heroHeight-creditH-imageHeight);
+      // Height and below-hero footprint are measured independently of image
+      // prominence. Above the preferred subject size, extra art earns no
+      // bonus and pays for the empty columns it creates.
+      const scaleShortfall=Math.max(0,art.preferred-imageHeight);
+      const scaleExcess=Math.max(0,imageHeight-art.preferred);
+      const balancedSlack=(leftSlack+rightSlack)*.15;
+      const visualCost=copyPenalty+tilePenalty+bioPenalty+balancedSlack+
+        artUnderfill*.22+scaleShortfall*.18+scaleExcess*.22;
+      const c={stage:promotionStage(p),scores:p.scores,tiles:p.tiles,
+        abilities:p.abilities,promotion:promotionKey(p),bioMode,
+        cols,tile,gap,tileGap:TILE_GAP,rightWidth,copyWidth,laneWidth,
+        imageWidth,imageHeight,heroHeight,creditHeight:creditH,
+        bioHeight:bioH,scoreRowHeight,leftHeight:leftH,rightHeight:rightH,
+        leftSlack,rightSlack,artUnderfill,visualCost};
+      if(!best || c.heroHeight+c.visualCost<best.heroHeight+best.visualCost-.25)
+        best=c;
+    }
+    return best;
   }
 
-  function selectGeometry(p,hero,view,ratio,available,imageFloor,measurer) {
+  function selectGeometry(p,hero,view,ratio,available,imageFloor,measurer,art) {
     const desc=hero.querySelector('.yofi-hero-copy');
     if(!desc)return null;
     const font=parseFloat(getComputedStyle(desc.querySelector('.small-text')||desc).fontSize)||16;
@@ -2833,7 +2986,7 @@ article.yofi-scores-layout section.moves > dl + dl {
           tried.add(copyWidth);
           for(const mode of modes){
             const candidate=geometryFor(p,mode,tile,cols,copyWidth,hero,view,
-              ratio,available,imageFloor,measurer);
+              ratio,available,imageFloor,measurer,art);
             if(candidate&&(!best||candidate.visualCost+candidate.heroHeight<
                 best.visualCost+best.heroHeight-.01||
               (Math.abs(candidate.visualCost+candidate.heroHeight-
@@ -2846,7 +2999,7 @@ article.yofi-scores-layout section.moves > dl + dl {
     return best;
   }
 
-  function chooseFootprintLayout(candidates,displaced,increasing,previous=null) {
+  function chooseFootprintLayout(candidates,displaced,increasing,previous=null,maxFootprint=Infinity) {
     const all=candidates.filter(Boolean).map(c=>({
       ...c,totalFootprint:c.heroHeight+
         (c.scores?0:displaced.scores)+
@@ -2858,12 +3011,14 @@ article.yofi-scores-layout section.moves > dl + dl {
     // Allow only changes that preserve or improve the original affected page
     // footprint, including the native below-hero sections they displace.
     const budget=compact?.totalFootprint??Infinity;
-    const viable=all.filter(c=>c.totalFootprint<=budget+1);
+    const normal=all.filter(c=>c.totalFootprint<=budget+1);
+    const monotonic=normal.filter(c=>c.totalFootprint<=maxFootprint+1);
+    const viable=monotonic.length?monotonic:normal;
     if(!viable.length)return compact||all[0];
     const referenceArt=compact?.imageHeight||Math.max(...viable.map(c=>c.imageHeight));
     for(const c of viable){
       const imageLoss=Math.max(0,referenceArt-c.imageHeight);
-      c.totalQuality=c.totalFootprint+c.visualCost+imageLoss*.78;
+      c.totalQuality=c.totalFootprint+c.visualCost+imageLoss*.15;
     }
     const best=Math.min(...viable.map(c=>c.totalQuality));
     // Promotion is a tiebreaker only among genuinely comparable arrangements.
@@ -2908,6 +3063,7 @@ article.yofi-scores-layout section.moves > dl + dl {
     const hero=article.querySelector('.yofi-species-hero');
     restoreOriginalDisplays(view || (hero && views.get(hero)));
 
+    clearBBoxRendering(article,hero);
     article.classList.remove('lab3-active','lab3-tiles','lab3-abilities','lab3-scores',
       'lab3-stage0','lab3-stage1','lab3-stage2','lab3-stage3');
     if (hero) {
@@ -2934,17 +3090,21 @@ article.yofi-scores-layout section.moves > dl + dl {
     if(!(available>0))return null;
     const image=hero.querySelector('.yofi-hero-art-lane img');
     if(!image)return null;
-    const ratio=portraitRatio(article,image);
+    const subject=subjectBBoxFor(article,image);
+    const ratio=subject?.ratio || portraitRatio(article,image);
     if(!Number.isFinite(ratio)||ratio<=0)return null;
     const desc=hero.querySelector('.yofi-hero-copy');
     const descStyle=getComputedStyle(desc?.querySelector('.small-text')||desc);
-    const identity=[currentSpeciesRouteKey(),desc?.innerHTML||'',
+    const identity=[currentSpeciesRouteKey(),subject?.slug||'canvas',
+      subject ? subject.width+':'+subject.height : '',desc?.innerHTML||'',
       view.abilities?.innerHTML||'',cleanText(view.scoreStrip),
       cleanText(view.vitals),cleanText(view.egg),descStyle.fontSize,
-      hero.style.getPropertyValue('--lab3-native-ability-font')].join('|');
+      hero.style.getPropertyValue('--lab3-native-ability-font'),panelHeight].join('|');
     const before=resizeMemory.get(hero);
     const increasing=before&&before.identity===identity&&available>=before.width-.5;
-    const floor=artFloor(raw,ratio);
+    const panelHeight=usablePanelHeight(article);
+    const art=artLimits(panelHeight,raw,ratio);
+    const floor=art.min;
     const hasAbilities=!!view.abilities?.querySelector('.ability,.yofi-native-hidden-pair');
     const hasScores=!!view.scoreStrip&&
       view.scoreStrip.querySelectorAll(':scope > dt').length===6&&
@@ -2958,9 +3118,7 @@ article.yofi-scores-layout section.moves > dl + dl {
       for(const abilities of tiles&&hasAbilities?[false,true]:[false]){
         const p={scores,tiles,abilities};
         const signature=promotionKey(p);
-        const retained=increasing&&before.promotion===signature;
-        const minimum=Math.max(182,floor*(abilities?.955:tiles?.96:scores?.975:1),
-          retained?before.peakImageHeight*(1-ART_WIDTH_PROGRESS.shrinkTolerance):0);
+        const minimum=art.min*(abilities?.955:tiles?.96:scores?.975:1);
         availablePromotions.push({p,minimum});
       }
     }
@@ -2976,23 +3134,25 @@ article.yofi-scores-layout section.moves > dl + dl {
     try {
       displaced=measurer.nativeFootprints(article,view);
       for(const {p,minimum} of availablePromotions){
-        const candidate=selectGeometry(p,hero,view,ratio,available,minimum,measurer);
+        const candidate=selectGeometry(p,hero,view,ratio,available,minimum,measurer,art);
         if(candidate)choices.push(candidate);
       }
     } finally {measurer.close();}
-    const layout=chooseFootprintLayout(choices,displaced,increasing,before?.layout);
-    // A winning unpromoted projection is rendered by the already functional
-    // native compact hero, not an extra replacement DOM representation.
-    const result=layout&&!layout.scores&&!layout.tiles&&!layout.abilities?null:layout;
-    geometryMemo.set(hero,{key,layout:result,identity,available});
-    return result;
+    const widthIncreased=increasing&&available>before.width+.5;
+    const ceiling=widthIncreased&&Number.isFinite(before?.footprint)?before.footprint:Infinity;
+    const layout=chooseFootprintLayout(choices,displaced,increasing,before?.layout,ceiling);
+    // A compact/native-like composition is an actual winner with its own
+    // geometry, never a null that opts out of the shared selection.
+    if(layout)layout.native=!layout.scores&&!layout.tiles&&!layout.abilities;
+    geometryMemo.set(hero,{key,layout,identity,available});
+    return layout;
   }
 
     function rememberNativeHero(hero) {
     const memo=geometryMemo.get(hero);
     if (!memo?.identity) return;
     const img=hero.querySelector('.yofi-hero-art-lane .square-image img');
-    const artH=img?.getBoundingClientRect().height||0;
+    const artH=parseFloat(hero.style.getPropertyValue('--yofi-subject-art-height')) || img?.getBoundingClientRect().height || 0;
     if (!(artH>0)) return;
     const box=hero.getBoundingClientRect();
     const css=getComputedStyle(hero);
@@ -3002,7 +3162,8 @@ article.yofi-scores-layout section.moves > dl + dl {
     resizeMemory.set(hero,{
       identity:memo.identity,width,
       peakImageHeight:same?Math.max(old.peakImageHeight,artH):artH,
-      promotion:same?old.promotion:'native',
+      footprint:memo.layout?.totalFootprint??old?.footprint??Infinity,
+      promotion:memo.layout?.promotion||'native',
       layout:same?old.layout:null
     });
   }
@@ -3068,7 +3229,7 @@ article.yofi-scores-layout section.moves > dl + dl {
     hero.dataset.lab3Promotion=layout.promotion;
     hero.dataset.lab3Priority='footprint > artwork occupancy > use of space';
     hero.dataset.lab3ImageFloor=String(Math.round(artFloor(hero.getBoundingClientRect().width,
-      layout.imageWidth/layout.imageHeight)));
+      layout.imageWidth/layout.imageHeight,usablePanelHeight(article))));
     const memo=geometryMemo.get(hero);
     const identity=memo?.identity||'';
     const old=resizeMemory.get(hero);
@@ -3079,6 +3240,7 @@ article.yofi-scores-layout section.moves > dl + dl {
     resizeMemory.set(hero,{
       identity,width,promotion:layout.promotion,
       peakImageHeight:same?Math.max(old.peakImageHeight,layout.imageHeight):layout.imageHeight,
+      footprint:layout.totalFootprint,
       layout:{promotion:layout.promotion,bioMode:layout.bioMode,cols:layout.cols}
     });
   }
@@ -4553,6 +4715,10 @@ article.yofi-scores-layout section.moves > dl + dl {
               article.dataset.yofiSpeciesRouteKey !== routeKey) continue;
           watchPortraitImage(article, pendingImage(article));
         }
+        // Restore the untransformed zoom only while the native fitting pass
+        // measures it; the selected transform returns in this same tick.
+        const previousHero=article.querySelector('.yofi-species-hero');
+        if(previousHero)clearBBoxRendering(article,previousHero);
         installSpeciesPresentation(article);
         updateNativeHero(article);
         const hero = article.querySelector('.yofi-species-hero');
@@ -4564,12 +4730,18 @@ article.yofi-scores-layout section.moves > dl + dl {
         if (!locateCanonical(view, article)) { restore(article, view); continue; }
         syncView(view, article, data);
         const layout = chooseStage(article, hero, view);
-        if (layout) apply(article, view, layout);
-        else {
+        if (layout?.native) {
           restore(article, view);
           const state = speciesHeroStates.get(hero);
           if (state) selectHeroFactsMode(state);
+          renderSubjectBBox(article, hero, nativeSubjectLayout(article,hero,layout));
           rememberNativeHero(hero);
+        } else if (layout) {
+          apply(article, view, layout);
+          renderSubjectBBox(article, hero, layout);
+        } else {
+          restore(article, view);
+          clearBBoxRendering(article, hero);
         }
       }
       installSpeciesTMColumns();
@@ -4586,7 +4758,7 @@ article.yofi-scores-layout section.moves > dl + dl {
   // DevTools: window.__yofiHeroLayoutStatus() reports the actually installed
   // version, active stage, computed gender segment widths and score labels.
   window.__yofiSpeciesCardStatus = () => {
-    const article = visibleSpeciesArticles().find(card => card.classList.contains('lab3-active'));
+    const article = visibleSpeciesArticles()[0];
     const hero = article?.querySelector('.yofi-species-hero');
     const gender = hero?.querySelector('.lab3-gender .gender-ratio-display');
     const box = gender?.getBoundingClientRect();
