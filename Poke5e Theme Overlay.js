@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Theme Overlay [v0.3.49]
+// @name         Theme Overlay [v0.3.50]
 // @namespace    yofi.poke5e.theme-presentation-companion
-// @version      0.3.49
-// @description  Optional theme treatments; keeps theme colors independent while Species Card owns adaptive TM geometry.
+// @version      0.3.50
+// @description  Type theme with curated backgroundType choices and derived 18-type presentation palette.
 // @match        https://poke5e.app/*
 // @run-at       document-end
 // @grant        none
@@ -138,11 +138,11 @@
     window.addEventListener('load',detectQol,{once:true});
     return {register,status,requireQol,report,notice,ready:publishReady};
   })());
-  const registration = modules.register('Theme Overlay','0.3.49');
+  const registration = modules.register('Theme Overlay','0.3.50');
   modules.requireQol(registration,runThemeOverlay);
   function runThemeOverlay() {
-  const KEY = '__p5ThemeOverlay0349';
-  const STYLE_ID = 'p5-theme-overlay-v0349-styles';
+  const KEY = '__p5ThemeOverlay0350';
+  const STYLE_ID = 'p5-theme-overlay-v0350-styles';
   const PRE_REVEAL_EVENT = 'yofi:species-card-before-reveal';
   // Stop prior instances, including reinjection of this same version.
   // One namespace check replaces an ever-growing historical version list.
@@ -282,56 +282,257 @@
     button.setAttribute('aria-label',title);
   }
 
-  // Offline scan: 613 native Poké5e dual-type portraits from the supplied
-  // 1,139-image normal-artwork analysis. Values are [primary, secondary, banner, tint].
-  // This overlay never fetches or samples image pixels, alters portrait nodes,
-  // changes move-color metadata, or modifies the original type header gradient.
-  const ARTWORK_TYPE_CHOICES = {"bulbasaur":["grass","poison","grass","poison"],"ivysaur":["grass","poison","grass","poison"],"venusaur":["grass","poison","grass","poison"],"charizard":["fire","flying","fire","flying"],"butterfree":["bug","flying","flying","bug"],"weedle":["bug","poison","bug","poison"],"kakuna":["bug","poison","bug","poison"],"beedrill":["bug","poison","bug","poison"],"pidgey":["normal","flying","normal","flying"],"pidgeotto":["normal","flying","normal","flying"],"pidgeot":["normal","flying","normal","flying"],"spearow":["normal","flying","normal","flying"],"fearow":["normal","flying","normal","flying"],"nidoqueen":["poison","ground","poison","ground"],"nidoking":["poison","ground","poison","ground"],"jigglypuff":["normal","fairy","fairy","normal"],"wigglytuff":["normal","fairy","fairy","normal"],"zubat":["poison","flying","poison","flying"],"golbat":["poison","flying","poison","flying"],"oddish":["grass","poison","grass","poison"],"gloom":["grass","poison","poison","grass"],"vileplume":["grass","poison","poison","grass"],"paras":["bug","grass","bug","grass"],"parasect":["bug","grass","bug","grass"],"venonat":["bug","poison","poison","bug"],"venomoth":["bug","poison","poison","bug"],"poliwrath":["water","fighting","water","fighting"],"bellsprout":["grass","poison","grass","poison"],"weepinbell":["grass","poison","grass","poison"],"victreebel":["grass","poison","grass","poison"],"tentacool":["water","poison","water","poison"],"tentacruel":["water","poison","water","poison"],"geodude":["rock","ground","rock","ground"],"graveler":["rock","ground","rock","ground"],"golem":["rock","ground","rock","ground"],"slowpoke":["water","psychic","psychic","water"],"slowbro":["water","psychic","psychic","water"],"magnemite":["electric","steel","steel","electric"],"magneton":["electric","steel","steel","electric"],"farfetchd":["normal","flying","normal","flying"],"doduo":["normal","flying","normal","flying"],"dodrio":["normal","flying","normal","flying"],"dewgong":["water","ice","ice","water"],"cloyster":["water","ice","water","ice"],"gastly":["ghost","poison","ghost","poison"],"haunter":["ghost","poison","ghost","poison"],"gengar":["ghost","poison","ghost","poison"],"onix":["rock","ground","rock","ground"],"exeggcute":["grass","psychic","psychic","grass"],"exeggutor":["grass","psychic","grass","psychic"],"rhyhorn":["ground","rock","rock","ground"],"rhydon":["ground","rock","rock","ground"],"starmie":["water","psychic","water","psychic"],"mr-mime":["psychic","fairy","fairy","psychic"],"scyther":["bug","flying","bug","flying"],"jynx":["ice","psychic","ice","psychic"],"gyarados":["water","flying","flying","water"],"lapras":["water","ice","ice","water"],"omanyte":["rock","water","rock","water"],"omastar":["rock","water","rock","water"],"kabuto":["rock","water","rock","water"],"kabutops":["rock","water","rock","water"],"aerodactyl":["rock","flying","flying","rock"],"articuno":["ice","flying","flying","ice"],"zapdos":["electric","flying","electric","flying"],"moltres":["fire","flying","fire","flying"],"dragonite":["dragon","flying","flying","dragon"],"hoothoot":["normal","flying","normal","flying"],"noctowl":["normal","flying","normal","flying"],"ledyba":["bug","flying","bug","flying"],"ledian":["bug","flying","flying","bug"],"spinarak":["bug","poison","bug","poison"],"ariados":["bug","poison","poison","bug"],"crobat":["poison","flying","flying","poison"],"chinchou":["water","electric","water","electric"],"lanturn":["water","electric","water","electric"],"igglybuff":["normal","fairy","normal","fairy"],"togetic":["fairy","flying","flying","fairy"],"natu":["psychic","flying","flying","psychic"],"xatu":["psychic","flying","flying","psychic"],"marill":["water","fairy","water","fairy"],"azumarill":["water","fairy","water","fairy"],"hoppip":["grass","flying","flying","grass"],"skiploom":["grass","flying","grass","flying"],"jumpluff":["grass","flying","flying","grass"],"yanma":["bug","flying","bug","flying"],"wooper":["water","ground","water","ground"],"quagsire":["water","ground","water","ground"],"murkrow":["dark","flying","dark","flying"],"slowking":["water","psychic","psychic","water"],"girafarig":["normal","psychic","normal","psychic"],"forretress":["bug","steel","steel","bug"],"gligar":["ground","flying","flying","ground"],"steelix":["steel","ground","steel","ground"],"qwilfish":["water","poison","water","poison"],"scizor":["bug","steel","steel","bug"],"shuckle":["bug","rock","bug","rock"],"heracross":["bug","fighting","bug","fighting"],"sneasel":["dark","ice","ice","dark"],"magcargo":["fire","rock","fire","rock"],"swinub":["ice","ground","ground","ice"],"piloswine":["ice","ground","ground","ice"],"corsola":["water","rock","rock","water"],"delibird":["ice","flying","flying","ice"],"mantine":["water","flying","flying","water"],"skarmory":["steel","flying","flying","steel"],"houndour":["dark","fire","dark","fire"],"houndoom":["dark","fire","dark","fire"],"kingdra":["water","dragon","water","dragon"],"smoochum":["ice","psychic","ice","psychic"],"larvitar":["rock","ground","rock","ground"],"pupitar":["rock","ground","rock","ground"],"tyranitar":["rock","dark","rock","dark"],"lugia":["psychic","flying","flying","psychic"],"ho-oh":["fire","flying","fire","flying"],"celebi":["grass","psychic","grass","psychic"],"combusken":["fire","fighting","fighting","fire"],"blaziken":["fire","fighting","fighting","fire"],"marshtomp":["water","ground","water","ground"],"swampert":["water","ground","water","ground"],"beautifly":["bug","flying","flying","bug"],"dustox":["bug","poison","bug","poison"],"lotad":["water","grass","grass","water"],"lombre":["water","grass","grass","water"],"ludicolo":["water","grass","grass","water"],"nuzleaf":["grass","dark","dark","grass"],"shiftry":["grass","dark","dark","grass"],"taillow":["normal","flying","normal","flying"],"swellow":["normal","flying","normal","flying"],"wingull":["water","flying","flying","water"],"pelipper":["water","flying","flying","water"],"ralts":["psychic","fairy","fairy","psychic"],"kirlia":["psychic","fairy","fairy","psychic"],"gardevoir":["psychic","fairy","fairy","psychic"],"surskit":["bug","water","water","bug"],"masquerain":["bug","flying","flying","bug"],"breloom":["grass","fighting","grass","fighting"],"nincada":["bug","ground","bug","ground"],"ninjask":["bug","flying","flying","bug"],"shedinja":["bug","ghost","bug","ghost"],"azurill":["normal","fairy","normal","fairy"],"sableye":["dark","ghost","ghost","dark"],"mawile":["steel","fairy","steel","fairy"],"aron":["steel","rock","steel","rock"],"lairon":["steel","rock","rock","steel"],"aggron":["steel","rock","steel","rock"],"meditite":["fighting","psychic","psychic","fighting"],"medicham":["fighting","psychic","psychic","fighting"],"roselia":["grass","poison","grass","poison"],"carvanha":["water","dark","dark","water"],"sharpedo":["water","dark","water","dark"],"numel":["fire","ground","ground","fire"],"camerupt":["fire","ground","ground","fire"],"vibrava":["ground","dragon","ground","dragon"],"flygon":["ground","dragon","ground","dragon"],"cacturne":["grass","dark","grass","dark"],"swablu":["normal","flying","normal","flying"],"altaria":["dragon","flying","flying","dragon"],"lunatone":["rock","psychic","rock","psychic"],"solrock":["rock","psychic","rock","psychic"],"barboach":["water","ground","water","ground"],"whiscash":["water","ground","water","ground"],"crawdaunt":["water","dark","dark","water"],"baltoy":["ground","psychic","ground","psychic"],"claydol":["ground","psychic","ground","psychic"],"lileep":["rock","grass","rock","grass"],"cradily":["rock","grass","rock","grass"],"anorith":["rock","bug","rock","bug"],"armaldo":["rock","bug","rock","bug"],"tropius":["grass","flying","grass","flying"],"spheal":["ice","water","ice","water"],"sealeo":["ice","water","ice","water"],"walrein":["ice","water","ice","water"],"relicanth":["water","rock","rock","water"],"salamence":["dragon","flying","flying","dragon"],"beldum":["steel","psychic","steel","psychic"],"metang":["steel","psychic","steel","psychic"],"metagross":["steel","psychic","steel","psychic"],"latias":["dragon","psychic","dragon","psychic"],"latios":["dragon","psychic","dragon","psychic"],"groudon-primal":["ground","fire","ground","fire"],"rayquaza":["dragon","flying","flying","dragon"],"jirachi":["steel","psychic","steel","psychic"],"torterra":["grass","ground","grass","ground"],"monferno":["fire","fighting","fighting","fire"],"infernape":["fire","fighting","fighting","fire"],"empoleon":["water","steel","steel","water"],"starly":["normal","flying","normal","flying"],"staravia":["normal","flying","normal","flying"],"staraptor":["normal","flying","normal","flying"],"bibarel":["normal","water","normal","water"],"budew":["grass","poison","grass","poison"],"roserade":["grass","poison","grass","poison"],"shieldon":["rock","steel","rock","steel"],"bastiodon":["rock","steel","steel","rock"],"wormadam-plant-cloak":["bug","grass","grass","bug"],"wormadam-sand-cloak":["bug","ground","ground","bug"],"wormadam-trash-cloak":["bug","steel","steel","bug"],"mothim":["bug","flying","bug","flying"],"combee":["bug","flying","bug","flying"],"vespiquen":["bug","flying","bug","flying"],"gastrodon":["water","ground","ground","water"],"drifloon":["ghost","flying","flying","ghost"],"drifblim":["ghost","flying","ghost","flying"],"honchkrow":["dark","flying","dark","flying"],"stunky":["poison","dark","dark","poison"],"skuntank":["poison","dark","dark","poison"],"bronzor":["steel","psychic","steel","psychic"],"bronzong":["steel","psychic","steel","psychic"],"mime-jr":["psychic","fairy","fairy","psychic"],"chatot":["normal","flying","normal","flying"],"spiritomb":["ghost","dark","dark","ghost"],"gible":["dragon","ground","dragon","ground"],"gabite":["dragon","ground","dragon","ground"],"garchomp":["dragon","ground","dragon","ground"],"lucario":["fighting","steel","steel","fighting"],"skorupi":["poison","bug","poison","bug"],"drapion":["poison","dark","poison","dark"],"croagunk":["poison","fighting","poison","fighting"],"toxicroak":["poison","fighting","poison","fighting"],"mantyke":["water","flying","water","flying"],"snover":["grass","ice","ice","grass"],"abomasnow":["grass","ice","ice","grass"],"weavile":["dark","ice","dark","ice"],"magnezone":["electric","steel","steel","electric"],"rhyperior":["ground","rock","rock","ground"],"togekiss":["fairy","flying","flying","fairy"],"yanmega":["bug","flying","bug","flying"],"gliscor":["ground","flying","flying","ground"],"mamoswine":["ice","ground","ground","ice"],"gallade":["psychic","fighting","fighting","psychic"],"probopass":["rock","steel","rock","steel"],"froslass":["ice","ghost","ice","ghost"],"rotom":["electric","ghost","ghost","electric"],"rotom-heat":["electric","fire","fire","electric"],"rotom-wash":["electric","water","water","electric"],"rotom-frost":["electric","ice","ice","electric"],"rotom-fan":["electric","flying","electric","flying"],"rotom-mow":["electric","grass","electric","grass"],"dialga":["steel","dragon","steel","dragon"],"dialga-origin":["steel","dragon","dragon","steel"],"palkia":["water","dragon","water","dragon"],"palkia-origin":["water","dragon","water","dragon"],"heatran":["fire","steel","steel","fire"],"giratina-altered-forme":["ghost","dragon","ghost","dragon"],"giratina-origin-forme":["ghost","dragon","ghost","dragon"],"shaymin-sky":["grass","flying","flying","grass"],"victini":["psychic","fire","psychic","fire"],"pignite":["fire","fighting","fighting","fire"],"emboar":["fire","fighting","fire","fighting"],"pidove":["normal","flying","normal","flying"],"tranquill":["normal","flying","normal","flying"],"unfezant":["normal","flying","normal","flying"],"woobat":["psychic","flying","flying","psychic"],"swoobat":["psychic","flying","flying","psychic"],"excadrill":["steel","ground","steel","ground"],"palpitoad":["water","ground","water","ground"],"seismitoad":["water","ground","water","ground"],"sewaddle":["bug","grass","bug","grass"],"swadloon":["bug","grass","bug","grass"],"leavanny":["bug","grass","grass","bug"],"venipede":["bug","poison","poison","bug"],"whirlipede":["bug","poison","poison","bug"],"scolipede":["bug","poison","poison","bug"],"cottonee":["grass","fairy","grass","fairy"],"whimsicott":["grass","fairy","grass","fairy"],"sandile":["ground","dark","ground","dark"],"krokorok":["ground","dark","ground","dark"],"krookodile":["ground","dark","dark","ground"],"dwebble":["bug","rock","rock","bug"],"crustle":["bug","rock","rock","bug"],"scraggy":["dark","fighting","fighting","dark"],"scrafty":["dark","fighting","fighting","dark"],"sigilyph":["psychic","flying","flying","psychic"],"tirtouga":["water","rock","water","rock"],"carracosta":["water","rock","water","rock"],"archen":["rock","flying","rock","flying"],"archeops":["rock","flying","flying","rock"],"ducklett":["water","flying","flying","water"],"swanna":["water","flying","flying","water"],"deerling":["normal","grass","normal","grass"],"sawsbuck":["normal","grass","normal","grass"],"emolga":["electric","flying","flying","electric"],"escavalier":["bug","steel","steel","bug"],"foongus":["grass","poison","grass","poison"],"amoonguss":["grass","poison","poison","grass"],"frillish":["water","ghost","water","ghost"],"jellicent":["water","ghost","water","ghost"],"joltik":["bug","electric","electric","bug"],"galvantula":["bug","electric","electric","bug"],"ferroseed":["grass","steel","steel","grass"],"ferrothorn":["grass","steel","steel","grass"],"litwick":["ghost","fire","ghost","fire"],"lampent":["ghost","fire","ghost","fire"],"chandelure":["ghost","fire","ghost","fire"],"stunfisk":["ground","electric","ground","electric"],"golett":["ground","ghost","ghost","ground"],"golurk":["ground","ghost","ghost","ground"],"pawniard":["dark","steel","dark","steel"],"bisharp":["dark","steel","steel","dark"],"rufflet":["normal","flying","normal","flying"],"braviary":["normal","flying","normal","flying"],"vullaby":["dark","flying","dark","flying"],"mandibuzz":["dark","flying","dark","flying"],"durant":["bug","steel","steel","bug"],"deino":["dark","dragon","dark","dragon"],"zweilous":["dark","dragon","dark","dragon"],"hydreigon":["dark","dragon","dark","dragon"],"larvesta":["bug","fire","bug","fire"],"volcarona":["bug","fire","fire","bug"],"cobalion":["steel","fighting","steel","fighting"],"terrakion":["rock","fighting","rock","fighting"],"virizion":["grass","fighting","grass","fighting"],"thundurus":["electric","flying","flying","electric"],"thundurus-therian":["electric","flying","flying","electric"],"reshiram":["dragon","fire","dragon","fire"],"zekrom":["dragon","electric","dragon","electric"],"landorus":["ground","flying","ground","flying"],"landorus-therian":["ground","flying","flying","ground"],"kyurem":["dragon","ice","ice","dragon"],"white-kyurem":["dragon","ice","ice","dragon"],"black-kyurem":["dragon","ice","dragon","ice"],"keldeo":["water","fighting","water","fighting"],"meloetta---aria":["normal","psychic","normal","psychic"],"meloetta---pirouette":["normal","fighting","normal","fighting"],"genesect":["bug","steel","steel","bug"],"chesnaught":["grass","fighting","grass","fighting"],"delphox":["fire","psychic","fire","psychic"],"greninja":["water","dark","water","dark"],"diggersby":["normal","ground","normal","ground"],"fletchling":["normal","flying","normal","flying"],"fletchinder":["fire","flying","flying","fire"],"talonflame":["fire","flying","flying","fire"],"vivillon":["bug","flying","flying","bug"],"litleo":["fire","normal","normal","fire"],"pyroar":["fire","normal","fire","normal"],"pangoro":["fighting","dark","dark","fighting"],"honedge":["steel","ghost","steel","ghost"],"doublade":["steel","ghost","ghost","steel"],"aegislash":["steel","ghost","steel","ghost"],"inkay":["dark","psychic","dark","psychic"],"malamar":["dark","psychic","dark","psychic"],"binacle":["rock","water","rock","water"],"barbaracle":["rock","water","rock","water"],"skrelp":["poison","water","water","poison"],"dragalge":["poison","dragon","poison","dragon"],"helioptile":["electric","normal","electric","normal"],"heliolisk":["electric","normal","electric","normal"],"tyrunt":["rock","dragon","rock","dragon"],"tyrantrum":["rock","dragon","rock","dragon"],"amaura":["rock","ice","ice","rock"],"aurorus":["rock","ice","ice","rock"],"hawlucha":["fighting","flying","flying","fighting"],"dedenne":["electric","fairy","electric","fairy"],"carbink":["rock","fairy","rock","fairy"],"klefki":["steel","fairy","steel","fairy"],"phantump":["ghost","grass","ghost","grass"],"trevenant":["ghost","grass","grass","ghost"],"pumpkaboo":["ghost","grass","ghost","grass"],"gourgeist":["ghost","grass","ghost","grass"],"noibat":["flying","dragon","flying","dragon"],"noivern":["flying","dragon","dragon","flying"],"yveltal":["dark","flying","dark","flying"],"zygarde-10-forme":["dragon","ground","ground","dragon"],"zygarde-50-forme":["dragon","ground","ground","dragon"],"zygarde-complete-forme":["dragon","ground","ground","dragon"],"diancie":["rock","fairy","rock","fairy"],"hoopa-confined":["psychic","ghost","ghost","psychic"],"hoopa-unbound":["psychic","dark","dark","psychic"],"volcanion":["fire","water","fire","water"],"alolan-rattata":["dark","normal","dark","normal"],"alolan-raticate":["dark","normal","dark","normal"],"alolan-raichu":["electric","psychic","electric","psychic"],"alolan-sandshrew":["ice","steel","ice","steel"],"alolan-sandslash":["ice","steel","steel","ice"],"alolan-ninetales":["ice","fairy","ice","fairy"],"alolan-diglett":["ground","steel","ground","steel"],"alolan-dugtrio":["ground","steel","ground","steel"],"alolan-geodude":["rock","electric","rock","electric"],"alolan-graveler":["rock","electric","rock","electric"],"alolan-golem":["rock","electric","rock","electric"],"alolan-grimer":["poison","dark","dark","poison"],"alolan-muk":["poison","dark","dark","poison"],"alolan-exeggutor":["grass","dragon","grass","dragon"],"alolan-marowak":["fire","ghost","ghost","fire"],"rowlet":["grass","flying","flying","grass"],"dartrix":["grass","flying","flying","grass"],"decidueye":["grass","ghost","ghost","grass"],"incineroar":["fire","dark","fire","dark"],"primarina":["water","fairy","fairy","water"],"pikipek":["normal","flying","normal","flying"],"trumbeak":["normal","flying","normal","flying"],"toucannon":["normal","flying","normal","flying"],"charjabug":["bug","electric","bug","electric"],"vikavolt":["bug","electric","bug","electric"],"crabominable":["fighting","ice","ice","fighting"],"oricorio-baile-style":["fire","flying","fire","flying"],"oricorio-pom-pom-style":["electric","flying","electric","flying"],"oricorio-pau-style":["psychic","flying","flying","psychic"],"oricorio-sensu-style":["ghost","flying","flying","ghost"],"cutiefly":["bug","fairy","fairy","bug"],"ribombee":["bug","fairy","fairy","bug"],"mareanie":["poison","water","water","poison"],"toxapex":["poison","water","water","poison"],"dewpider":["water","bug","water","bug"],"araquanid":["water","bug","water","bug"],"morelull":["grass","fairy","fairy","grass"],"shiinotic":["grass","fairy","fairy","grass"],"salandit":["poison","fire","poison","fire"],"salazzle":["poison","fire","poison","fire"],"stufful":["normal","fighting","normal","fighting"],"bewear":["normal","fighting","normal","fighting"],"oranguru":["normal","psychic","normal","psychic"],"wimpod":["bug","water","water","bug"],"golisopod":["bug","water","water","bug"],"sandygast":["ghost","ground","ground","ghost"],"palossand":["ghost","ground","ground","ghost"],"minior-meteor-form":["rock","flying","rock","flying"],"minior-core-form":["rock","flying","rock","flying"],"turtonator":["fire","dragon","fire","dragon"],"togedemaru":["electric","steel","steel","electric"],"mimikyu":["ghost","fairy","fairy","ghost"],"bruxish":["water","psychic","psychic","water"],"drampa":["normal","dragon","normal","dragon"],"dhelmise":["ghost","grass","ghost","grass"],"hakamo-o":["dragon","fighting","fighting","dragon"],"kommo-o":["dragon","fighting","fighting","dragon"],"tapu-koko":["electric","fairy","fairy","electric"],"tapu-lele":["psychic","fairy","psychic","fairy"],"tapu-bulu":["grass","fairy","fairy","grass"],"tapu-fini":["water","fairy","water","fairy"],"solgaleo":["psychic","steel","steel","psychic"],"lunala":["psychic","ghost","ghost","psychic"],"nihilego":["rock","poison","rock","poison"],"buzzwole":["bug","fighting","fighting","bug"],"pheromosa":["bug","fighting","bug","fighting"],"celesteela":["steel","flying","steel","flying"],"kartana":["grass","steel","steel","grass"],"guzzlord":["dark","dragon","dark","dragon"],"dusk-mane-necrozma":["psychic","steel","steel","psychic"],"dawn-wings-necrozma":["psychic","ghost","ghost","psychic"],"ultra-necrozma":["psychic","dragon","psychic","dragon"],"magearna":["steel","fairy","steel","fairy"],"marshadow":["fighting","ghost","ghost","fighting"],"naganadel":["poison","dragon","poison","dragon"],"stakataka":["rock","steel","steel","rock"],"blacephalon":["fire","ghost","ghost","fire"],"galarian-rapidash":["psychic","fairy","fairy","psychic"],"galarian-slowbro":["poison","psychic","psychic","poison"],"galarian-weezing":["poison","fairy","fairy","poison"],"galarian-mr-mime":["ice","psychic","ice","psychic"],"articuno-galar":["psychic","flying","flying","psychic"],"zapdos-galar":["fighting","flying","flying","fighting"],"moltres-galar":["dark","flying","dark","flying"],"galarian-slowking":["poison","psychic","poison","psychic"],"galarian-zigzagoon":["dark","normal","dark","normal"],"galarian-linoone":["dark","normal","normal","dark"],"galarian-yamask":["ground","ghost","ghost","ground"],"galarian-stunfisk":["ground","steel","steel","ground"],"corviknight":["flying","steel","steel","flying"],"dottler":["bug","psychic","bug","psychic"],"orbeetle":["bug","psychic","psychic","bug"],"drednaw":["water","rock","rock","water"],"carkol":["rock","fire","rock","fire"],"coalossal":["rock","fire","rock","fire"],"applin":["grass","dragon","dragon","grass"],"flapple":["grass","dragon","grass","dragon"],"appletun":["grass","dragon","grass","dragon"],"cramorant":["flying","water","water","flying"],"toxel":["electric","poison","poison","electric"],"toxtricity-amped":["electric","poison","poison","electric"],"toxtricity-low-key":["electric","poison","poison","electric"],"sizzlipede":["fire","bug","fire","bug"],"centiskorch":["fire","bug","fire","bug"],"hatterene":["psychic","fairy","fairy","psychic"],"impidimp":["dark","fairy","fairy","dark"],"morgrem":["dark","fairy","fairy","dark"],"grimmsnarl":["dark","fairy","dark","fairy"],"obstagoon":["dark","normal","normal","dark"],"mr-rime":["ice","psychic","ice","psychic"],"runerigus":["ground","ghost","ghost","ground"],"snom":["ice","bug","ice","bug"],"frosmoth":["ice","bug","ice","bug"],"indeedee-m":["psychic","normal","normal","psychic"],"indeedee-f":["psychic","normal","normal","psychic"],"morpeko":["electric","dark","electric","dark"],"dracozolt":["electric","dragon","dragon","electric"],"arctozolt":["electric","ice","ice","electric"],"dracovish":["water","dragon","water","dragon"],"arctovish":["water","ice","ice","water"],"duraludon":["steel","dragon","steel","dragon"],"dreepy":["dragon","ghost","ghost","dragon"],"drakloak":["dragon","ghost","ghost","dragon"],"dragapult":["dragon","ghost","dragon","ghost"],"zacian-crowned":["fairy","steel","steel","fairy"],"zamazenta-crowned":["fighting","steel","steel","fighting"],"eternatus":["poison","dragon","poison","dragon"],"eternatus-eternamax":["poison","dragon","poison","dragon"],"urshifu-single":["fighting","dark","dark","fighting"],"urshifu-rapid":["fighting","water","water","fighting"],"zarude":["dark","grass","dark","grass"],"calyrex":["psychic","grass","grass","psychic"],"calyrex-ice":["psychic","ice","ice","psychic"],"calyrex-shadow":["psychic","ghost","ghost","psychic"],"growlithe-hisui":["fire","rock","rock","fire"],"arcanine-hisui":["fire","rock","rock","fire"],"voltorb-hisui":["electric","grass","electric","grass"],"electrode-hisui":["electric","grass","electric","grass"],"typhlosion-hisui":["fire","ghost","ghost","fire"],"qwilfish-hisui":["dark","poison","dark","poison"],"sneasel-hisui":["fighting","poison","poison","fighting"],"samurott-hisui":["water","dark","dark","water"],"lilligant-hisui":["grass","fighting","grass","fighting"],"zorua-hisui":["normal","ghost","normal","ghost"],"zoroark-hisui":["normal","ghost","normal","ghost"],"braviary-hisui":["psychic","flying","flying","psychic"],"sliggoo-hisui":["steel","dragon","steel","dragon"],"goodra-hisui":["steel","dragon","steel","dragon"],"avalugg-hisui":["ice","rock","ice","rock"],"decidueye-hisui":["grass","fighting","fighting","grass"],"wyrdeer":["normal","psychic","normal","psychic"],"kleavor":["bug","rock","rock","bug"],"ursaluna":["ground","normal","normal","ground"],"ursaluna-bloodmoon":["ground","normal","normal","ground"],"basculegion-m":["water","ghost","ghost","water"],"basculegion-f":["water","ghost","water","ghost"],"sneasler":["fighting","poison","poison","fighting"],"overqwil":["dark","poison","dark","poison"],"enamorus":["fairy","flying","flying","fairy"],"enamorus-therian":["fairy","flying","fairy","flying"],"tauros-paldea-blaze-breed":["fighting","fire","fire","fighting"],"tauros-paldea-aqua-breed":["fighting","water","water","fighting"],"wooper-paldea":["poison","ground","ground","poison"],"meowscarada":["grass","dark","grass","dark"],"skeledirge":["fire","ghost","fire","ghost"],"quaquaval":["water","fighting","water","fighting"],"lokix":["bug","dark","dark","bug"],"pawmo":["electric","fighting","electric","fighting"],"pawmot":["electric","fighting","electric","fighting"],"smoliv":["grass","normal","grass","normal"],"dolliv":["grass","normal","grass","normal"],"arboliva":["grass","normal","grass","normal"],"squawkabilly":["normal","flying","normal","flying"],"armarouge":["fire","psychic","fire","psychic"],"ceruledge":["fire","ghost","ghost","fire"],"wattrel":["electric","flying","flying","electric"],"kilowattrel":["electric","flying","electric","flying"],"shroodle":["poison","normal","normal","poison"],"grafaiai":["poison","normal","normal","poison"],"bramblin":["grass","ghost","grass","ghost"],"brambleghast":["grass","ghost","grass","ghost"],"toedscool":["ground","grass","ground","grass"],"toedscruel":["ground","grass","ground","grass"],"scovillain":["grass","fire","grass","fire"],"rabsca":["bug","psychic","psychic","bug"],"tinkatink":["fairy","steel","fairy","steel"],"tinkatuff":["fairy","steel","fairy","steel"],"tinkaton":["fairy","steel","fairy","steel"],"bombirdier":["flying","dark","flying","dark"],"varoom":["steel","poison","steel","poison"],"revavroom":["steel","poison","steel","poison"],"cyclizar":["dragon","normal","normal","dragon"],"glimmet":["rock","poison","poison","rock"],"glimmora":["rock","poison","poison","rock"],"flamigo":["flying","fighting","flying","fighting"],"veluza":["water","psychic","psychic","water"],"tatsugiri":["dragon","water","water","dragon"],"annihilape":["fighting","ghost","ghost","fighting"],"clodsire":["poison","ground","ground","poison"],"farigiraf":["normal","psychic","normal","psychic"],"kingambit":["dark","steel","dark","steel"],"great-tusk":["ground","fighting","ground","fighting"],"scream-tail":["fairy","psychic","fairy","psychic"],"brute-bonnet":["grass","dark","dark","grass"],"flutter-mane":["ghost","fairy","ghost","fairy"],"slither-wing":["bug","fighting","fighting","bug"],"sandy-shocks":["electric","ground","ground","electric"],"iron-treads":["ground","steel","ground","steel"],"iron-bundle":["ice","water","ice","water"],"iron-hands":["fighting","electric","electric","fighting"],"iron-jugulis":["dark","flying","dark","flying"],"iron-moth":["fire","poison","fire","poison"],"iron-thorns":["rock","electric","rock","electric"],"frigibax":["dragon","ice","ice","dragon"],"arctibax":["dragon","ice","ice","dragon"],"baxcalibur":["dragon","ice","dragon","ice"],"gholdengo":["steel","ghost","steel","ghost"],"wo-chien":["dark","grass","dark","grass"],"chien-pao":["dark","ice","ice","dark"],"ting-lu":["dark","ground","dark","ground"],"chi-yu":["dark","fire","fire","dark"],"roaring-moon":["dragon","dark","dark","dragon"],"iron-valiant":["fairy","fighting","fairy","fighting"],"koraidon":["fighting","dragon","fighting","dragon"],"miraidon":["electric","dragon","dragon","electric"],"walking-wake":["water","dragon","water","dragon"],"iron-leaves":["grass","psychic","grass","psychic"],"dipplin":["grass","dragon","grass","dragon"],"poltchageist":["grass","ghost","grass","ghost"],"sinistcha":["grass","ghost","ghost","grass"],"okidogi":["poison","fighting","poison","fighting"],"munkidori":["poison","psychic","poison","psychic"],"fezandipiti":["poison","fairy","fairy","poison"],"ogerpon-wellspring-mask":["grass","water","water","grass"],"ogerpon-heartflame-mask":["grass","fire","grass","fire"],"ogerpon-cornerstone-mask":["grass","rock","rock","grass"],"archaludon":["steel","dragon","steel","dragon"],"hydrapple":["grass","dragon","dragon","grass"],"gouging-fire":["fire","dragon","fire","dragon"],"raging-bolt":["electric","dragon","electric","dragon"],"iron-boulder":["rock","psychic","rock","psychic"],"iron-crown":["steel","psychic","steel","psychic"],"pecharunt":["poison","ghost","ghost","poison"]};
+  // User-reviewed original Pokemon backgroundType choices (613 dual types/forms).
+  // Seeded offline from Hue/Saturation + Neutral Lightness, then manually edited.
+  // backgroundType selects the card tint; the other type supplies section banners.
+  // Never confuse this data with palette mix values or the native header gradient.
+  // This overlay never fetches or samples image pixels.
+  const ORIGINAL_POKEMON_BACKGROUND_TYPES = Object.freeze({"bulbasaur":"grass","ivysaur":"grass","venusaur":"grass","charizard":"fire","butterfree":"bug","weedle":"bug","kakuna":"bug","beedrill":"bug","pidgey":"normal","pidgeotto":"normal","pidgeot":"normal","spearow":"normal","fearow":"normal","nidoqueen":"poison","nidoking":"poison","jigglypuff":"fairy","wigglytuff":"fairy","zubat":"poison","golbat":"poison","oddish":"poison","gloom":"poison","vileplume":"poison","paras":"bug","parasect":"bug","venonat":"poison","venomoth":"poison","poliwrath":"water","bellsprout":"grass","weepinbell":"grass","victreebel":"grass","tentacool":"water","tentacruel":"water","geodude":"rock","graveler":"rock","golem":"rock","slowpoke":"psychic","slowbro":"psychic","magnemite":"steel","magneton":"steel","farfetchd":"normal","doduo":"normal","dodrio":"normal","dewgong":"water","cloyster":"water","gastly":"ghost","haunter":"ghost","gengar":"ghost","onix":"ground","exeggcute":"psychic","exeggutor":"psychic","rhyhorn":"rock","rhydon":"rock","starmie":"water","mr-mime":"fairy","scyther":"bug","jynx":"psychic","gyarados":"flying","lapras":"ice","omanyte":"water","omastar":"water","kabuto":"rock","kabutops":"rock","aerodactyl":"rock","articuno":"flying","zapdos":"flying","moltres":"flying","dragonite":"flying","hoothoot":"normal","noctowl":"normal","ledyba":"bug","ledian":"bug","spinarak":"bug","ariados":"bug","crobat":"poison","chinchou":"water","lanturn":"water","igglybuff":"fairy","togetic":"fairy","natu":"psychic","xatu":"psychic","marill":"fairy","azumarill":"fairy","hoppip":"flying","skiploom":"flying","jumpluff":"flying","yanma":"bug","wooper":"water","quagsire":"water","murkrow":"flying","slowking":"psychic","girafarig":"normal","forretress":"steel","gligar":"flying","steelix":"ground","qwilfish":"water","scizor":"bug","shuckle":"rock","heracross":"fighting","sneasel":"ice","magcargo":"fire","swinub":"ground","piloswine":"ground","corsola":"rock","delibird":"flying","mantine":"flying","skarmory":"flying","houndour":"dark","houndoom":"dark","kingdra":"water","smoochum":"psychic","larvitar":"rock","pupitar":"rock","tyranitar":"rock","lugia":"flying","ho-oh":"flying","celebi":"psychic","combusken":"fighting","blaziken":"fighting","marshtomp":"water","swampert":"water","beautifly":"bug","dustox":"bug","lotad":"grass","lombre":"grass","ludicolo":"grass","nuzleaf":"dark","shiftry":"dark","taillow":"flying","swellow":"flying","wingull":"flying","pelipper":"flying","ralts":"psychic","kirlia":"psychic","gardevoir":"psychic","surskit":"water","masquerain":"flying","breloom":"grass","nincada":"bug","ninjask":"bug","shedinja":"bug","azurill":"normal","sableye":"dark","mawile":"fairy","aron":"rock","lairon":"rock","aggron":"rock","meditite":"fighting","medicham":"fighting","roselia":"grass","carvanha":"dark","sharpedo":"dark","numel":"ground","camerupt":"ground","vibrava":"ground","flygon":"ground","cacturne":"grass","swablu":"normal","altaria":"flying","lunatone":"rock","solrock":"rock","barboach":"water","whiscash":"water","crawdaunt":"dark","baltoy":"ground","claydol":"ground","lileep":"rock","cradily":"rock","anorith":"rock","armaldo":"rock","tropius":"grass","spheal":"ice","sealeo":"ice","walrein":"ice","relicanth":"rock","salamence":"flying","beldum":"steel","metang":"steel","metagross":"steel","latias":"psychic","latios":"dragon","groudon-primal":"fire","rayquaza":"flying","jirachi":"steel","torterra":"grass","monferno":"fighting","infernape":"fighting","empoleon":"steel","starly":"normal","staravia":"normal","staraptor":"normal","bibarel":"normal","budew":"grass","roserade":"grass","shieldon":"rock","bastiodon":"rock","wormadam-plant-cloak":"grass","wormadam-sand-cloak":"ground","wormadam-trash-cloak":"steel","mothim":"flying","combee":"bug","vespiquen":"bug","gastrodon":"ground","drifloon":"ghost","drifblim":"ghost","honchkrow":"flying","stunky":"poison","skuntank":"poison","bronzor":"steel","bronzong":"steel","mime-jr":"fairy","chatot":"normal","spiritomb":"dark","gible":"dragon","gabite":"dragon","garchomp":"dragon","lucario":"steel","skorupi":"poison","drapion":"poison","croagunk":"poison","toxicroak":"poison","mantyke":"flying","snover":"ice","abomasnow":"ice","weavile":"dark","magnezone":"steel","rhyperior":"ground","togekiss":"flying","yanmega":"bug","gliscor":"flying","mamoswine":"ground","gallade":"psychic","probopass":"rock","froslass":"ice","rotom":"electric","rotom-heat":"electric","rotom-wash":"electric","rotom-frost":"electric","rotom-fan":"electric","rotom-mow":"electric","dialga":"steel","dialga-origin":"steel","palkia":"dragon","palkia-origin":"dragon","heatran":"fire","giratina-altered-forme":"ghost","giratina-origin-forme":"ghost","shaymin-sky":"grass","victini":"psychic","pignite":"fighting","emboar":"fighting","pidove":"normal","tranquill":"normal","unfezant":"normal","woobat":"flying","swoobat":"flying","excadrill":"ground","palpitoad":"water","seismitoad":"water","sewaddle":"bug","swadloon":"bug","leavanny":"bug","venipede":"poison","whirlipede":"poison","scolipede":"poison","cottonee":"grass","whimsicott":"grass","sandile":"dark","krokorok":"dark","krookodile":"dark","dwebble":"rock","crustle":"rock","scraggy":"fighting","scrafty":"fighting","sigilyph":"flying","tirtouga":"rock","carracosta":"rock","archen":"flying","archeops":"flying","ducklett":"flying","swanna":"flying","deerling":"grass","sawsbuck":"grass","emolga":"flying","escavalier":"steel","foongus":"grass","amoonguss":"grass","frillish":"water","jellicent":"water","joltik":"electric","galvantula":"electric","ferroseed":"steel","ferrothorn":"steel","litwick":"ghost","lampent":"ghost","chandelure":"ghost","stunfisk":"ground","golett":"ground","golurk":"ground","pawniard":"dark","bisharp":"dark","rufflet":"normal","braviary":"normal","vullaby":"dark","mandibuzz":"dark","durant":"steel","deino":"dragon","zweilous":"dragon","hydreigon":"dragon","larvesta":"fire","volcarona":"fire","cobalion":"steel","terrakion":"rock","virizion":"grass","thundurus":"flying","thundurus-therian":"flying","reshiram":"dragon","zekrom":"dragon","landorus":"ground","landorus-therian":"ground","kyurem":"ice","white-kyurem":"ice","black-kyurem":"ice","keldeo":"water","meloetta---aria":"normal","meloetta---pirouette":"normal","genesect":"steel","chesnaught":"grass","delphox":"fire","greninja":"water","diggersby":"normal","fletchling":"normal","fletchinder":"fire","talonflame":"fire","vivillon":"flying","litleo":"normal","pyroar":"normal","pangoro":"fighting","honedge":"ghost","doublade":"ghost","aegislash":"ghost","inkay":"dark","malamar":"dark","binacle":"rock","barbaracle":"rock","skrelp":"water","dragalge":"poison","helioptile":"electric","heliolisk":"electric","tyrunt":"rock","tyrantrum":"rock","amaura":"ice","aurorus":"ice","hawlucha":"fighting","dedenne":"electric","carbink":"rock","klefki":"steel","phantump":"grass","trevenant":"grass","pumpkaboo":"ghost","gourgeist":"ghost","noibat":"dragon","noivern":"dragon","yveltal":"dark","zygarde-10-forme":"dragon","zygarde-50-forme":"dragon","zygarde-complete-forme":"dragon","diancie":"rock","hoopa-confined":"ghost","hoopa-unbound":"dark","volcanion":"water","alolan-rattata":"normal","alolan-raticate":"normal","alolan-raichu":"psychic","alolan-sandshrew":"steel","alolan-sandslash":"steel","alolan-ninetales":"fairy","alolan-diglett":"ground","alolan-dugtrio":"ground","alolan-geodude":"rock","alolan-graveler":"rock","alolan-golem":"rock","alolan-grimer":"dark","alolan-muk":"dark","alolan-exeggutor":"grass","alolan-marowak":"ghost","rowlet":"grass","dartrix":"grass","decidueye":"grass","incineroar":"fire","primarina":"water","pikipek":"normal","trumbeak":"normal","toucannon":"normal","charjabug":"bug","vikavolt":"bug","crabominable":"ice","oricorio-baile-style":"flying","oricorio-pom-pom-style":"flying","oricorio-pau-style":"flying","oricorio-sensu-style":"flying","cutiefly":"bug","ribombee":"bug","mareanie":"water","toxapex":"water","dewpider":"water","araquanid":"water","morelull":"fairy","shiinotic":"fairy","salandit":"poison","salazzle":"poison","stufful":"normal","bewear":"normal","oranguru":"normal","wimpod":"water","golisopod":"water","sandygast":"ground","palossand":"ground","minior-meteor-form":"rock","minior-core-form":"rock","turtonator":"fire","togedemaru":"steel","mimikyu":"fairy","bruxish":"psychic","drampa":"normal","dhelmise":"ghost","hakamo-o":"fighting","kommo-o":"fighting","tapu-koko":"electric","tapu-lele":"psychic","tapu-bulu":"grass","tapu-fini":"water","solgaleo":"steel","lunala":"ghost","nihilego":"poison","buzzwole":"fighting","pheromosa":"fighting","celesteela":"flying","kartana":"steel","guzzlord":"dark","dusk-mane-necrozma":"psychic","dawn-wings-necrozma":"psychic","ultra-necrozma":"dragon","magearna":"fairy","marshadow":"ghost","naganadel":"poison","stakataka":"rock","blacephalon":"ghost","galarian-rapidash":"fairy","galarian-slowbro":"poison","galarian-weezing":"fairy","galarian-mr-mime":"ice","articuno-galar":"flying","zapdos-galar":"flying","moltres-galar":"flying","galarian-slowking":"poison","galarian-zigzagoon":"normal","galarian-linoone":"normal","galarian-yamask":"ghost","galarian-stunfisk":"ground","corviknight":"flying","dottler":"bug","orbeetle":"psychic","drednaw":"rock","carkol":"rock","coalossal":"rock","applin":"grass","flapple":"grass","appletun":"grass","cramorant":"flying","toxel":"electric","toxtricity-amped":"electric","toxtricity-low-key":"electric","sizzlipede":"fire","centiskorch":"fire","hatterene":"psychic","impidimp":"fairy","morgrem":"fairy","grimmsnarl":"fairy","obstagoon":"normal","mr-rime":"ice","runerigus":"ghost","snom":"ice","frosmoth":"ice","indeedee-m":"normal","indeedee-f":"normal","morpeko":"electric","dracozolt":"electric","arctozolt":"electric","dracovish":"water","arctovish":"water","duraludon":"steel","dreepy":"dragon","drakloak":"dragon","dragapult":"dragon","zacian-crowned":"steel","zamazenta-crowned":"steel","eternatus":"dragon","eternatus-eternamax":"dragon","urshifu-single":"fighting","urshifu-rapid":"fighting","zarude":"dark","calyrex":"grass","calyrex-ice":"ice","calyrex-shadow":"ghost","growlithe-hisui":"rock","arcanine-hisui":"rock","voltorb-hisui":"electric","electrode-hisui":"electric","typhlosion-hisui":"fire","qwilfish-hisui":"dark","sneasel-hisui":"poison","samurott-hisui":"water","lilligant-hisui":"grass","zorua-hisui":"normal","zoroark-hisui":"normal","braviary-hisui":"flying","sliggoo-hisui":"steel","goodra-hisui":"steel","avalugg-hisui":"ice","decidueye-hisui":"fighting","wyrdeer":"normal","kleavor":"rock","ursaluna":"ground","ursaluna-bloodmoon":"ground","basculegion-m":"ghost","basculegion-f":"ghost","sneasler":"poison","overqwil":"dark","enamorus":"fairy","enamorus-therian":"fairy","tauros-paldea-blaze-breed":"fire","tauros-paldea-aqua-breed":"water","wooper-paldea":"ground","meowscarada":"grass","skeledirge":"fire","quaquaval":"water","lokix":"dark","pawmo":"electric","pawmot":"electric","smoliv":"grass","dolliv":"grass","arboliva":"grass","squawkabilly":"normal","armarouge":"psychic","ceruledge":"ghost","wattrel":"electric","kilowattrel":"electric","shroodle":"normal","grafaiai":"normal","bramblin":"grass","brambleghast":"grass","toedscool":"ground","toedscruel":"ground","scovillain":"grass","rabsca":"psychic","tinkatink":"fairy","tinkatuff":"fairy","tinkaton":"fairy","bombirdier":"dark","varoom":"poison","revavroom":"poison","cyclizar":"dragon","glimmet":"poison","glimmora":"poison","flamigo":"fighting","veluza":"water","tatsugiri":"water","annihilape":"ghost","clodsire":"ground","farigiraf":"normal","kingambit":"dark","great-tusk":"ground","scream-tail":"fairy","brute-bonnet":"dark","flutter-mane":"ghost","slither-wing":"fighting","sandy-shocks":"ground","iron-treads":"ground","iron-bundle":"ice","iron-hands":"fighting","iron-jugulis":"dark","iron-moth":"fire","iron-thorns":"rock","frigibax":"ice","arctibax":"ice","baxcalibur":"ice","gholdengo":"ghost","wo-chien":"dark","chien-pao":"dark","ting-lu":"dark","chi-yu":"dark","roaring-moon":"dark","iron-valiant":"fairy","koraidon":"fighting","miraidon":"dragon","walking-wake":"water","iron-leaves":"grass","dipplin":"grass","poltchageist":"ghost","sinistcha":"ghost","okidogi":"poison","munkidori":"poison","fezandipiti":"poison","ogerpon-wellspring-mask":"grass","ogerpon-heartflame-mask":"grass","ogerpon-cornerstone-mask":"grass","archaludon":"dragon","hydrapple":"grass","gouging-fire":"fire","raging-bolt":"dragon","iron-boulder":"rock","iron-crown":"steel","pecharunt":"ghost"});
   // Native cards expose the Dex number, not the route slug. Regional forms
   // share that number, so pair it with their native name to resolve the exact
   // existing choice-table ID. Only indexed dual types need this lookup.
   const ARTWORK_IDS_BY_NATIVE_RECORD = {"1:bulbasaur":"bulbasaur","2:ivysaur":"ivysaur","3:venusaur":"venusaur","6:charizard":"charizard","12:butterfree":"butterfree","13:weedle":"weedle","14:kakuna":"kakuna","15:beedrill":"beedrill","16:pidgey":"pidgey","17:pidgeotto":"pidgeotto","18:pidgeot":"pidgeot","21:spearow":"spearow","22:fearow":"fearow","31:nidoqueen":"nidoqueen","34:nidoking":"nidoking","39:jigglypuff":"jigglypuff","40:wigglytuff":"wigglytuff","41:zubat":"zubat","42:golbat":"golbat","43:oddish":"oddish","44:gloom":"gloom","45:vileplume":"vileplume","46:paras":"paras","47:parasect":"parasect","48:venonat":"venonat","49:venomoth":"venomoth","62:poliwrath":"poliwrath","69:bellsprout":"bellsprout","70:weepinbell":"weepinbell","71:victreebel":"victreebel","72:tentacool":"tentacool","73:tentacruel":"tentacruel","74:geodude":"geodude","75:graveler":"graveler","76:golem":"golem","79:slowpoke":"slowpoke","80:slowbro":"slowbro","81:magnemite":"magnemite","82:magneton":"magneton","83:farfetch'd":"farfetchd","84:doduo":"doduo","85:dodrio":"dodrio","87:dewgong":"dewgong","91:cloyster":"cloyster","92:gastly":"gastly","93:haunter":"haunter","94:gengar":"gengar","95:onix":"onix","102:exeggcute":"exeggcute","103:exeggutor":"exeggutor","111:rhyhorn":"rhyhorn","112:rhydon":"rhydon","121:starmie":"starmie","122:mr. mime":"mr-mime","123:scyther":"scyther","124:jynx":"jynx","130:gyarados":"gyarados","131:lapras":"lapras","138:omanyte":"omanyte","139:omastar":"omastar","140:kabuto":"kabuto","141:kabutops":"kabutops","142:aerodactyl":"aerodactyl","144:articuno":"articuno","145:zapdos":"zapdos","146:moltres":"moltres","149:dragonite":"dragonite","163:hoothoot":"hoothoot","164:noctowl":"noctowl","165:ledyba":"ledyba","166:ledian":"ledian","167:spinarak":"spinarak","168:ariados":"ariados","169:crobat":"crobat","170:chinchou":"chinchou","171:lanturn":"lanturn","174:igglybuff":"igglybuff","176:togetic":"togetic","177:natu":"natu","178:xatu":"xatu","183:marill":"marill","184:azumarill":"azumarill","187:hoppip":"hoppip","188:skiploom":"skiploom","189:jumpluff":"jumpluff","193:yanma":"yanma","194:wooper":"wooper","195:quagsire":"quagsire","198:murkrow":"murkrow","199:slowking":"slowking","203:girafarig":"girafarig","205:forretress":"forretress","207:gligar":"gligar","208:steelix":"steelix","211:qwilfish":"qwilfish","212:scizor":"scizor","213:shuckle":"shuckle","214:heracross":"heracross","215:sneasel":"sneasel","219:magcargo":"magcargo","220:swinub":"swinub","221:piloswine":"piloswine","222:corsola":"corsola","225:delibird":"delibird","226:mantine":"mantine","227:skarmory":"skarmory","228:houndour":"houndour","229:houndoom":"houndoom","230:kingdra":"kingdra","238:smoochum":"smoochum","246:larvitar":"larvitar","247:pupitar":"pupitar","248:tyranitar":"tyranitar","249:lugia":"lugia","250:ho-oh":"ho-oh","251:celebi":"celebi","256:combusken":"combusken","257:blaziken":"blaziken","259:marshtomp":"marshtomp","260:swampert":"swampert","267:beautifly":"beautifly","269:dustox":"dustox","270:lotad":"lotad","271:lombre":"lombre","272:ludicolo":"ludicolo","274:nuzleaf":"nuzleaf","275:shiftry":"shiftry","276:taillow":"taillow","277:swellow":"swellow","278:wingull":"wingull","279:pelipper":"pelipper","280:ralts":"ralts","281:kirlia":"kirlia","282:gardevoir":"gardevoir","283:surskit":"surskit","284:masquerain":"masquerain","286:breloom":"breloom","290:nincada":"nincada","291:ninjask":"ninjask","292:shedinja":"shedinja","298:azurill":"azurill","302:sableye":"sableye","303:mawile":"mawile","304:aron":"aron","305:lairon":"lairon","306:aggron":"aggron","307:meditite":"meditite","308:medicham":"medicham","315:roselia":"roselia","318:carvanha":"carvanha","319:sharpedo":"sharpedo","322:numel":"numel","323:camerupt":"camerupt","329:vibrava":"vibrava","330:flygon":"flygon","332:cacturne":"cacturne","333:swablu":"swablu","334:altaria":"altaria","337:lunatone":"lunatone","338:solrock":"solrock","339:barboach":"barboach","340:whiscash":"whiscash","342:crawdaunt":"crawdaunt","343:baltoy":"baltoy","344:claydol":"claydol","345:lileep":"lileep","346:cradily":"cradily","347:anorith":"anorith","348:armaldo":"armaldo","357:tropius":"tropius","363:spheal":"spheal","364:sealeo":"sealeo","365:walrein":"walrein","369:relicanth":"relicanth","373:salamence":"salamence","374:beldum":"beldum","375:metang":"metang","376:metagross":"metagross","380:latias":"latias","381:latios":"latios","383:groudon (primal)":"groudon-primal","384:rayquaza":"rayquaza","385:jirachi":"jirachi","389:torterra":"torterra","391:monferno":"monferno","392:infernape":"infernape","395:empoleon":"empoleon","396:starly":"starly","397:staravia":"staravia","398:staraptor":"staraptor","400:bibarel":"bibarel","406:budew":"budew","407:roserade":"roserade","410:shieldon":"shieldon","411:bastiodon":"bastiodon","413:wormadam plant cloak":"wormadam-plant-cloak","413:wormadam sand cloak":"wormadam-sand-cloak","413:wormadam trash cloak":"wormadam-trash-cloak","414:mothim":"mothim","415:combee":"combee","416:vespiquen":"vespiquen","423:gastrodon":"gastrodon","425:drifloon":"drifloon","426:drifblim":"drifblim","430:honchkrow":"honchkrow","434:stunky":"stunky","435:skuntank":"skuntank","436:bronzor":"bronzor","437:bronzong":"bronzong","439:mime jr.":"mime-jr","441:chatot":"chatot","442:spiritomb":"spiritomb","443:gible":"gible","444:gabite":"gabite","445:garchomp":"garchomp","448:lucario":"lucario","451:skorupi":"skorupi","452:drapion":"drapion","453:croagunk":"croagunk","454:toxicroak":"toxicroak","458:mantyke":"mantyke","459:snover":"snover","460:abomasnow":"abomasnow","461:weavile":"weavile","462:magnezone":"magnezone","464:rhyperior":"rhyperior","468:togekiss":"togekiss","469:yanmega":"yanmega","472:gliscor":"gliscor","473:mamoswine":"mamoswine","475:gallade":"gallade","476:probopass":"probopass","478:froslass":"froslass","479:rotom":"rotom","479:rotom heat":"rotom-heat","479:rotom wash":"rotom-wash","479:rotom frost":"rotom-frost","479:rotom fan":"rotom-fan","479:rotom mow":"rotom-mow","483:dialga":"dialga","483:dialga (origin forme)":"dialga-origin","484:palkia":"palkia","484:palkia (origin forme)":"palkia-origin","485:heatran":"heatran","487:giratina altered forme":"giratina-altered-forme","487:giratina origin forme":"giratina-origin-forme","492:shaymin sky":"shaymin-sky","494:victini":"victini","499:pignite":"pignite","500:emboar":"emboar","519:pidove":"pidove","520:tranquill":"tranquill","521:unfezant":"unfezant","527:woobat":"woobat","528:swoobat":"swoobat","530:excadrill":"excadrill","536:palpitoad":"palpitoad","537:seismitoad":"seismitoad","540:sewaddle":"sewaddle","541:swadloon":"swadloon","542:leavanny":"leavanny","543:venipede":"venipede","544:whirlipede":"whirlipede","545:scolipede":"scolipede","546:cottonee":"cottonee","547:whimsicott":"whimsicott","551:sandile":"sandile","552:krokorok":"krokorok","553:krookodile":"krookodile","557:dwebble":"dwebble","558:crustle":"crustle","559:scraggy":"scraggy","560:scrafty":"scrafty","561:sigilyph":"sigilyph","564:tirtouga":"tirtouga","565:carracosta":"carracosta","566:archen":"archen","567:archeops":"archeops","580:ducklett":"ducklett","581:swanna":"swanna","585:deerling":"deerling","586:sawsbuck":"sawsbuck","587:emolga":"emolga","589:escavalier":"escavalier","590:foongus":"foongus","591:amoonguss":"amoonguss","592:frillish":"frillish","593:jellicent":"jellicent","595:joltik":"joltik","596:galvantula":"galvantula","597:ferroseed":"ferroseed","598:ferrothorn":"ferrothorn","607:litwick":"litwick","608:lampent":"lampent","609:chandelure":"chandelure","618:stunfisk":"stunfisk","622:golett":"golett","623:golurk":"golurk","624:pawniard":"pawniard","625:bisharp":"bisharp","627:rufflet":"rufflet","628:braviary":"braviary","629:vullaby":"vullaby","630:mandibuzz":"mandibuzz","632:durant":"durant","633:deino":"deino","634:zweilous":"zweilous","635:hydreigon":"hydreigon","636:larvesta":"larvesta","637:volcarona":"volcarona","638:cobalion":"cobalion","639:terrakion":"terrakion","640:virizion":"virizion","642:thundurus (incarnate)":"thundurus","642:thundurus (therian)":"thundurus-therian","643:reshiram":"reshiram","644:zekrom":"zekrom","645:landorus (incarnate)":"landorus","645:landorus (therian)":"landorus-therian","646:kyurem":"kyurem","646:white kyurem":"white-kyurem","646:black kyurem":"black-kyurem","647:keldeo":"keldeo","648:meloetta - aria":"meloetta---aria","648:meloetta - pirouette":"meloetta---pirouette","649:genesect":"genesect","652:chesnaught":"chesnaught","655:delphox":"delphox","658:greninja":"greninja","660:diggersby":"diggersby","661:fletchling":"fletchling","662:fletchinder":"fletchinder","663:talonflame":"talonflame","666:vivillon":"vivillon","667:litleo":"litleo","668:pyroar":"pyroar","675:pangoro":"pangoro","679:honedge":"honedge","680:doublade":"doublade","681:aegislash":"aegislash","686:inkay":"inkay","687:malamar":"malamar","688:binacle":"binacle","689:barbaracle":"barbaracle","690:skrelp":"skrelp","691:dragalge":"dragalge","694:helioptile":"helioptile","695:heliolisk":"heliolisk","696:tyrunt":"tyrunt","697:tyrantrum":"tyrantrum","698:amaura":"amaura","699:aurorus":"aurorus","701:hawlucha":"hawlucha","702:dedenne":"dedenne","703:carbink":"carbink","707:klefki":"klefki","708:phantump":"phantump","709:trevenant":"trevenant","710:pumpkaboo":"pumpkaboo","711:gourgeist":"gourgeist","714:noibat":"noibat","715:noivern":"noivern","717:yveltal":"yveltal","718:zygarde 10% forme":"zygarde-10-forme","718:zygarde 50% forme":"zygarde-50-forme","718:zygarde complete forme":"zygarde-complete-forme","719:diancie":"diancie","720:hoopa confined":"hoopa-confined","720:hoopa unbound":"hoopa-unbound","721:volcanion":"volcanion","19:alolan rattata":"alolan-rattata","20:alolan raticate":"alolan-raticate","26:alolan raichu":"alolan-raichu","27:alolan sandshrew":"alolan-sandshrew","28:alolan sandslash":"alolan-sandslash","38:alolan ninetales":"alolan-ninetales","50:alolan diglett":"alolan-diglett","51:alolan dugtrio":"alolan-dugtrio","74:alolan geodude":"alolan-geodude","75:alolan graveler":"alolan-graveler","76:alolan golem":"alolan-golem","88:alolan grimer":"alolan-grimer","89:alolan muk":"alolan-muk","103:alolan exeggutor":"alolan-exeggutor","105:alolan marowak":"alolan-marowak","722:rowlet":"rowlet","723:dartrix":"dartrix","724:decidueye":"decidueye","727:incineroar":"incineroar","730:primarina":"primarina","731:pikipek":"pikipek","732:trumbeak":"trumbeak","733:toucannon":"toucannon","737:charjabug":"charjabug","738:vikavolt":"vikavolt","740:crabominable":"crabominable","741:oricorio baile style":"oricorio-baile-style","741:oricorio pom-pom style":"oricorio-pom-pom-style","741:oricorio pa'u style":"oricorio-pau-style","741:oricorio sensu style":"oricorio-sensu-style","742:cutiefly":"cutiefly","743:ribombee":"ribombee","747:mareanie":"mareanie","748:toxapex":"toxapex","751:dewpider":"dewpider","752:araquanid":"araquanid","755:morelull":"morelull","756:shiinotic":"shiinotic","757:salandit":"salandit","758:salazzle":"salazzle","759:stufful":"stufful","760:bewear":"bewear","765:oranguru":"oranguru","767:wimpod":"wimpod","768:golisopod":"golisopod","769:sandygast":"sandygast","770:palossand":"palossand","774:minior meteor form":"minior-meteor-form","774:minior core form":"minior-core-form","776:turtonator":"turtonator","777:togedemaru":"togedemaru","778:mimikyu":"mimikyu","779:bruxish":"bruxish","780:drampa":"drampa","781:dhelmise":"dhelmise","783:hakamo-o":"hakamo-o","784:kommo-o":"kommo-o","785:tapu koko":"tapu-koko","786:tapu lele":"tapu-lele","787:tapu bulu":"tapu-bulu","788:tapu fini":"tapu-fini","791:solgaleo":"solgaleo","792:lunala":"lunala","793:nihilego":"nihilego","794:buzzwole":"buzzwole","795:pheromosa":"pheromosa","797:celesteela":"celesteela","798:kartana":"kartana","799:guzzlord":"guzzlord","800:dusk mane necrozma":"dusk-mane-necrozma","800:dawn wings necrozma":"dawn-wings-necrozma","800:ultra necrozma":"ultra-necrozma","801:magearna":"magearna","802:marshadow":"marshadow","804:naganadel":"naganadel","805:stakataka":"stakataka","806:blacephalon":"blacephalon","78:galarian rapidash":"galarian-rapidash","80:galarian slowbro":"galarian-slowbro","110:galarian weezing":"galarian-weezing","122:galarian mr. mime":"galarian-mr-mime","144:galarian articuno":"articuno-galar","145:galarian zapdos":"zapdos-galar","146:galarian moltres":"moltres-galar","199:galarian slowking":"galarian-slowking","263:galarian zigzagoon":"galarian-zigzagoon","264:galarian linoone":"galarian-linoone","562:galarian yamask":"galarian-yamask","618:galarian stunfisk":"galarian-stunfisk","823:corviknight":"corviknight","825:dottler":"dottler","826:orbeetle":"orbeetle","834:drednaw":"drednaw","838:carkol":"carkol","839:coalossal":"coalossal","840:applin":"applin","841:flapple":"flapple","842:appletun":"appletun","845:cramorant":"cramorant","848:toxel":"toxel","849:toxtricity (amped)":"toxtricity-amped","849:toxtricity (low key)":"toxtricity-low-key","850:sizzlipede":"sizzlipede","851:centiskorch":"centiskorch","858:hatterene":"hatterene","859:impidimp":"impidimp","860:morgrem":"morgrem","861:grimmsnarl":"grimmsnarl","862:obstagoon":"obstagoon","866:mr. rime":"mr-rime","867:runerigus":"runerigus","872:snom":"snom","873:frosmoth":"frosmoth","876:indeedee ♂":"indeedee-m","876:indeedee ♀":"indeedee-f","877:morpeko":"morpeko","880:dracozolt":"dracozolt","881:arctozolt":"arctozolt","882:dracovish":"dracovish","883:arctovish":"arctovish","884:duraludon":"duraludon","885:dreepy":"dreepy","886:drakloak":"drakloak","887:dragapult":"dragapult","888:zacian (crowned)":"zacian-crowned","889:zamazenta (crowned)":"zamazenta-crowned","890:eternatus":"eternatus","890:eternatus (eternamax)":"eternatus-eternamax","892:urshifu (single strike)":"urshifu-single","892:urshifu (rapid strike)":"urshifu-rapid","893:zarude":"zarude","898:calyrex":"calyrex","898:calyrex (ice rider)":"calyrex-ice","898:calyrex (shadow rider)":"calyrex-shadow","58:hisuian growlithe":"growlithe-hisui","59:hisuian arcanine":"arcanine-hisui","100:hisuian voltorb":"voltorb-hisui","101:hisuian electrode":"electrode-hisui","157:hisuian typhlosion":"typhlosion-hisui","211:hisuian qwilfish":"qwilfish-hisui","215:hisuian sneasel":"sneasel-hisui","503:hisuian samurott":"samurott-hisui","549:hisuian lilligant":"lilligant-hisui","570:hisuian zorua":"zorua-hisui","571:hisuian zoroark":"zoroark-hisui","628:hisuian braviary":"braviary-hisui","705:hisuian sliggoo":"sliggoo-hisui","706:hisuian goodra":"goodra-hisui","713:hisuian avalugg":"avalugg-hisui","724:hisuian decidueye":"decidueye-hisui","899:wyrdeer":"wyrdeer","900:kleavor":"kleavor","901:ursaluna":"ursaluna","901:bloodmoon ursaluna":"ursaluna-bloodmoon","902:basculegion ♂":"basculegion-m","902:basculegion ♀":"basculegion-f","903:sneasler":"sneasler","904:overqwil":"overqwil","905:enamorus (incarnate)":"enamorus","905:enamorus (therian)":"enamorus-therian","128:paldean tauros (blaze breed)":"tauros-paldea-blaze-breed","128:paldean tauros (aqua breed)":"tauros-paldea-aqua-breed","194:paldean wooper":"wooper-paldea","908:meowscarada":"meowscarada","911:skeledirge":"skeledirge","914:quaquaval":"quaquaval","920:lokix":"lokix","922:pawmo":"pawmo","923:pawmot":"pawmot","928:smoliv":"smoliv","929:dolliv":"dolliv","930:arboliva":"arboliva","931:squawkabilly":"squawkabilly","936:armarouge":"armarouge","937:ceruledge":"ceruledge","940:wattrel":"wattrel","941:kilowattrel":"kilowattrel","944:shroodle":"shroodle","945:grafaiai":"grafaiai","946:bramblin":"bramblin","947:brambleghast":"brambleghast","948:toedscool":"toedscool","949:toedscruel":"toedscruel","952:scovillain":"scovillain","954:rabsca":"rabsca","957:tinkatink":"tinkatink","958:tinkatuff":"tinkatuff","959:tinkaton":"tinkaton","962:bombirdier":"bombirdier","965:varoom":"varoom","966:revavroom":"revavroom","967:cyclizar":"cyclizar","969:glimmet":"glimmet","970:glimmora":"glimmora","973:flamigo":"flamigo","976:veluza":"veluza","978:tatsugiri":"tatsugiri","979:annihilape":"annihilape","980:clodsire":"clodsire","981:farigiraf":"farigiraf","983:kingambit":"kingambit","984:great tusk":"great-tusk","985:scream tail":"scream-tail","986:brute bonnet":"brute-bonnet","987:flutter mane":"flutter-mane","988:slither wing":"slither-wing","989:sandy shocks":"sandy-shocks","990:iron treads":"iron-treads","991:iron bundle":"iron-bundle","992:iron hands":"iron-hands","993:iron jugulis":"iron-jugulis","994:iron moth":"iron-moth","995:iron thorns":"iron-thorns","996:frigibax":"frigibax","997:arctibax":"arctibax","998:baxcalibur":"baxcalibur","1000:gholdengo":"gholdengo","1001:wo-chien":"wo-chien","1002:chien-pao":"chien-pao","1003:ting-lu":"ting-lu","1004:chi-yu":"chi-yu","1005:roaring moon":"roaring-moon","1006:iron valiant":"iron-valiant","1007:koraidon":"koraidon","1008:miraidon":"miraidon","1009:walking wake":"walking-wake","1010:iron leaves":"iron-leaves","1011:dipplin":"dipplin","1012:poltchageist":"poltchageist","1013:sinistcha":"sinistcha","1014:okidogi":"okidogi","1015:munkidori":"munkidori","1016:fezandipiti":"fezandipiti","1017:ogerpon (wellspring mask)":"ogerpon-wellspring-mask","1017:ogerpon (heartflame mask)":"ogerpon-heartflame-mask","1017:ogerpon (cornerstone mask)":"ogerpon-cornerstone-mask","1018:archaludon":"archaludon","1019:hydrapple":"hydrapple","1020:gouging fire":"gouging-fire","1021:raging bolt":"raging-bolt","1022:iron boulder":"iron-boulder","1023:iron crown":"iron-crown","1025:pecharunt":"pecharunt"};
-  const ARTWORK_TINT_ALPHA_BY_TYPE = {
-    "normal": 0.34,
-    "fire": 0.40,
-    "water": 0.38,
-    "electric": 0.40,
-    "grass": 0.32,
-    "ice": 0.40,
-    "dark": 0.45,
-    "ghost": 0.42,
-    "fairy": 0.40,
-    "psychic": 0.32,
-    "rock": 0.42,
-    "steel": 0.40,
-    "bug": 0.38,
-    "poison": 0.38,
-    "flying": 0.30,
-    "ground": 0.40,
-    "dragon": 0.36,
-    "fighting": 0.34
-}; // Per-type artwork tint strengths.
-  // Universal S/V colors are defined by QOL as --skin-<type>-bg.
-  // The optional Theme Overlay NEVER declares or overrides that base palette.
+  // Canonical Scarlet/Violet type values remain QoL-owned --skin-<type>-bg.
+  // Each type has independently adjustable presentation strengths in the CSS
+  // block below. No mixing depends on the OTHER type in a species pairing.
   const svTypeColor = type => `var(--skin-${type}-bg)`;
-  const tintWash = (type, alpha) =>
-    `color-mix(in srgb, ${svTypeColor(type)} ${(alpha * 100).toFixed(3)}%, transparent)`;
-  // Editable backgrounds shared by section banners and move/TM pills.
-  // 60 = 60% type + 40% white; 70 = 70% type + 30% white.
-  // Missing types use DEFAULT_TYPE_LIGHT_MIX. Text colors stay 60% type/40% black.
-  const DEFAULT_TYPE_LIGHT_MIX = 60;
-  const TYPE_LIGHT_MIX = {
-    electric: 70, // Edit this value to tune Electric independently.
-  };
-  const lightPct = type => Math.max(0, Math.min(100, TYPE_LIGHT_MIX[type] ?? DEFAULT_TYPE_LIGHT_MIX));
-  const typeFill = type => `color-mix(in srgb, var(--skin-${type}-bg) ${lightPct(type)}%, white ${100-lightPct(type)}%)`;
+  const typeVar = (type, role) => `var(--p5ov-${type}-${role})`;
+  const TYPES = 'normal fire fighting water flying grass poison electric ground psychic rock ice bug dragon ghost dark steel fairy'.split(' ');
   let artworkApplied = 0;
   let artworkLastError = null;
-  const artworkCss = typeFill;
 
-  const TYPES = 'normal fire fighting water flying grass poison electric ground psychic rock ice bug dragon ghost dark steel fairy'.split(' ');
   const THEME_ARTICLE = 'html.yofi-type-theme .page > main article.yofi-type-tinted';
   const CSS_ROOT = `${THEME_ARTICLE}:has(section.moves):is([data-p5ov-artwork-choice],[data-p5ov-fakemon-fallback])`;
+  // ===== TYPE PALETTE: ALL MIX PERCENTAGES TOGETHER =====
+  // These preserve the current Type-theme mixing, without recalibration.
+  // Edit ONLY this one CSS block to tune any type in future.
+  // Percentages refer to the CANONICAL type fraction in each mix.
+  const typePalettePercentCss = `
+    .page > main article {
+      --p5ov-normal-bg-pct: 34%; --p5ov-normal-light-pct: 60%; --p5ov-normal-dark-pct: 60%;
+      --p5ov-fire-bg-pct: 40%; --p5ov-fire-light-pct: 60%; --p5ov-fire-dark-pct: 60%;
+      --p5ov-fighting-bg-pct: 34%; --p5ov-fighting-light-pct: 60%; --p5ov-fighting-dark-pct: 60%;
+      --p5ov-water-bg-pct: 38%; --p5ov-water-light-pct: 60%; --p5ov-water-dark-pct: 60%;
+      --p5ov-flying-bg-pct: 30%; --p5ov-flying-light-pct: 60%; --p5ov-flying-dark-pct: 60%;
+      --p5ov-grass-bg-pct: 32%; --p5ov-grass-light-pct: 60%; --p5ov-grass-dark-pct: 60%;
+      --p5ov-poison-bg-pct: 38%; --p5ov-poison-light-pct: 60%; --p5ov-poison-dark-pct: 60%;
+      --p5ov-electric-bg-pct: 40%; --p5ov-electric-light-pct: 70%; --p5ov-electric-dark-pct: 60%;
+      --p5ov-ground-bg-pct: 40%; --p5ov-ground-light-pct: 60%; --p5ov-ground-dark-pct: 60%;
+      --p5ov-psychic-bg-pct: 32%; --p5ov-psychic-light-pct: 60%; --p5ov-psychic-dark-pct: 60%;
+      --p5ov-rock-bg-pct: 42%; --p5ov-rock-light-pct: 60%; --p5ov-rock-dark-pct: 60%;
+      --p5ov-ice-bg-pct: 40%; --p5ov-ice-light-pct: 60%; --p5ov-ice-dark-pct: 60%;
+      --p5ov-bug-bg-pct: 38%; --p5ov-bug-light-pct: 60%; --p5ov-bug-dark-pct: 60%;
+      --p5ov-dragon-bg-pct: 36%; --p5ov-dragon-light-pct: 60%; --p5ov-dragon-dark-pct: 60%;
+      --p5ov-ghost-bg-pct: 42%; --p5ov-ghost-light-pct: 60%; --p5ov-ghost-dark-pct: 60%;
+      --p5ov-dark-bg-pct: 45%; --p5ov-dark-light-pct: 60%; --p5ov-dark-dark-pct: 60%;
+      --p5ov-steel-bg-pct: 40%; --p5ov-steel-light-pct: 60%; --p5ov-steel-dark-pct: 60%;
+      --p5ov-fairy-bg-pct: 40%; --p5ov-fairy-light-pct: 60%; --p5ov-fairy-dark-pct: 60%;
+    }
+  `;
+  // ===== DERIVED COLORS: EXPLICIT BLOCKS PER TYPE, AFTER PARAMETERS =====
+  // Same formula for each type. Banner/Move alias Light for now; each
+  // alias can receive its own mix formula later without a pair-based rule.
+  // Declared on article so --skin-content resolves in the card theme.
+  const typePaletteMixCss = `
+    /* Normal */
+    .page > main article {
+      --p5ov-normal-base: var(--skin-normal-bg);
+      --p5ov-normal-bg: color-mix(in srgb, var(--p5ov-normal-base) var(--p5ov-normal-bg-pct), var(--skin-content));
+      --p5ov-normal-wash: color-mix(in srgb, var(--p5ov-normal-base) var(--p5ov-normal-bg-pct), transparent);
+      --p5ov-normal-light: color-mix(in srgb, var(--p5ov-normal-base) var(--p5ov-normal-light-pct), white);
+      --p5ov-normal-banner: var(--p5ov-normal-light);
+      --p5ov-normal-move: var(--p5ov-normal-light);
+      --p5ov-normal-dark: color-mix(in srgb, var(--p5ov-normal-base) var(--p5ov-normal-dark-pct), black);
+    }
+
+    /* Fire */
+    .page > main article {
+      --p5ov-fire-base: var(--skin-fire-bg);
+      --p5ov-fire-bg: color-mix(in srgb, var(--p5ov-fire-base) var(--p5ov-fire-bg-pct), var(--skin-content));
+      --p5ov-fire-wash: color-mix(in srgb, var(--p5ov-fire-base) var(--p5ov-fire-bg-pct), transparent);
+      --p5ov-fire-light: color-mix(in srgb, var(--p5ov-fire-base) var(--p5ov-fire-light-pct), white);
+      --p5ov-fire-banner: var(--p5ov-fire-light);
+      --p5ov-fire-move: var(--p5ov-fire-light);
+      --p5ov-fire-dark: color-mix(in srgb, var(--p5ov-fire-base) var(--p5ov-fire-dark-pct), black);
+    }
+
+    /* Fighting */
+    .page > main article {
+      --p5ov-fighting-base: var(--skin-fighting-bg);
+      --p5ov-fighting-bg: color-mix(in srgb, var(--p5ov-fighting-base) var(--p5ov-fighting-bg-pct), var(--skin-content));
+      --p5ov-fighting-wash: color-mix(in srgb, var(--p5ov-fighting-base) var(--p5ov-fighting-bg-pct), transparent);
+      --p5ov-fighting-light: color-mix(in srgb, var(--p5ov-fighting-base) var(--p5ov-fighting-light-pct), white);
+      --p5ov-fighting-banner: var(--p5ov-fighting-light);
+      --p5ov-fighting-move: var(--p5ov-fighting-light);
+      --p5ov-fighting-dark: color-mix(in srgb, var(--p5ov-fighting-base) var(--p5ov-fighting-dark-pct), black);
+    }
+
+    /* Water */
+    .page > main article {
+      --p5ov-water-base: var(--skin-water-bg);
+      --p5ov-water-bg: color-mix(in srgb, var(--p5ov-water-base) var(--p5ov-water-bg-pct), var(--skin-content));
+      --p5ov-water-wash: color-mix(in srgb, var(--p5ov-water-base) var(--p5ov-water-bg-pct), transparent);
+      --p5ov-water-light: color-mix(in srgb, var(--p5ov-water-base) var(--p5ov-water-light-pct), white);
+      --p5ov-water-banner: var(--p5ov-water-light);
+      --p5ov-water-move: var(--p5ov-water-light);
+      --p5ov-water-dark: color-mix(in srgb, var(--p5ov-water-base) var(--p5ov-water-dark-pct), black);
+    }
+
+    /* Flying */
+    .page > main article {
+      --p5ov-flying-base: var(--skin-flying-bg);
+      --p5ov-flying-bg: color-mix(in srgb, var(--p5ov-flying-base) var(--p5ov-flying-bg-pct), var(--skin-content));
+      --p5ov-flying-wash: color-mix(in srgb, var(--p5ov-flying-base) var(--p5ov-flying-bg-pct), transparent);
+      --p5ov-flying-light: color-mix(in srgb, var(--p5ov-flying-base) var(--p5ov-flying-light-pct), white);
+      --p5ov-flying-banner: var(--p5ov-flying-light);
+      --p5ov-flying-move: var(--p5ov-flying-light);
+      --p5ov-flying-dark: color-mix(in srgb, var(--p5ov-flying-base) var(--p5ov-flying-dark-pct), black);
+    }
+
+    /* Grass */
+    .page > main article {
+      --p5ov-grass-base: var(--skin-grass-bg);
+      --p5ov-grass-bg: color-mix(in srgb, var(--p5ov-grass-base) var(--p5ov-grass-bg-pct), var(--skin-content));
+      --p5ov-grass-wash: color-mix(in srgb, var(--p5ov-grass-base) var(--p5ov-grass-bg-pct), transparent);
+      --p5ov-grass-light: color-mix(in srgb, var(--p5ov-grass-base) var(--p5ov-grass-light-pct), white);
+      --p5ov-grass-banner: var(--p5ov-grass-light);
+      --p5ov-grass-move: var(--p5ov-grass-light);
+      --p5ov-grass-dark: color-mix(in srgb, var(--p5ov-grass-base) var(--p5ov-grass-dark-pct), black);
+    }
+
+    /* Poison */
+    .page > main article {
+      --p5ov-poison-base: var(--skin-poison-bg);
+      --p5ov-poison-bg: color-mix(in srgb, var(--p5ov-poison-base) var(--p5ov-poison-bg-pct), var(--skin-content));
+      --p5ov-poison-wash: color-mix(in srgb, var(--p5ov-poison-base) var(--p5ov-poison-bg-pct), transparent);
+      --p5ov-poison-light: color-mix(in srgb, var(--p5ov-poison-base) var(--p5ov-poison-light-pct), white);
+      --p5ov-poison-banner: var(--p5ov-poison-light);
+      --p5ov-poison-move: var(--p5ov-poison-light);
+      --p5ov-poison-dark: color-mix(in srgb, var(--p5ov-poison-base) var(--p5ov-poison-dark-pct), black);
+    }
+
+    /* Electric */
+    .page > main article {
+      --p5ov-electric-base: var(--skin-electric-bg);
+      --p5ov-electric-bg: color-mix(in srgb, var(--p5ov-electric-base) var(--p5ov-electric-bg-pct), var(--skin-content));
+      --p5ov-electric-wash: color-mix(in srgb, var(--p5ov-electric-base) var(--p5ov-electric-bg-pct), transparent);
+      --p5ov-electric-light: color-mix(in srgb, var(--p5ov-electric-base) var(--p5ov-electric-light-pct), white);
+      --p5ov-electric-banner: var(--p5ov-electric-light);
+      --p5ov-electric-move: var(--p5ov-electric-light);
+      --p5ov-electric-dark: color-mix(in srgb, var(--p5ov-electric-base) var(--p5ov-electric-dark-pct), black);
+    }
+
+    /* Ground */
+    .page > main article {
+      --p5ov-ground-base: var(--skin-ground-bg);
+      --p5ov-ground-bg: color-mix(in srgb, var(--p5ov-ground-base) var(--p5ov-ground-bg-pct), var(--skin-content));
+      --p5ov-ground-wash: color-mix(in srgb, var(--p5ov-ground-base) var(--p5ov-ground-bg-pct), transparent);
+      --p5ov-ground-light: color-mix(in srgb, var(--p5ov-ground-base) var(--p5ov-ground-light-pct), white);
+      --p5ov-ground-banner: var(--p5ov-ground-light);
+      --p5ov-ground-move: var(--p5ov-ground-light);
+      --p5ov-ground-dark: color-mix(in srgb, var(--p5ov-ground-base) var(--p5ov-ground-dark-pct), black);
+    }
+
+    /* Psychic */
+    .page > main article {
+      --p5ov-psychic-base: var(--skin-psychic-bg);
+      --p5ov-psychic-bg: color-mix(in srgb, var(--p5ov-psychic-base) var(--p5ov-psychic-bg-pct), var(--skin-content));
+      --p5ov-psychic-wash: color-mix(in srgb, var(--p5ov-psychic-base) var(--p5ov-psychic-bg-pct), transparent);
+      --p5ov-psychic-light: color-mix(in srgb, var(--p5ov-psychic-base) var(--p5ov-psychic-light-pct), white);
+      --p5ov-psychic-banner: var(--p5ov-psychic-light);
+      --p5ov-psychic-move: var(--p5ov-psychic-light);
+      --p5ov-psychic-dark: color-mix(in srgb, var(--p5ov-psychic-base) var(--p5ov-psychic-dark-pct), black);
+    }
+
+    /* Rock */
+    .page > main article {
+      --p5ov-rock-base: var(--skin-rock-bg);
+      --p5ov-rock-bg: color-mix(in srgb, var(--p5ov-rock-base) var(--p5ov-rock-bg-pct), var(--skin-content));
+      --p5ov-rock-wash: color-mix(in srgb, var(--p5ov-rock-base) var(--p5ov-rock-bg-pct), transparent);
+      --p5ov-rock-light: color-mix(in srgb, var(--p5ov-rock-base) var(--p5ov-rock-light-pct), white);
+      --p5ov-rock-banner: var(--p5ov-rock-light);
+      --p5ov-rock-move: var(--p5ov-rock-light);
+      --p5ov-rock-dark: color-mix(in srgb, var(--p5ov-rock-base) var(--p5ov-rock-dark-pct), black);
+    }
+
+    /* Ice */
+    .page > main article {
+      --p5ov-ice-base: var(--skin-ice-bg);
+      --p5ov-ice-bg: color-mix(in srgb, var(--p5ov-ice-base) var(--p5ov-ice-bg-pct), var(--skin-content));
+      --p5ov-ice-wash: color-mix(in srgb, var(--p5ov-ice-base) var(--p5ov-ice-bg-pct), transparent);
+      --p5ov-ice-light: color-mix(in srgb, var(--p5ov-ice-base) var(--p5ov-ice-light-pct), white);
+      --p5ov-ice-banner: var(--p5ov-ice-light);
+      --p5ov-ice-move: var(--p5ov-ice-light);
+      --p5ov-ice-dark: color-mix(in srgb, var(--p5ov-ice-base) var(--p5ov-ice-dark-pct), black);
+    }
+
+    /* Bug */
+    .page > main article {
+      --p5ov-bug-base: var(--skin-bug-bg);
+      --p5ov-bug-bg: color-mix(in srgb, var(--p5ov-bug-base) var(--p5ov-bug-bg-pct), var(--skin-content));
+      --p5ov-bug-wash: color-mix(in srgb, var(--p5ov-bug-base) var(--p5ov-bug-bg-pct), transparent);
+      --p5ov-bug-light: color-mix(in srgb, var(--p5ov-bug-base) var(--p5ov-bug-light-pct), white);
+      --p5ov-bug-banner: var(--p5ov-bug-light);
+      --p5ov-bug-move: var(--p5ov-bug-light);
+      --p5ov-bug-dark: color-mix(in srgb, var(--p5ov-bug-base) var(--p5ov-bug-dark-pct), black);
+    }
+
+    /* Dragon */
+    .page > main article {
+      --p5ov-dragon-base: var(--skin-dragon-bg);
+      --p5ov-dragon-bg: color-mix(in srgb, var(--p5ov-dragon-base) var(--p5ov-dragon-bg-pct), var(--skin-content));
+      --p5ov-dragon-wash: color-mix(in srgb, var(--p5ov-dragon-base) var(--p5ov-dragon-bg-pct), transparent);
+      --p5ov-dragon-light: color-mix(in srgb, var(--p5ov-dragon-base) var(--p5ov-dragon-light-pct), white);
+      --p5ov-dragon-banner: var(--p5ov-dragon-light);
+      --p5ov-dragon-move: var(--p5ov-dragon-light);
+      --p5ov-dragon-dark: color-mix(in srgb, var(--p5ov-dragon-base) var(--p5ov-dragon-dark-pct), black);
+    }
+
+    /* Ghost */
+    .page > main article {
+      --p5ov-ghost-base: var(--skin-ghost-bg);
+      --p5ov-ghost-bg: color-mix(in srgb, var(--p5ov-ghost-base) var(--p5ov-ghost-bg-pct), var(--skin-content));
+      --p5ov-ghost-wash: color-mix(in srgb, var(--p5ov-ghost-base) var(--p5ov-ghost-bg-pct), transparent);
+      --p5ov-ghost-light: color-mix(in srgb, var(--p5ov-ghost-base) var(--p5ov-ghost-light-pct), white);
+      --p5ov-ghost-banner: var(--p5ov-ghost-light);
+      --p5ov-ghost-move: var(--p5ov-ghost-light);
+      --p5ov-ghost-dark: color-mix(in srgb, var(--p5ov-ghost-base) var(--p5ov-ghost-dark-pct), black);
+    }
+
+    /* Dark */
+    .page > main article {
+      --p5ov-dark-base: var(--skin-dark-bg);
+      --p5ov-dark-bg: color-mix(in srgb, var(--p5ov-dark-base) var(--p5ov-dark-bg-pct), var(--skin-content));
+      --p5ov-dark-wash: color-mix(in srgb, var(--p5ov-dark-base) var(--p5ov-dark-bg-pct), transparent);
+      --p5ov-dark-light: color-mix(in srgb, var(--p5ov-dark-base) var(--p5ov-dark-light-pct), white);
+      --p5ov-dark-banner: var(--p5ov-dark-light);
+      --p5ov-dark-move: var(--p5ov-dark-light);
+      --p5ov-dark-dark: color-mix(in srgb, var(--p5ov-dark-base) var(--p5ov-dark-dark-pct), black);
+    }
+
+    /* Steel */
+    .page > main article {
+      --p5ov-steel-base: var(--skin-steel-bg);
+      --p5ov-steel-bg: color-mix(in srgb, var(--p5ov-steel-base) var(--p5ov-steel-bg-pct), var(--skin-content));
+      --p5ov-steel-wash: color-mix(in srgb, var(--p5ov-steel-base) var(--p5ov-steel-bg-pct), transparent);
+      --p5ov-steel-light: color-mix(in srgb, var(--p5ov-steel-base) var(--p5ov-steel-light-pct), white);
+      --p5ov-steel-banner: var(--p5ov-steel-light);
+      --p5ov-steel-move: var(--p5ov-steel-light);
+      --p5ov-steel-dark: color-mix(in srgb, var(--p5ov-steel-base) var(--p5ov-steel-dark-pct), black);
+    }
+
+    /* Fairy */
+    .page > main article {
+      --p5ov-fairy-base: var(--skin-fairy-bg);
+      --p5ov-fairy-bg: color-mix(in srgb, var(--p5ov-fairy-base) var(--p5ov-fairy-bg-pct), var(--skin-content));
+      --p5ov-fairy-wash: color-mix(in srgb, var(--p5ov-fairy-base) var(--p5ov-fairy-bg-pct), transparent);
+      --p5ov-fairy-light: color-mix(in srgb, var(--p5ov-fairy-base) var(--p5ov-fairy-light-pct), white);
+      --p5ov-fairy-banner: var(--p5ov-fairy-light);
+      --p5ov-fairy-move: var(--p5ov-fairy-light);
+      --p5ov-fairy-dark: color-mix(in srgb, var(--p5ov-fairy-base) var(--p5ov-fairy-dark-pct), black);
+    }
+
+  `;
   const style = document.createElement('style');
   const typeLinkRules = TYPES.map(type => `
     .page > main article > .scrollable a.yofi-typed-detail-link[data-yofi-target-type="${type}"] {
@@ -348,14 +549,14 @@
     ${THEME_ARTICLE}:not(:has(section.moves))[data-yofi-tint-type="${type}"] {
       --p5ov-primary: var(--skin-${type}-bg);
       --p5ov-top-primary: var(--skin-${type}-bg);
-      --p5ov-body-ink: color-mix(in srgb, var(--skin-${type}-bg) 60%, black 40%);
-      --p5ov-banner-ink: color-mix(in srgb, var(--skin-${type}-bg) 60%, black 40%);
-      --p5ov-tint-native-color: var(--skin-${type}-bg);
-      --p5ov-surface: color-mix(in srgb, var(--skin-${type}-bg) ${(ARTWORK_TINT_ALPHA_BY_TYPE[type] ?? .34) * 100}%, var(--skin-content) ${(1 - (ARTWORK_TINT_ALPHA_BY_TYPE[type] ?? .34)) * 100}%);
+      --p5ov-body-ink: ${typeVar(type,'dark')};
+      --p5ov-banner-ink: ${typeVar(type,'dark')};
+      --p5ov-tint-native-color: ${svTypeColor(type)};
+      --p5ov-surface: ${typeVar(type,'bg')};
       /* Monotypes use the same per-type tint strength as indexed dual types.
          This separate wash is intentionally not --yofi-entry-type-wash:
          the QoL script continually resets that variable to 23%. */
-      --p5ov-mono-tint-wash: ${tintWash(type, ARTWORK_TINT_ALPHA_BY_TYPE[type] ?? .34)};
+      --p5ov-mono-tint-wash: ${typeVar(type,'wash')};
     }
     /* The base script reads the type badge background to decorate the lead.
        Our transparent badge obscures that read, so restore the ORIGINAL
@@ -370,7 +571,8 @@
   `).join('\n');
   const moveFillRules = TYPES.map(type => `
     ${CSS_ROOT} > .scrollable section.moves dd ul > li > a[data-yofi-target-type="${type}"] {
-      --p5ov-move-fill: ${typeFill(type)};
+      --p5ov-move-fill: ${typeVar(type,'move')};
+      --p5ov-move-ink: ${typeVar(type,'dark')};
     }
   `).join('\n');
   const darkPaletteRules = TYPES.map(type => `
@@ -381,6 +583,8 @@
   `).join('\n');
   style.textContent = `
     /* QOL defines the universal S/V type palette, including Dark mode. */
+    ${typePalettePercentCss}
+    ${typePaletteMixCss}
     .yofi-native-theme-item button { cursor: pointer; border: 0;
       font: inherit; background: transparent; color: var(--skin-bg-text);
       display: flex; flex-direction: column; align-items: center; gap: .5em;
@@ -460,7 +664,7 @@
     }
 
     /* Type ink applies to card prose and standard information labels only.
-       Monotypes use their own type; indexed dual types use the artwork-selected BACKGROUND TINT type.
+       Monotypes use their own type; indexed dual types use the reviewed backgroundType.
        Do not alter move pills, effectiveness badges, native header or lead. */
     ${CSS_ROOT} > .scrollable {
       color: var(--p5ov-body-ink) !important;
@@ -514,12 +718,12 @@
       text-decoration-color: currentColor !important;
     }
 
-    /* Fakémon use primary banners and secondary background tint
+    /* Fakémon temporarily retain primary banners and secondary background tint
        and exactly its configured wash. The previous :not(:has(.right)) gate
        accidentally left every unindexed DUAL Fakemon on the QoL 23% wash:
        Rock/Steel Rookite differed from Rock Minereon, and Normal/Rock
-       Rocking differed from Normal Veeveon. Artwork-indexed Pokemon retain
-       their own (potentially opposite-type) wash below. */
+       Rocking differed from Normal Veeveon. Original Pokemon now use
+       the reviewed backgroundType wash below. */
     ${CSS_ROOT}[data-p5ov-fakemon-fallback],
     ${CSS_ROOT}[data-p5ov-fakemon-fallback] > .scrollable {
       background: linear-gradient(var(--p5ov-mono-tint-wash), var(--p5ov-mono-tint-wash)), var(--skin-content) !important;
@@ -536,9 +740,9 @@
       color: #fff !important;
     }
 
-    /* Native Poké5e artwork choice: only the section banners + card surface.
-       The header keeps --p5ov-primary/secondary in ORIGINAL type order.
-       Monotypes use their sole type; Fakémon use primary banners and secondary tint. */
+    /* Original Pokemon backgroundType determines card tint, with the other
+       type on banners; native header keeps its ORIGINAL type order.
+       Monotypes stay single-type, Fakemon keep their existing fallback. */
     ${CSS_ROOT}[data-p5ov-artwork-choice] > .scrollable section h2::before {
       background: var(--p5ov-art-banner-color) !important;
     }
@@ -662,7 +866,7 @@
       border: 0 !important;
       border-radius: 999px !important;
       background: var(--p5ov-move-fill, color-mix(in srgb, var(--p5ov-move-color) 60%, white 40%)) !important;
-      color: color-mix(in srgb, var(--p5ov-move-color) 60%, black 40%) !important;
+      color: var(--p5ov-move-ink, color-mix(in srgb, var(--p5ov-move-color) 60%, black 40%)) !important;
       font-size: .91em !important;
       font-weight: 600 !important;
       line-height: 1.12 !important;
@@ -922,42 +1126,46 @@
     const actual = [...card.querySelectorAll(':scope > header .type-tag > .type')]
       .map(headerTypeName).filter(Boolean);
     if (!actual.length) return;
-    let selection = identity.group === 'pokemon' && (actual.length === 1
-      ? [actual[0], null, actual[0], actual[0]] : ARTWORK_TYPE_CHOICES[identity.id]);
-    if (identity.group === 'pokemon' && !selection) {
-      artworkLastError = `Missing original artwork choice: ${identity.id}`;
-      if (!reportedMissingChoices.has(identity.id)) {
-        reportedMissingChoices.add(identity.id);
-        console.error('[P5 Theme Overlay]', artworkLastError);
+    let primary = actual[0];
+    let secondary = actual[1] || null;
+    let backgroundType;
+    let banner;
+    if (identity.group === 'pokemon') {
+      backgroundType = secondary ? ORIGINAL_POKEMON_BACKGROUND_TYPES[identity.id] : primary;
+      if (!backgroundType || !actual.includes(backgroundType)) {
+        artworkLastError = `Invalid/missing original backgroundType: ${identity.id}`;
+        if (!reportedMissingChoices.has(identity.id)) {
+          reportedMissingChoices.add(identity.id);
+          console.error('[P5 Theme Overlay]', artworkLastError);
+        }
+        clearArtworkChoice(card);
+        return;
       }
-      clearArtworkChoice(card);
-      return;
+      banner = secondary ? actual.find(type => type !== backgroundType) : primary;
+    } else {
+      // Fakemon: unchanged primary banner/secondary tint until creator choice
+      // and native cross-device persistence are implemented separately.
+      banner = primary;
+      backgroundType = secondary || primary;
     }
-    if (identity.group === 'fakemon') {
-      // Fakémon are not indexed: primary banners, secondary (or sole) type tint.
-      selection = [actual[0], actual[1] || null, actual[0], actual[1] || actual[0]];
-    }
-    const [primary, secondary, banner, tint] = selection;
-    if (actual.length !== (secondary ? 2 : 1) || actual[0] !== primary ||
-        (secondary && actual[1] !== secondary)) return;
+    const tint = backgroundType;
     const choiceKey = `${identity.key}:${primary}/${secondary || ''}:${banner}/${tint}`;
     if (card.dataset.p5ovArtworkChoice === choiceKey ||
         card.dataset.p5ovFakemonFallback === choiceKey) return;
-    const alpha = ARTWORK_TINT_ALPHA_BY_TYPE[tint] ?? .34;
     // Commit a complete palette once, independent of image load/src mutations.
     card.style.setProperty('--p5ov-primary', svTypeColor(primary));
     card.style.setProperty('--p5ov-top-primary', svTypeColor(primary));
     card.style.setProperty('--p5ov-top-secondary', svTypeColor(secondary || primary));
-    const bannerFill = artworkCss(banner);
+    const bannerFill = typeVar(banner,'banner');
     card.style.setProperty('--p5ov-secondary', bannerFill);
     card.style.setProperty('--p5ov-art-banner-color', bannerFill);
-    const bannerInk = `color-mix(in srgb, ${svTypeColor(banner)} 60%, black 40%)`;
+    const bannerInk = typeVar(banner,'dark');
     card.style.setProperty('--p5ov-art-banner-ink', bannerInk);
     card.style.setProperty('--p5ov-banner-ink', bannerInk);
-    card.style.setProperty('--p5ov-body-ink', `color-mix(in srgb, ${svTypeColor(tint)} 60%, black 40%)`);
+    card.style.setProperty('--p5ov-body-ink', typeVar(tint,'dark'));
     card.style.setProperty('--p5ov-tint-native-color', svTypeColor(tint));
-    card.style.setProperty('--p5ov-surface', `color-mix(in srgb, ${svTypeColor(tint)} ${alpha * 100}%, var(--skin-content) ${100 - alpha * 100}%)`);
-    const wash = tintWash(tint, alpha);
+    card.style.setProperty('--p5ov-surface', typeVar(tint,'bg'));
+    const wash = typeVar(tint,'wash');
     card.style.setProperty('--p5ov-art-tint-wash', wash);
     card.style.setProperty('--p5ov-mono-tint-wash', wash);
     card.removeAttribute(identity.group === 'fakemon' ? 'data-p5ov-artwork-choice' : 'data-p5ov-fakemon-fallback');
@@ -988,7 +1196,7 @@
       // Color only: TM measurement remains in the normal scheduled pass.
       processCardColors(card, mode());
     } catch (error) {
-      console.warn('[P5 Theme Overlay v0.3.49] Incoming-card color sync failed:', error);
+      console.warn('[P5 Theme Overlay v0.3.50] Incoming-card color sync failed:', error);
     }
   }
   document.addEventListener(PRE_REVEAL_EVENT, prepareSpeciesCardBeforeReveal);
@@ -1004,7 +1212,7 @@
       lastError = null;
     } catch (error) {
       lastError = String(error?.stack || error);
-      console.error('[P5 Theme Overlay v0.3.49]', error);
+      console.error('[P5 Theme Overlay v0.3.50]', error);
     }
   }
   function schedule() {
@@ -1061,7 +1269,7 @@
   document.fonts?.ready?.then(() => { if (!stopped) whenFontsChange(); });
   document.fonts?.addEventListener?.('loadingdone', whenFontsChange);
   window[KEY] = {
-    version:'0.3.49', stop, refresh:apply,
+    version:'0.3.50', stop, refresh:apply,
     diagnose() {
       const all = cards();
       const a = all.find(card => card.getClientRects().length && card.getBoundingClientRect().width > 0) || all[0];
@@ -1073,7 +1281,7 @@
       const genderless = a?.querySelector('.yofi-hero-gender .gender-ratio-display:has(> .bar.genderless)');
       const genderlessLabel = genderless?.querySelector('.yofi-gender-center-label');
       return {
-        version:'0.3.49', themeMode, nativeMode:window.__yofiQolThemeBridge?.mode?.(), heroActive:!!a?.classList.contains('lab3-active'), heroScoresVisible:!!a?.classList.contains('lab3-scores'), heroAbilitiesVisible:!!a?.classList.contains('lab3-abilities'), artworkApplied, artworkIndexed:Object.keys(ARTWORK_TYPE_CHOICES).length, artworkSpeciesId:a && speciesIdentity(a)?.id, artworkChoice:a?.dataset.p5ovArtworkChoice || null, artworkSelected:a?.dataset.p5ovArtworkChoice && ARTWORK_TYPE_CHOICES[speciesIdentity(a)?.id] || null, artworkError:artworkLastError, cardCount:all.length, theme:mode(),
+        version:'0.3.50', themeMode, nativeMode:window.__yofiQolThemeBridge?.mode?.(), heroActive:!!a?.classList.contains('lab3-active'), heroScoresVisible:!!a?.classList.contains('lab3-scores'), heroAbilitiesVisible:!!a?.classList.contains('lab3-abilities'), artworkApplied, artworkIndexed:Object.keys(ORIGINAL_POKEMON_BACKGROUND_TYPES).length, artworkSpeciesId:a && speciesIdentity(a)?.id, artworkChoice:a?.dataset.p5ovArtworkChoice || null, artworkSelected:a?.dataset.p5ovArtworkChoice && ORIGINAL_POKEMON_BACKGROUND_TYPES[speciesIdentity(a)?.id] || null, backgroundType:a && speciesIdentity(a)?.group === 'pokemon' && (ORIGINAL_POKEMON_BACKGROUND_TYPES[speciesIdentity(a)?.id] || null), artworkError:artworkLastError, cardCount:all.length, theme:mode(),
         tinted:!!a?.classList.contains('yofi-type-tinted'),
         computedBodyInk:a?.querySelector(':scope > .scrollable') && getComputedStyle(a.querySelector(':scope > .scrollable')).color,
         computedBannerInk:h && getComputedStyle(h).color,
@@ -1122,6 +1330,6 @@
   setThemeMode(themeMode);
   document.addEventListener('change', onNativeThemeChange, true);
   apply();
-  console.info('[P5 Theme Overlay v0.3.49 - Native Theme Targets] installed');
+  console.info('[P5 Theme Overlay v0.3.50 - Native Theme Targets] installed');
   } // runThemeOverlay
 })();
