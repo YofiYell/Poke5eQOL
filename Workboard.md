@@ -10,59 +10,77 @@ These are working development candidates. Presence in GitHub does not establish 
 
 ART — Artwork Intelligence
 
-ART-COLOR — Dual-type color selection
+Current agreed scope (supersedes the earlier ART-02-R01 runtime color-selection plan)
 
-Status: Discussing optimization; existing implementation candidate available.
+* Analyze **normal/main portrait** artwork only for Fakémon subject geometry, including monotypes. Never analyze shiny artwork for geometry or color.
+* **Do not scan artwork to determine Fakémon theme colors.** A Fakémon creator selects its background type in the native create/edit workflow; persistence and exact editor integration still need implementation and verification.
+* The 613 original dual-type Pokémon/form assignments come from a **completed offline** color-analysis dataset, to be finalized through manual review. Original Pokémon do not require runtime color scanning.
+* Separate species color assignment from type-palette mixing and from the actual presentation surfaces. Theme Overlay owns presentation; Artwork Intelligence owns normal-portrait geometry/acquisition/analysis metadata; QoL owns canonical type colors.
+* The aim for geometry-dependent UI is correct **initial** presentation, not visible late corrections. ART-02-R01 remains a working geometry implementation candidate, not authority to retain obsolete color-processing, masks, or workers.
+* Keep monotype presentation and the existing functionality of all three established scripts intact until a replacement is separately implemented and verified.
+
+ART-COLOR — Offline color decisions and retirement of runtime scanning
+
+Status: Requirements revised; runtime Fakémon color scanner retired from the target design. No production migration or editor integration yet.
 
 Requirements
 
-* Analyze only normal/main artwork.
-* Perform color selection only for dual-type Fakémon.
-* Determine which of the two type colors best represents the artwork.
-* Preserve existing single-type styling and official Pokémon decisions.
-* Reduce scan time substantially from the observed 569 ms.
-* Compare direct type-color matching against existing scanner results before selecting a replacement.
+* Treat the full original-Pokémon offline analysis as a **one-time seed**, not a runtime dependency. The selected baseline is Hue/Saturation + Neutral Lightness, covering 613 dual-type original Pokémon/forms. Preserve its exact result set for review rather than rerunning or silently changing its choices.
+* Manual review may override that seed for visual composition, contrast or form identity. Preserve the user's current local selections and exported corrections when migrating.
+* The earlier `matchedType` and temporary review-script `visualType` describe the history of the data. **`backgroundType` is the proposed durable name** for the final meaning: which of a species' types supplies its card background; confirm/export-migrate that name before deploying permanent consumers.
+* Default intended presentation: **backgroundType supplies the tint, the other type supplies the section banners**. Keep assignment and placement separately modeled; the temporary reviewer allows a global tint/banner inversion for comparison without mutating stored assignments.
+* A Fakémon's background type is **creator-selected**, limited to its actual typing, via Fakémon create/edit. Determine and test native persistence, cross-device behavior, missing/changed types, and preservation of existing notes. Monotypes require no choice.
+* Remove or disable color-only image analysis, per-pixel scoring, workers, caches, prefetch jobs, APIs and tests as part of a verified ART cleanup; do not retain them as unnecessary parallel systems. Keep reproducible historical datasets and comparisons when useful, without executing color scans in production.
+* **No per-type-pair mixing or corrections**: Fire's presentation is identical whether paired with Flying, Dark, Dragon or anything else. A Pokémon-specific backgroundType selection is allowed; a pair-specific color formula is not.
 
-Unresolved: Final scoring algorithm and acceptable differences from the Python reference.
+Remaining: Native Fakémon editor persistence, ART geometry integration, and retirement of runtime ART color-scoring code. Original-Pokémon assignments and the per-type palette are accepted and integrated into the dev branch as exact v0.3.50 (commit 41179f9a); no further color-scoring algorithm work is required.
 
 ART-GEO — Subject geometry
 
-Status: Implemented; simplification under discussion.
+Status: Existing full-canvas mask candidate implemented; required exterior-contour implementation **not yet complete**.
 
 Requirements
 
-* Analyze normal artwork for all Fakémon.
-* Determine whether a usable transparent background exists.
-* Calculate actual visible-content bounds.
-* Extract accurate exterior subject contours, including detached details.
-* No need to preserve interior holes for overlap decisions.
-* Avoid unnecessary permanent pixel-mask and pixel-by-pixel collision machinery.
-* Use dependable fallback for opaque artwork.
+* Analyze normal/main artwork for **all Fakémon**, including monotypes, independently of whether a color decision is needed.
+* Determine whether transparent alpha provides a usable subject/background separation; expose a simple usable-transparency Boolean and appropriate diagnostics.
+* Compute actual visible subject bounds rather than fitting the usually-square natural canvas. Validate which alpha threshold represents visible artwork without losing meaningful fine details.
+* Trace and retain faithful **exterior** subject outline paths, including narrow extensions and detached pieces. Do not simplify away details needed to protect other card content.
+* **Interior holes are not required** for overlap decisions or stored contour data; do not compute/persist them merely to satisfy the old ART-02 mask contract.
+* Do not require a permanent full-canvas bitmask or pixel-by-pixel affine collision engine when exterior contours meet the production needs. A temporary pixel mask used during accurate outline extraction is acceptable.
+* Map outline coordinates to the actual rendered scale and position for lightweight contour/rectangle clearance tests; do not repeatedly inspect individual source pixels when placing the shiny control.
+* If subject isolation is unreliable (for example an opaque background), retain dependable existing fitting/placement behavior without speculative segmentation. Do not fall back to runtime color scanning.
+
+Retire obsolete packed-mask, interior-hole and per-pixel collision runtime paths and tests when a verified replacement makes them unnecessary. Preserve tests that validate the retained exact exterior-outline behavior.
 
 ART-PREFETCH — Anticipatory analysis
 
-Status: Planned; approach under discussion.
+Status: Planned; three-priority scheduling approach agreed in principle, not yet implemented.
 
 Requirements
 
-* Analyze artwork before the user opens a card wherever possible.
-* Consider list-based idle analysis, hover/focus prioritization, and neighboring Fakémon.
-* Prioritize user interaction over background processing.
-* Avoid duplicate work, excessive requests, or repeated analysis of cached images.
-* Preserve responsiveness throughout.
+* Produce **geometry** metadata before a card is clicked whenever possible, so subject-aware fitting and decoration can be ready on first reveal; theme assignments do not wait on ART.
+* Access species read keys directly from the native Fakémon list without opening each detail card; resolve normal portrait URLs and ordered types through the existing read-only `get_fakemon` pathway.
+* Use **one bounded, deduplicating priority queue**: (1) pointer hover/dwell, keyboard focus and feasible touch intent; (2) previous and next entries in the actual list order while a card is open; (3) idle warming of uncached Fakémon from the list.
+* Promote an already queued job rather than creating a duplicate. Keep scan and fetch concurrency conservative, prioritize interaction, and suspend/defer low-priority work during active loading or resource pressure.
+* Avoid repeatedly validating or scanning unchanged artwork in one session. Prefer reusing existing native/QoL response work where safely available, without making ART depend on QoL.
+* Preserve normal card/list responsiveness and avoid eager site-wide bulk scanning when no relevant Fakémon list/context has been entered.
+* Confirm real list lifecycle, read-key extraction, network/CORS behavior and queue effectiveness in a target browser; no native detail-card opening is required for artwork retrieval.
 
-ART-CACHE — Persistent analysis records
+Open implementation details: exact event attachment to the list, idle budget, concurrency limit and touch behavior. These are to be measured rather than guessed.
 
-Status: Implemented; browser acceptance outstanding.
+ART-CACHE — Persistent geometry analysis records
+
+Status: Initial IndexedDB/snapshot candidate implemented; streamline to geometry-only records and verify in a real browser.
 
 Requirements
 
-* Use species ID as the record identity.
-* Persist successful artwork metadata.
-* Reuse previous results without unnecessary rescanning.
-* Revalidate after refresh while retaining successful cached results.
-* Preserve last-good decisions on failure.
-* Avoid recomputation from shiny toggles or resizing.
+* Use the existing Fakémon species ID alone as the lookup identity within its namespace; source URL, source hash and geometry-analysis version remain record metadata.
+* Cache successful **normal-artwork geometry** for every Fakémon, including monotypes. Do not cache or compute runtime artwork-derived type-color choices.
+* Coordinate one stable initial geometry presentation from validated results already available; no late repositioning flashes.
+* Reuse successful geometry without rescanning; revalidate authoritative normal artwork as needed while preserving last-good results on failures, interruptions or storage denial.
+* Avoid recomputation from shiny toggles, viewport resizing, theme changes or same-session navigation. Respond to size changes using previously extracted geometry.
+* Migrate obsolete color and full-canvas mask records, diagnostics and tests only when the replacement geometry format and compatibility path have been verified. Keep synchronous snapshots small and canonical records in IndexedDB.
+* Creator-selected backgroundType persistence belongs to species/editing data, **not** to the artwork-analysis cache.
 
 ART-MODULE — Standalone Artwork Intelligence userscript
 
@@ -71,7 +89,7 @@ Status: Implemented; integration and browser acceptance outstanding.
 Requirements
 
 * Keep Artwork Intelligence independent of QoL, Species Card and Theme Overlay.
-* Own artwork acquisition, analysis, records, geometry data and recommendations.
+* Own normal-artwork acquisition, geometry analysis, geometry records and layout recommendations; not color selection.
 * Expose a versioned, read-only public API for consumers.
 * Do not independently modify cards, shiny controls, theme styles or navigation.
 * Permit existing scripts to initialize and operate without Artwork Intelligence.
@@ -99,64 +117,69 @@ Current implementation: ART-02-R01 includes an independent acquisition coordinat
 
 ART-INTEGRATION — Shared analysis consumers
 
-Status: Planned; no consumer integration committed at the verified HEAD.
+Status: Planned; ART geometry consumer integration not yet committed.
 
 Requirements
 
-* Theme Overlay consumes verified Fakémon color decisions.
-* Species Card consumes reliable subject bounds and geometry.
-* QoL optionally consumes shiny-icon corner recommendations.
-* Keep all display, interaction and styling responsibilities with their existing script owners.
-* Reject metadata belonging to an outgoing species, outdated artwork source or incompatible analysis revision.
-* Publish complete successful analysis updates atomically.
-* Prevent partial color or geometry changes during card presentation.
-* Do not require consumers to decode or scan the same source pixels independently.
-* Preserve existing behavior when Artwork Intelligence is absent, incomplete or unsuccessful.
+* Theme Overlay consumes **static original-Pokémon backgroundType assignments** and separately persisted, creator-selected Fakémon backgroundType; neither color source depends on an ART image scan.
+* Species Card consumes reliable visible bounds, exterior outlines and effective composition bounds for hero scaling/positioning and decorative overlap.
+* QoL consumes optional shiny-icon corner recommendations without relinquishing the button or manual preferences.
+* Geometry may load or finish independently of native type/theme data. A failed or missing ART result must not prevent theme styling, navigation or shiny operation.
+* The card's **geometry presentation** must be coherent: use compatible completed geometry results before first reveal where available, and avoid a visible second-pass jump while the card remains onscreen.
+* Reject outgoing-species, stale artwork, mismatched identities and incompatible analysis revisions; keep last-good geometry while revalidating in the background.
+* Existing script owners retain all display, interaction and styling responsibilities. Consumers do not independently fetch or reanalyze source pixels.
+* Preserve normal standalone behavior when Artwork Intelligence is absent, incomplete or unsuccessful, without hiding loading defects behind replacement cards or corrective flashes.
+
+The cold direct-link / immediate uncached-click geometry policy remains unresolved; instant correct subject-aware fitting cannot be guaranteed before the source is available.
 
 ART-QOL — Optional shiny-control enhancement
 
-Status: Ready; consumer integration not implemented.
+Status: Planned; design requirements settled, integration awaits exterior-contour geometry.
 
 Requirements
 
 * QoL remains the sole owner of the shiny button, toggle, manual positions and saved preferences.
-* Artwork Intelligence must enhance the shiny button, never become a dependency of it.
+* Artwork Intelligence enhances the shiny button but must never become a dependency of it.
 * Without Artwork Intelligence, preserve all existing shiny functionality.
 * Apply preference precedence: explicit manual corner → valid automatic recommendation → existing top-right fallback.
 * Distinguish an absent manual preference from the default returned by savedPortraitCorner().
-* Never override any of the four unrestricted manual corner choices.
-* Recalculate recommendations when relevant rendered geometry changes, without rescanning the image.
-* A missing, late or failed recommendation must not interrupt interaction or card loading.
+* Evaluate four candidate corners using the normal artwork's visible-content box, actual icon dimensions, clearance and the **exterior contour**, not repeated pixel-level collision tests.
+* If any original corner is valid, do **not** expand. If none is valid, expand equally on all four sides by exactly one rendered icon width and reevaluate; supply the effective composition bounds to Species Card.
+* Never override or constrain any of the four explicit manual corner choices, including intentionally inconvenient choices.
+* Recalculate placement cheaply when real rendered dimensions/position change, without artwork rescans or unnecessary repositioning loops.
+* A missing, late or failed recommendation must not interrupt interaction, card loading or existing shiny behavior. Never analyze shiny artwork.
 
 ART-RUNTIME — Worker and browser performance
 
-Status: Discussing optimization; initial worker implementation exists.
+Status: Discussing optimization; ART-02-R01 worker and full-scan fallback exist.
 
 Requirements
 
-* Keep expensive image analysis off the UI thread wherever supported.
-* Examine Blob-worker compatibility, especially in iPad Safari and the installed browser extension.
-* Diagnose fallback behavior when workers are blocked.
-* Avoid allowing a full-resolution main-thread fallback to cause visible interaction stalls.
-* Measure actual scan time, worker overhead, memory usage and cache hydration.
-* Preserve full-resolution color accuracy while comparing optimizations.
-* Report unsupported image formats and decoder differences explicitly.
-* Do not replace precise results with unverified approximations merely to improve speed.
+* Separate and profile native metadata retrieval, image transfer, decoding, geometry extraction, hashing, worker transfer and storage writes. Retired color scoring is not part of the runtime performance budget.
+* Keep expensive analysis off the UI thread wherever supported; verify Blob-worker behavior in the actual userscript extension/iPad Safari environment.
+* A worker-denied main-thread fallback must not cause an uninterrupted large UI stall. Measure any fallback and implement safe scheduling without delaying native card presentation.
+* Avoid decoding twice, competing scanners, excessive RGBA copies or retaining per-species temporary buffers after analysis.
+* Remove retired runtime color-scoring costs and dependencies from ART rather than optimizing a feature no longer required. Retain offline source datasets and results independently of the production geometry runtime.
+* Preserve pixel-faithful exterior contours at whatever representation is chosen; do not claim approximate geometry is exact.
+* Report unsupported formats, decoding and color-management differences. Distinguish actual Safari measurements from desktop/Node or calculated memory proxies.
+* Remove retired production algorithms, masks, caches, worker code and tests rather than keeping them running or maintained for hypothetical reuse.
 
-Current implementation: ART-02-R01 includes a Blob worker and same-bundle fallback. Safari performance remains unverified.
+Current implementation: ART-02-R01 includes a Blob worker and same-bundle fallback; actual Safari timing/persistence is unverified.
 
-ART-ORIGINAL — Future original-Pokémon metadata migration
+ART-ORIGINAL — Original-Pokémon background type assignment migration
 
-Status: Discussing; deferred.
+Status: **Accepted and integrated on dev — 613 user-curated original-Pokémon backgroundType assignments in Theme Overlay v0.3.50** (commit 41179f9a).
 
 Requirements
 
-* Eventually provide offline-generated artwork metadata for original Pokémon.
-* Preserve the existing 613 dual-type artwork assignments until an approved migration is verified.
-* Do not browser-scan original Pokémon as part of the current Fakémon implementation.
-* Support compatible geometry, color and icon metadata without changing existing original-Pokémon styling.
-* Consolidate redundant metadata and lookup machinery only after the replacement is validated.
-* Do not retain permanent duplicate authorities for the same artwork decisions.
+* The chosen offline seed is the **Hue/Saturation + Neutral Lightness** full set of 613 original dual-type Pokémon/forms (not the later 50/50 hybrid). No original-Pokémon runtime scanner is needed.
+* The temporary VisualType reviewer lets the user invert an individual assignment, globally preview **assignment → tint versus banner**, and export the entire corrected set. Its review script and local edits are not a committed permanent Theme Overlay migration.
+* Keep the exact reviewed/approved assignments, including form-specific identity, separate from visual mixing. Preserve user edits on import; check species ID/form mapping and that the selected type is one of the actual types.
+* Migrate legacy four-tuples `[primary,secondary,banner,tint]` and provisional `visualType` toward a single proposed `backgroundType` decision per original dual-type identity. The other color and its surface roles are resolved separately, not permanently baked into the assignment data.
+* Prefer **backgroundType → tint** for original dual types, with the other type used as banner. Monotypes retain their established single-type styling. The review toggle is a comparison control, not a requirement for a permanent user-facing global toggle.
+* Decide whether the static original-Pokémon data belongs in a small dedicated source file or remains embedded in Theme Overlay, based on maintainability, installation simplicity, startup cost and single source of truth. Do not create duplicate authorities.
+* Original-Pokémon geometry, if later supported, is independent of this frozen color assignment set.
+* Regress across form variants, Pokémon/Fakémon separation, local review export/import, all themes, shiny transitions and native navigation before deployment.
 
 ⸻
 
@@ -168,11 +191,13 @@ Status: Planned.
 
 Requirements
 
-* Fit and center artwork according to visible subject bounds, not transparent canvas margins.
-* Account for actual rendered scale and position.
-* Allow appropriate decorative extension into unused neighboring space.
-* Protect HP values, labels, controls and hit targets.
-* Avoid layout jumps, temporary oversizing and compensating redraws.
+* Fit, center and scale artwork using actual visible subject bounds instead of transparent canvas margins, while retaining the complete original artwork source.
+* Use accurately extracted normal-artwork exterior contours to allow suitable decorative extension into empty neighboring hero space.
+* Protect HP values, labels, controls, hit targets and stacking from subject-outline overlap.
+* Use the uniformly **expanded effective composition bounds** when automatic shiny placement has required expansion; otherwise use the original content bounds.
+* Work with the actual rendered artwork transform and existing content-driven hero grammar, not a new catalog of fixed layout permutations.
+* Maintain a dependable fallback for opaque or unavailable geometry, preserving existing hero behavior.
+* Avoid layout jumps, transient oversized artwork, unnecessary DOM reconstruction and repeated post-paint corrections.
 
 HERO-SHINY — Automatic shiny-icon placement
 
@@ -180,16 +205,17 @@ Status: Planned.
 
 Requirements
 
-* Preserve all four unrestricted manual placements.
-* Evaluate four corners of the normal-artwork content box using the icon’s actual dimensions and exterior contour.
-* Prefer a valid original corner.
-* Only if all four fail, expand equally on all four sides by exactly one rendered icon width.
-* Use expanded composition bounds for fitting when expansion is necessary.
-* Do not analyze shiny artwork.
+* Preserve all four unrestricted manual placements and the established manual-over-auto precedence.
+* Score four corners **within** the normal-artwork subject box using the icon's real rendered width/height and stored exterior contours; no interior-hole fitting or pixel-by-pixel source collision engine.
+* Prefer a valid original corner with stable clearance. If any original corner is usable, do not expand.
+* Only if all four original corners fail, expand equally on all four sides by **exactly one current rendered icon width** and reevaluate four corners.
+* Pass any expanded composition bounds into hero fitting; do not clip artwork to this rectangle or draw a visible outline.
+* Use normal artwork metadata only, even if shiny artwork is currently displayed, subject to safe source/geometry compatibility checks.
+* Keep manual position controls and interaction unchanged, without layout rescue for intentionally inconvenient manual choices.
 
 HERO-GRAMMAR — Content-driven adaptive composition
 
-Status: Implemented; current candidate requires browser acceptance.
+Status: Implemented candidate; Nosepass promotion oscillation reported, browser acceptance outstanding.
 
 Requirements
 
@@ -204,6 +230,49 @@ Requirements
 * Keep layout decisions stable during resize, navigation and asynchronous rendering.
 
 Current implementation: GEO-01-R01 and GEO-01-R02, through Species Card 0.1.26.
+
+HERO-OSCILLATION — Repeated or width-sensitive hero promotion/demotion
+
+Status: Ready for cross-species, width-sensitive root-cause investigation and cause-driven corrective work; no userscript changes yet.
+
+Observed behavior (2026-10-16 to 2026-10-17)
+
+* Nosepass (#0299) repeatedly alternates between native and promoted hero arrangements while the selected species and browser-panel width remain unchanged. The animation visibly relocates ability scores, gender/egg bars and artwork, rather than showing a normal one-time load transition.
+* The recording shows the problem in desktop-style Safari with a narrow split browser panel. Other species shown after navigation do not establish that the defect is unique to Nosepass.
+* The recording proves repeated layout changes, but does not include live layout-state or computed-style telemetry. The full causal chain is not yet confirmed.
+* Additional user report (2026-10-17): another, as-yet-unidentified Pokémon exhibited Nosepass-like flicker at an approximately 624 px panel width. After resizing the window away from that width and back, the flicker stopped in that session. The width is approximate; no live state/geometry trace was supplied for this case. This is a second reported affected species, not evidence of a confirmed root cause or permanent resolution.
+* Nosepass is the first identified species; at least one additional, unnamed species is now reported. Compare shared width/selection-history behavior and species-specific content rather than assuming the issue is unique to Nosepass or universal at every width.
+* The clip visibly alternates between native scores and a scores-promoted arrangement; confirm the exact promotion flags by instrumenting the real layout selector. A near-tie between candidates is a hypothesis, not a measured finding.
+
+Cross-species and reproduction investigation
+
+* Identify the second affected Pokémon when available; record whether ~624 px refers to the outer viewport, detail card, or an interior panel, without assuming these are interchangeable.
+* Reproduce a direct entry at the affected width, resizing across the boundary, returning to the same width, refreshing there, and changing species/theme. Compare initial and subsequent candidate decisions to test whether prior selections or remembered geometry affect stability.
+
+* Record Nosepass's actual description text and rendered line count, gender/egg field values (including the short Mineral label), normal portrait intrinsic dimensions/aspect ratio and displayed size, Abilities content, card inner width, font state and layout measurements. Compare against representative species that stay stable at the same width and theme.
+* Capture the entire candidate table before and after each flip: promotion tuple (especially native versus scores-only), biology arrangement, track widths, content/section heights, displaced native-footprint measurements, feasibility constraints, image minimums, quality score and chosen winner.
+* Test whether content geometry places Nosepass near a legitimate decision boundary. Quantify any score/height difference and show precisely which input changes between passes; do not assume that a short Egg label, long description or image aspect ratio is causal without comparing measurements.
+* Check the intrinsic portrait ratio at first render versus after decode, and remeasure under an unchanged ratio to separate image readiness from selector-induced oscillation.
+* Reproduce at the recording's narrow desktop split-card geometry, then compare a range of widths immediately above and below the boundary, including stable neighboring Pokémon.
+
+Source inspection leads (Species Card 0.1.26 on `dev/hero-restoration-2026-10-14`)
+
+* `chooseStage()` uses measured native-versus-promoted footprint, stored previous promotion and retained-image constraints. Confirm that each candidate is measured under an invariant canonical style/state independent of the currently applied promotion.
+* `createMeasurer().nativeFootprints()` attaches measurement clones inside the presently styled article. In particular, `article.lab3-active` changes stats/banner margins; test whether this makes the displaced/native footprint depend on the previous selection and produces an alternating winner.
+* `rememberNativeHero()` retains `old.promotion` and `old.layout` when identity/width are unchanged, even after the actual DOM was restored to native. Correct the stale recorded identity when verifying the root cause, without sacrificing legitimate resize hysteresis.
+* The Hero `ResizeObserver` schedules a subsequent layout pass when the artwork/info height changes. Determine whether the script's own promotion/demotion initiates the next pass; an observer-triggered pass must not create an endless feedback cycle.
+* Inspect `geometryMemo` keys and `resizeMemory` for selection-dependent inputs, cached geometries or retained minimum image heights that change merely because an arrangement was applied.
+
+Requirements and acceptance
+
+* With unchanged route, card width, source data and font metrics, repeat evaluations must select the same stable arrangement. Do not rely on a delay, arbitrary cooldown, animation, hidden card or frozen layout to mask instability.
+* Distinguish genuine changes (viewport, text, portrait intrinsic dimensions, font readiness, theme) from self-generated layout changes. Ensure one coherent measurement basis for competing candidates.
+* Capture per-pass chosen promotion, biology mode, source identity, card/content widths, projected footprints, candidate costs, image height and reason for recalculation on live Safari.
+* Regression-test Nosepass near the recorded narrow split-pane width and the second reported case near approximately 624 px panel width, including a resize away and back. Also cover shorter/taller descriptions, different abilities, theme modes, refresh, next/previous navigation and manual resizing across thresholds.
+* Preserve adaptive promotions when actually beneficial; fix the input/state inconsistency rather than disabling a legitimate layout mode.
+* After tracing the actual cause, correct the offending geometry measurement, native-state restoration, memory invalidation or observer dependency at its owner; remove obsolete logic superseded by the correction. Do not add delays, a cooldown, arbitrary threshold hysteresis or a Nosepass-specific exemption.
+* Confirm that the chosen native or promoted scores layout is stable across repeated evaluations while inputs are unchanged, and changes appropriately when text, fonts, dimensions or portrait data genuinely change. Validate with the actual Nosepass content, not only synthetic test fixtures.
+* Keep this as a scoped implementation and regression task on the development branch; main remains the accepted baseline until tested and approved.
 
 HERO-BANNERS — Promoted Abilities heading
 
@@ -234,9 +303,30 @@ Requirements
 * Keep color ownership with Theme Overlay and geometry ownership with Species Card.
 * Avoid hardcoded white lettering that conflicts with Type-theme ink.
 
+HERO-VITALS-CELLS — Reuse existing vitals SVGs in compact and promoted presentations
+
+Status: Ready for a first implementation candidate; geometry and compact visual baseline agreed, not yet built or accepted.
+
+Goal
+
+* Begin icon-based information presentation with the existing four vitals (SR, AC, HP, MinLvl), because their icons and promoted hero treatment already exist. Preserve the existing SR silhouette, HP heart, AC shield and minimum-level graphic; do not replace the approved SVGs with generic approximations.
+* In compact/unpromoted presentation, replace visible text labels with the corresponding small icon followed by the native value: SR, AC, HP including hit die, and MinLvl including the established level suffix/range rules. Preserve semantic/accessibility names.
+* **Initial compact treatment: unboxed.** No individual fill, border or decorative framing; use spacing and alignment alone. Only after browser review explore optional low-opacity frames, subtle outlines or a shared understated container. None of those are approved initial requirements.
+* Compact icons initially inherit the actual species/card body-text color in Light, Dark and Type modes. Existing separately colored icons remain available for sufficiently roomy promoted tiles. Choose monochrome versus semantic color according to final cell size/visual density, not a fixed viewport breakpoint.
+* Every icon/value pair remains an independent content cell in all layouts. Placement, dimensions and visual presentation are separable decisions; cells may appear inline, arranged across multiple rows, or enlarged as existing hero tiles when that improves total composition. Promotion must not force a particular icon/value presentation.
+* Aim to keep all four compact cells in one row when their measured final content fits. Permit unequal width allocations (HP/hit dice often require more width); evaluate alternatives only when necessary. Never allow collisions, truncation or panel overflow.
+* Reuse the native value nodes/data and one canonical SVG definition/mapping wherever feasible; do not add a second independently maintained vitals icon set or duplicate native state. Preserve existing tile behavior and navigation until a replacement is verified.
+
+Implementation/acceptance notes
+
+* First investigate how `.yofi-vitals-row` native fields and `.lab3-vital` promoted tiles consume their data, and consolidate the common presentation without breaking existing native ownership or the layout selector's measured geometry.
+* Measure and validate the final icon/value cells before layout choice, not by swapping labels after the chosen geometry has been scored. No extra late paint or compensating observer.
+* Test narrow iPhone cards, iPad split panels and wide cards; native versus promoted; long HP values, varying MinLvl text, Light/Dark/Type, transitions and browser refresh. Inspect optical alignment of the four existing SVGs at compact sizes.
+* This is the **first icon implementation task**, ahead of movement/effectiveness/senses. A compact unboxed cell row is the baseline for user visual testing, not blanket authorization to replace all existing vitals arrangements.
+
 HERO-BIOLOGY — Adaptive gender/egg arrangement
 
-Status: Implemented; browser acceptance outstanding.
+Status: Implemented candidate; paired-size and column-boundary regressions reported, browser acceptance outstanding.
 
 Requirements
 
@@ -247,8 +337,20 @@ Requirements
 * Retain the same underlying native biology information.
 * Avoid sacrificing available egg-text width merely to preserve an inline arrangement.
 * Preserve continuity while layout selection changes.
+* Treat Gender and Egg as a coordinated pair in every selected orientation: equal outer widths AND heights, consistent corner geometry, and one shared typography/icon scale. This applies to horizontal, stacked and any split arrangement.
+* Fill the actual assigned layout tracks, less established padding/margins/gaps. Side by side, allocate two equal tracks; stacked, both fill the same column's inner width. Never leave unused width because a gender bar retains its native fixed size or size the Egg bar beyond its track.
+* A compact stacked arrangement may use a smaller shared bar height, text and icon scale than a horizontal arrangement. Compare their actual content fit and total page height; never shrink one bar independently.
+* Bound both bars to their assigned column boxes at every layout stage. Reject arrangements that intrude into an adjacent column or the artwork lane rather than masking overflow with clipping or arbitrary CSS corrections.
+* Measure the final text and icon geometry when comparing orientations, accounting for font readiness and wrapping, and keep the accepted layout stable through navigation and resize.
 
-Current implementation: BIO-01 and GEO-01 introduced measured fitting and additional arrangements.
+Reported Safari regression cases (2026-10-16; exact installed script commit not independently verified):
+* Gummibo: side-by-side Gender bar does not stretch to match the Egg bar's allocated width.
+* Gummigills: stacked bars differ in width and can be unnecessarily large for the available space.
+* Mawile: Egg bar extends past the left text column into the adjacent artwork lane.
+
+Acceptance: both bars have equal measured outer dimensions in each accepted layout, use their full assigned width without crossing column boundaries, and remain consistent after refresh, navigation and promotion changes in Light, Dark and Type themes.
+
+Current implementation: BIO-01 and GEO-01 introduced measured fitting and additional arrangements; acceptance of shared geometry remains outstanding.
 
 ⸻
 
@@ -256,16 +358,17 @@ BIO — Species Biology Presentation
 
 BIO-EGG — Unified egg-group bar
 
-Status: Implemented; styling acceptance outstanding.
+Status: Implemented candidate; paired sizing and Egg overflow require correction, styling acceptance outstanding.
 
 Requirements
 
 * Use the same recognizable egg-bar presentation in compact and promoted species layouts.
 * Place the egg icon consistently at the left.
 * Center the remaining text within its available content region.
-* Scale the icon and text proportionally at different sizes.
-* Prefer a readable single line; reject layouts that cannot accommodate it.
-* Avoid breaking words or clipping group names.
+* Scale the icon and text proportionally at different sizes; the egg SVG's visible height should match its adjacent text's visible height (using font-relative dimensions and optical adjustment if needed).
+* Match the Gender bar's full outer width and height in every arrangement, using the shared allocated layout width rather than intrinsic label width.
+* Prefer a readable single line where it fits. Otherwise allow natural whole-word wrapping within the assigned bar width, increasing BOTH bars' shared height as needed; reject only layouts that cannot fit legibly.
+* Avoid breaking words, clipping group names, or overlapping an adjacent layout column.
 * Remove visible Egg: and Egg Group: labels and obsolete display alternatives.
 * Preserve accessible meaning and native egg-group data.
 * Reuse the same icon/value construction instead of duplicating components.
@@ -279,7 +382,8 @@ Status: Implemented; browser acceptance outstanding.
 Requirements
 
 * Scale gender symbols and ratio typography according to available bar width and height.
-* Preserve relative icon/text proportions and centering.
+* Preserve relative icon/text proportions and centering; make gender symbols' visible SVG height match the text height at the selected shared scale.
+* Fill the full assigned bar width and match the Egg bar's outer width and height. Do not retain a narrower native/fixed-width bar inside a larger allocated track.
 * Accommodate genderless, single-gender and mixed ratios.
 * Preserve the native gender segments and their behavior.
 * Prevent clipped icons, oversized labels and narrow-width collisions.
@@ -302,6 +406,42 @@ Current implementation: BIO-01-R01 and its subsequent correction.
 
 THEME — Visual Styling
 
+THEME-PALETTE — Canonical type palette and per-type derived treatments
+
+Status: **Accepted and integrated on dev — Theme Overlay v0.3.50** (user-approved 2026-10-17; exact accepted file committed as 41179f9a). Browser deployment/installation is independent from the GitHub commit.
+
+Requirements
+
+* QoL remains the **single source of truth for the canonical 18 Scarlet/Violet type colors** (`--skin-<type>-bg` currently). Do not duplicate or silently replace base colors in Theme Overlay or ART.
+* Define a **per-type presentation palette** derived from each canonical color using CSS variables and configurable mix parameters: `Type` (base), `TypeBg` (background tint), `TypeLight` (lightened treatment), and `TypeDark` (dark ink/outlines/allowed accents). `TypeRgb` is derived on demand only where an actual consumer needs RGB channels; never maintain a second manually edited RGB value.
+* Initially let `TypeBanner` and `TypeMove` both consume `TypeLight`; split them into **independent per-type treatments only if visual review justifies it**, without changing the underlying base color or altering move-type semantics.
+* Calibrate **each of the 18 types independently** for background strength, light strength, dark strength and, only where needed, separated banner/move strengths. Keep common formulas and shared defaults with explicit individual-type overrides. Derived values should update when a canonical color changes.
+* **Absolute constraint: no pairing-specific mixing, lookups, transforms, overrides or corrections.** A Fire banner/background/move/ink treatment must be the same regardless of the Pokémon's secondary type. No automatic pairwise contrast adjustment.
+* Type relationships affect **which two per-type treatments are chosen for a species**, not how either of those treatments is calculated. A manually chosen species backgroundType is a data decision, not a per-pair palette rule.
+* Preserve the original header gradient's canonical type identities and type badges. Maintain readable body text, banner text, icons, hidden ability indicators and move/TM pills while reusing actual native/site components.
+* **A new game's type palette requires visual recalibration.** Regenerating derivatives from 18 new base values is automatic, but existing mixing percentages are *not* assumed to remain aesthetically correct. Keep the parameters discoverable and reviewable for future game updates.
+* Avoid storing independent hard-coded derivative hex colors when CSS `color-mix()` from canonical base colors suffices. Record exact generated values only when a technical consumer demonstrably needs a resolved color.
+* Keep palette rules in the established Theme/QoL ownership boundary; do not add a new artwork scanner, per-species formula or per-pair special case as a workaround.
+
+Acceptance
+
+* Inspect representative monotype, dual-type and form cards, including Charizard (Fire/Flying), Cloyster/Dewgong (Water/Ice) and Hisuian Samurott (Water/Dark). Those are review examples, **not exceptions**.
+* Verify banner prominence, background harmony, text contrast, move-pill consistency, all three theme modes and dynamic palette replacement independently of Pokémon backgroundType selection.
+* Measure/verify theme transitions and absence of transient wrong-colored panels on iOS Safari and desktop before accepting.
+
+THEME-ASSIGNMENT — Separate backgroundType from palette mixing
+
+Status: **Accepted and integrated on dev — original-Pokémon backgroundType assignments in Theme Overlay v0.3.50** (commit 41179f9a). Fakémon creator-selection persistence remains planned.
+
+Requirements
+
+* For each dual-type original Pokémon/form, persist one chosen background type from its actual ordered type set; creator-selected Fakémon follow the same semantic model after native create/edit persistence is implemented.
+* The currently favored placement is **backgroundType as tint; the other type as banners**, with assignment independent of any global presentation swap for comparison.
+* Keep original Pokémon and Fakémon data sources distinct; changing the original assignment set must never assign colors to Fakémon.
+* Use type-scoped treatments from THEME-PALETTE, not a precomputed per-Pokémon background or banner hex code. Preserve existing monotype behavior.
+* Migrate temporary `visualType` exports and current Theme Overlay four-tuples without losing reviewed human choices. Do not silently change names, semantics, or placement during import.
+* Review any proposed cross-device persistence mechanism for Fakémon with the native editor/source before code changes. Avoid exposing structured technical metadata in visible notes or corrupting existing notes.
+
 THEME-PROMOTION — Theme continuity for moved elements
 
 Status: Implemented; visual acceptance outstanding.
@@ -317,7 +457,7 @@ Requirements
 
 THEME-VITALS — Light-theme hero tile contrast
 
-Status: Implemented candidate; target discrepancy requires review.
+Status: Implemented candidate; target discrepancy requires review. Compact monochrome vitals treatment is specified separately under HERO-VITALS-CELLS.
 
 Requirements
 
@@ -339,6 +479,34 @@ Requirements
 * Preserve established Type-theme pill styling.
 * Keep Light/Dark measured-column behavior independent of Type-theme wrapping.
 * Do not reintroduce conflicting TM column calculators in Theme Overlay.
+
+⸻
+
+FAKEMON-EDITOR — Native Fakémon Editor Extensions
+
+FAKEMON-EDITOR-METADATA — Versioned species metadata through native Notes
+
+Status: Discussing; architecture candidate only. No editor modification, live save/round-trip test or persistence implementation. Cross-reference THEME-ASSIGNMENT for backgroundType, CM-WORKFLOW for editor continuity, and CM-LIBRARY for the distinct reusable move registry.
+
+Source-grounded constraints
+
+* Native `FakemonEditor.svelte` submits fixed species fields; `SupabaseFakemonDataProvider.ts` explicitly maps fields into `new_fakemon`/`update_fakemon` RPC arguments. There is no demonstrated arbitrary metadata field.
+* The species Notes field is server-persisted and read back with the normal Fakémon record. Notes display uses Markdown and DOMPurify, so a namespaced HTML-comment marker is plausible, but exact Markdown-editor round-trip and display behavior require verification.
+* Save/edit permissions still require the native write key. Cross-device loading through the existing read-key path is a goal, not a tested feature.
+
+Candidate requirements and approach
+
+* Begin with creator-selected `backgroundType`, restricted to the Fakémon's actual type(s), without runtime portrait color-scanning. Allow future supplementary editor controls to reuse one versioned per-species metadata contract rather than independent ad hoc storage.
+* Investigate a single namespaced metadata block in Notes (for example a versioned HTML comment), with centralized parse, validate, merge, migrate and serialize operations. Preserve all user-authored Notes and unrelated data verbatim; do not expose metadata in the rendered species card.
+* Prefer synchronizing supplemental controls with the **native Svelte-bound Notes state and save lifecycle**. Blindly injecting metadata into only the outgoing RPC can cause a subsequent native save to overwrite it; avoid unverified synthetic event assumptions.
+* Handle missing/malformed/duplicated blocks, outdated formats, typing changes, cancel/reopen, refresh, bare Poké5e editing, stale cross-device edits and conflict recovery. Back up the complete species record before high-risk experiments.
+* Keep the reusable custom-move definition library separate from per-species metadata. Storing metadata in Notes does not, by itself, register move IDs in native Pokémon move resolution.
+
+Verification before implementation/acceptance
+
+* Inspect the actual Notes textarea/textarea-markdown event-to-Svelte binding, native create/edit submit and post-save store behavior on the current site, including iOS Safari.
+* Prove markup survival and correct invisibility in display/preview, user Notes preservation, write-key behavior, refresh and second-device read, type changes, repeated native saves and failure/cancellation recovery.
+* Check server text-size constraints and stale/concurrent-edit behavior. Do not claim cross-device persistence or a working custom move editor without an executed round trip.
 
 ⸻
 
@@ -386,6 +554,34 @@ Requirements
 * Match the established numbered TM-pill presentation.
 * Preserve actual TM identifiers, names, links and sorting data.
 * Avoid altering the underlying native records.
+
+⸻
+
+LIST — Pokémon and Fakémon List Presentation
+
+LIST-SPRITES — Real normal-sprite thumbnails within native list rows
+
+Status: Discussing; source-backed design candidate, no prototype, code changes or Safari performance results.
+
+Source-grounded integration
+
+* The canonical Pokémon SSR listing projects away media/sprites, but the complete client Pokémon dataset includes sprite references. QoL already requests that full canonical dataset for type information; gather sprite metadata from the **existing** response instead of per-row detail fetches.
+* Native Fakémon list DOM currently exposes only Name, while Fakémon records have optional uploaded media. QoL 0.13.4 already augments Fakémon list rows with Type/SR and deduplicated read-key lookups; extend that existing ownership/data path to obtain `normal_sprite_filename` where available.
+* Native `SpeciesMedia.sprite()` can fall back to portrait artwork. Do not use that fallback when deciding whether a list thumbnail exists: only real sprites qualify.
+
+First presentation candidate
+
+* Place the small normal sprite **after the species name, aligned at the existing black-to-white color transition of the list bar** (the boundary between its dark name region and light region), not before the name or merely adjacent to the final letter. Keep the name's current placement and the native row/link click behavior; inspect the actual row structure and styling to anchor the sprite without changing sorting, searching, navigation, responsive columns or row geometry on Pokémon and Fakémon lists.
+* Resolve actual canonical and uploaded sprite URLs from native metadata and established asset origins; never invent asset filenames, hue-shift synthetic sprites or show miniature full portraits for sprite-less species.
+* Start by evaluating normal-only thumbnails. Provisional 28–32 px artwork treatment is a prototype size for visual review, not an approved fixed specification. Shiny/female variant behavior, any sprite preference control, and use beyond the two native lists remain open.
+* For sprite-less rows, preserve the normal name position and bar transition. Compare reserving a visually empty sprite location at that transition against omitting the sprite element entirely; resolve alignment, overlap and responsive behavior through mobile/desktop review.
+* Reuse the current QoL row-decorating lifecycle with a bounded metadata cache, incremental row updates and lazy/near-viewport image loading. Avoid an independent list observer or 1,139 detail requests; evaluate decode/memory and the transient transition as sprite metadata becomes available.
+
+Verification and acceptance
+
+* Test sprites present, sprites absent, missing/broken URLs, original 2018/2024 data, uploaded Fakémon sprites, resort/filter/search and navigation after list updates.
+* Measure first list paint, scrolling, network/image memory and row-height shifts on iOS Safari and desktop/narrow panels. Preserve continuous list/card rendering during navigation and check Light, Dark and Type themes.
+* Keep implementation and real-device acceptance separate. No scripts or lists have yet been modified.
 
 ⸻
 
@@ -571,56 +767,70 @@ Existing implementation: QoL contains decorateEvolutionSexNames(). Its actual ex
 
 DETAIL — Species Information Region
 
+DETAIL-CELLS — Reusable icon/value-cell grammar
+
+Status: Design direction agreed; build and final artwork selection pending.
+
+Requirements
+
+* Treat each speed mode and, if individual-sense icons are adopted, each sense as an independently measurable **icon + numeric value cell**. This remains true in compact rows, wider multi-column placements, promoted regions or a shared/background bar. Promotion changes cell arrangement, not what constitutes a cell.
+* Permit cell tracks, row/column gaps, shared containers and wrapping to respond to actual content and available component dimensions rather than fixed viewport thresholds. Avoid artificial mandatory stages.
+* Keep the visible numeric values exact. Preserve full descriptive names, measurement units and meaning in accessible text and appropriate title/tooltip/expanded labels even when visible labels disappear.
+* Establish common sizing, SVG optical alignment, spacing and density conventions after candidate icon artwork is selected; do not pre-approve uncertain icons solely because a generic glyph exists.
+* Reuse existing native semantic data and DOM where feasible. The layout fitter must evaluate final icon/cell geometry before committing to placement; do not replace measured text with icons in a later pass.
+* Start implementation with HERO-VITALS-CELLS to validate the shared cell approach before extending it to movement or senses.
+
 DETAIL-SCALE — Wide-card information readability
 
-Status: Discussing.
+Status: Discussing; shared icon/value-cell architecture agreed.
 
 Requirements
 
 * Scale Speed, Senses, Skills, Saves and effectiveness information as card space increases.
-* Scale typography, icons, spacing and type badges coherently.
+* Scale typography, icons, spacing and type badges coherently, including the final icon-based presentation rather than obsolete text-label measurements.
 * Preserve readable proportions and alignment at narrow widths.
-* Make the layout fitter evaluate the content at its final intended scale.
+* Make the layout fitter evaluate the content at its final intended scale and cell geometry.
 * Prefer card/content geometry over arbitrary viewport breakpoints.
 * Avoid leaving unusually small detail typography beneath a large hero.
+* Explore alternative tracks/wrapping and possible conditional promotion into genuinely free hero space only after component content and measurements are stable; never mandate a specific promotion solely because icons are present.
 
 DETAIL-SPEED — Movement icons
 
-Status: Discussing.
+Status: Cell semantics and visible-unit rule agreed; SVG choice and visual acceptance pending.
 
 Requirements
 
-* Evaluate replacing repeated Speed labels with recognizable movement icons.
-* Cover native walking, flying, swimming, climbing, burrowing and hovering movement.
-* Preserve exact movement values and labels in accessible descriptions.
-* Use consistent icon size, stroke weight and alignment.
-* Verify whether the icon language remains understandable without visible text labels.
+* Represent each existing movement speed as its own icon/value cell rather than a single Speed category icon. Cover walking, swimming, flying, climbing, burrowing and hovering without altering native semantics.
+* Prospective visual metaphors (not approved final SVGs): shoe for walk; ripples/water/fish for swim; wing for fly; vine/hand for climb; shovel for burrow; UFO for hover.
+* Show each mode's numeric movement distance with **no visible “ft” suffix**; feet are currently implicit under Poké5e's D&D movement rules. Retain exact distances, full mode names and feet units in accessible metadata. No mechanics/data conversion.
+* Remove redundant visible individual mode words once the final icons are chosen and visually verified; choose legible fallback labels for any mode whose artwork remains ambiguous.
+* Movement icon/value cells can flow side by side, wrap, use grid tracks or share a subtle container regardless of whether they are in native details or a promoted region. Keep icon and its value together.
+* Select and inspect actual SVG shapes, stroke weight, optical height and consistency before committing to label-free visual presentation.
 
 DETAIL-SENSES — Sense identification
 
-Status: Discussing.
+Status: Discussing; individual icon artwork and label removal not approved.
 
 Requirements
 
-* Explore one recognizable category icon, potentially an eye, representing Senses.
-* Retain the actual sense names and distances where icons alone would be ambiguous.
-* Account for darkvision, blindsight, tremorsense and truesight.
-* Preserve the existing rule that missing Senses should not reserve blank layout space.
+* Consider darkvision, blindsight, tremorsense and truesight individually. A generic eye icon for the entire Senses category was an earlier fallback, not a settled final solution.
+* Desired direction is potentially label-free **sense icon/value cells**, but the symbols are harder to distinguish; inspect previously explored SVG candidates or create a comparable set, then test at intended small sizes before hiding the sense names.
+* If individual icons prove recognizable, each sense/distance remains its own independent measurable cell and uses DETAIL-CELLS layout rules. Otherwise keep meaningful text labels alongside a generic category marker; do not trade mechanical clarity for visual density.
+* Preserve full sense labels, exact distances and accessibility in either treatment.
+* Preserve the existing rule that missing Senses must not reserve blank layout space; do not invent a sense icon for absent data.
 
 DETAIL-EFFECTIVENESS — Weakness, resistance and immunity presentation
 
-Status: Discussing.
+Status: Discussing; candidate symbols and responsive badge concept identified, final SVGs and behavior pending.
 
 Requirements
 
-* Explore icon replacements for Weak To, Resists and Immune.
-* Candidate symbols: red double-circle/target, grey triangle and black X.
-* Preserve accessible descriptions and mechanical meaning.
-* Explore scaling the native type badges with available panel width.
-* Consider omitting the badge name cell at larger sizes when the type icon is sufficiently recognizable.
-* Explore an effectiveness strip and conditional promotion into unused hero space.
-* Do not duplicate native type badges unnecessarily.
-* Treat hero promotion as a content-and-space decision, not a rigid breakpoint.
+* Explore a compact visual relationship marker for each of Weak To, Resists and Immune using the proposed **target, triangle and X** symbols. The earlier workboard candidate associates target with Weak To, triangle with Resists and X with Immune; verify that mapping explicitly during actual icon review rather than treating the icon order as final approval.
+* Preserve accessible descriptions and the true effectiveness relationship independently of visual badge treatment.
+* Explore scaling the **existing native type glyph badges** up at certain measured card/panel widths, keeping their canonical type colors. Consider removing the small letter/name cell only when a larger SVG remains identifiable; do not unconditionally delete that information in compact layouts.
+* Compare compact icon/badge rows, larger symbol-dominant treatments and potentially a shared effectiveness strip; decide placement through actual available geometry rather than a fixed breakpoint.
+* Explore conditional promotion into unused hero space only after component fit and the hero-selection lifecycle are reliable. Do not duplicate native type badges or preempt other higher-value hero content.
+* Preserve a consistent icon scale, optical alignment and visual hierarchy between the relationship marker and nearby type badges, without assuming they must be the same physical size.
 
 ⸻
 
@@ -628,17 +838,18 @@ PRESENTATION — Loading and Continuity
 
 PRES-FIRST — Correct first presentation
 
-Status: Discussing.
+Status: Discussing cold-start edge case; pre-analysis strategy selected in principle.
 
 Requirements
 
-* Correct theme colors and artwork composition when the card first appears.
-* No color changes or layout shifts while viewing the card.
-* Preserve the existing list-to-card handoff.
-* Never show an empty interval or substitute card merely to conceal loading.
-* Pre-analysis should eliminate as many cold-start waits as possible.
+* Correct artwork-derived theme colors and subject-aware composition **on the first visible card frame**, including first-ever visits wherever prefetch succeeded.
+* No mid-view color changes, layout shifts or geometry corrections after the user sees the card.
+* Preserve the existing real-list-to-ready-card handoff. Never show an empty interval or substitute card merely to conceal loading.
+* Prioritize proactive list analysis, hover/focus intent and neighboring-species warming instead of making an expensive scanner routine work on click.
+* Revalidation changes discovered while viewing a card apply to its next presentation, not as an immediate visible repaint.
+* Color and geometry are independently computable; coordinate compatible cached/ready decisions before first reveal.
 
-Unresolved: Behavior when a never-before-analyzed Fakémon is opened directly or before prefetch completes.
+**Unresolved:** A truly cold direct URL or an immediate click before analysis completes cannot be guaranteed both immediately visible and correctly themed/composed without waiting or precomputed data. Establish and approve a cold-first-reveal policy before consumer integration; do not invent one by default.
 
 PRES-ATOMIC — Analysis and presentation synchronization
 
@@ -646,12 +857,13 @@ Status: Planned; not integrated.
 
 Requirements
 
-* Publish successful metadata coherently rather than exposing partially completed color/geometry decisions.
-* Prevent a late result for a previous species from affecting the current card.
+* Publish each complete, successful color or geometry product coherently; do not require their calculations to finish together.
+* Assemble one compatible presentation snapshot for the selected species before the card becomes visible.
+* Prevent late results for an outgoing species or a subsequent source revision from affecting the current card.
 * Retain last-good presentation during refresh validation and transient analysis failures.
-* Do not cause a second visible layout pass merely because background analysis completed.
-* Coordinate application of geometry and theme data with existing card readiness behavior.
-* Avoid adding competing lifecycle observers or card-reconstruction machinery.
+* Do not cause a second visible theme or hero-layout pass merely because a background analysis finishes.
+* Coordinate the initial application of color/geometry/auto-corner metadata with existing card readiness, honoring source identity and current layout measurements.
+* Avoid competing lifecycle observers, card-reconstruction machinery and compensating redraw loops.
 
 PRES-REGRESSION — Card and shiny-transition continuity
 
@@ -666,6 +878,32 @@ Requirements
 * Preserve native navigation and normal/shiny interaction.
 * Investigate lifecycle and geometry causes rather than conceal symptoms with placeholders, delays or redraw loops.
 
+PRES-ABILITY-SPACING — Intermittent excess vertical space within or after Abilities
+
+Status: Ready for investigation and corrective work; multiple Safari screenshots supplied, underlying cause(s) unconfirmed.
+
+Observed behavior and corrected scope (2026-10-16)
+
+* Mawile: with identical userscripts before/after refresh, one capture shows a large gap between the regular ability Intimidate and the final Hidden ability Sheer Force; the other shows natural spacing. This proves an intermittent excess gap in one inter-ability position.
+* Aegislash (#0681): a separate Safari screenshot shows a conspicuous gap AFTER its ordinary Stance Change ability and BEFORE the Evolution heading. No Hidden ability appears. The report broadens the defect beyond Hidden labels and beyond a gap before the last ability.
+* Treat the general defect as abnormal spacing around Abilities entries and section boundaries. The screenshots do not yet establish whether the Mawile and Aegislash cases share the same underlying cause; do not force one diagnosis onto both.
+* The six STR/DEX/CON/INT/WIS/CHA ability scores are not the affected text entries. The defect concerns the Pokémon ability descriptions/section and their surrounding layout.
+
+Investigation and corrective requirements
+
+* Capture live DOM rectangles, computed margins/padding/height, display/flow/flex/grid properties, pseudo-elements, surrounding section heights and sibling positions in both normal and oversized states. Check the actual gap location, not just the last ability element's own margin.
+* Compare all relevant paths: native `AbilityPoolInfo.svelte` output, Species Card's reparenting/promotion/restoration, QoL's grouping of Hidden paragraphs (when present), Theme's appearance rules, native Svelte content updates and measurement clones. The Hidden wrapper is one possible contributor to the Mawile case, not a universal explanation.
+* Specifically check the final regular `.ability` element, `section.abilities` height and margins, next `section.evolution` or other section heading, any fixed/min-height or space distribution, stale layout styles, and browser margin collapsing. Measure whether apparent whitespace is internal to Abilities or belongs to the following section.
+* Determine whether layout-selection state, route transitions, promoted/native ability placement, font/image readiness, or extra preserved dimensions cause the discrepancy; distinguish multiple causes if evidence requires it.
+* Correct verified source behavior only: retain original ability descriptions, their natural wrap and intended entry spacing; remove stale/obsolete CSS or geometry machinery where responsible. No arbitrary fixed spacers, masking, late corrective repaint, delay or compensating observer.
+
+Acceptance and regression
+
+* Mawile: consistent normal Intimidate-to-Sheer Force spacing before and after refresh and across navigation.
+* Aegislash: natural Stance Change-to-Evolution spacing with no Hidden ability; compare its behavior across narrow split-pane, fullscreen and refresh.
+* Include species with one normal ability, several normal abilities, a Hidden ability, and no Hidden ability. Validate the Abilities-to-next-section boundary and internal spacing in Light, Dark and Type, promoted and unpromoted layouts, first load, back/forward and resize.
+* No missing/duplicated ability text, displaced sections, layout flicker or new excessive whitespace. Do not mark resolved until browser acceptance.
+
 ⸻
 
 OPS — Development and Acceptance
@@ -679,7 +917,7 @@ Requirements
 * QoL owns navigation, shiny controls, relevant native enhancements and application-level interactions.
 * Species Card owns hero composition, responsive card geometry and placement.
 * Theme Overlay owns theme-dependent presentation.
-* Artwork Intelligence owns artwork-derived metadata and analysis.
+* Artwork Intelligence owns normal-artwork geometry metadata and analysis, not visual type-color choices.
 * Preserve all established standalone behavior; Artwork Intelligence enhancements must degrade safely when absent.
 * Prefer using existing native site elements and state.
 * Remove dead selectors, observers, caches, functions and compatibility machinery when a feature is replaced.
@@ -697,6 +935,7 @@ Requirements
 * Make focused changes on authorized development branches.
 * Commit logically separable implementation work with traceable messages.
 * Syntax-check and run targeted regressions.
+* Regression tests must verify retained production behavior; retire tests and reference gates that exclusively serve removed subsystems, while preserving frozen historical data needed for explicit algorithm comparisons.
 * Test all three themes, Pokémon/Fakémon, mobile and desktop layouts, loading transitions, and independent script operation where relevant.
 * Explicitly separate automated tests, headless browser results and user-device verification.
 * Deliver the exact commit/build selected for installation and browser testing.
@@ -708,9 +947,9 @@ Implementation record
 
 Current experimental branch: dev/hero-restoration-2026-10-14
 
-Verified HEAD: 3c82480ec9ef8bf4d547c3df40228800362bfcd7
+ART-02-R01 implementation baseline: 3c82480ec9ef8bf4d547c3df40228800362bfcd7
 
-Branch comparison: 13 commits ahead of main at the verified HEAD.
+Prior workboard alignment referenced dev HEAD 236b6095fa9d99c1dadb4959b268b11d95d9ec77. This palette/assignment planning revision was prepared against dev HEAD e4eb9249daef3fc29f65b429db982fb41f717740. Branch comparison and current HEAD must be checked live before any code edit; historical counts are not treated as current.
 
 Existing restoration commits
 
@@ -734,21 +973,29 @@ ART-02-R01: JavaScript analyzer candidate committed at 3c82480. Not yet accepted
 
 The ART-02 report records successful Python/JavaScript parity tests, synthetic and real-image validation, and local Chromium checks. Live Poké5e acquisition, real-origin persistence, Safari behavior and consumer integration remain unverified.
 
+Accepted Theme Overlay milestone — 2026-10-17
+
+* **Theme Overlay v0.3.50 BackgroundType + Type Palette is explicitly user-accepted and committed on dev.** Commit 41179f9a contains exactly the accepted v0.3.50 file, verified by matching Git blob SHA 2f482191b94a525d42ef0644c09e703ae5a93481.
+* Includes the user's authoritative 613 original dual-type species/form `backgroundType` selections, with backgroundType → tint, the other type → banner, and no pairing-specific transformations.
+* The CSS groups all 18 types' mixing percentages together **above** the 18 individual derived-type color blocks. Previous percentage values were not retuned; banner and move treatments share the light mix initially.
+* Reported local candidate verification: JavaScript syntax, 613 IDs and valid typings, and Chromium fixtures for representative species, themes, and dynamic canonical-color changes. Live iPad Safari verification was **not independently recorded**; do not imply it was.
+* **GitHub dev now has Theme Overlay v0.3.50** (commit 41179f9a). This is development-branch integration only; do not promote to the approved default branch without additional authorization. Fakémon creator-selected color persistence, ART color-code retirement and ART geometry integration remain incomplete.
+
 Current integration state
 
 * Artwork Intelligence exists as a fourth standalone userscript.
-* Current QoL, Species Card and Theme Overlay do not yet consume its analysis results.
-* Existing official Pokémon artwork decisions remain in Theme Overlay.
+* Current QoL, Species Card and Theme Overlay do not yet consume its geometry results. Runtime ART color scanning is now obsolete by design.
+* GitHub dev Theme Overlay now contains the **user-accepted v0.3.50** with the 613 finalized `backgroundType` choices and derived type palette (commit 41179f9a). The accepted file was committed byte-for-byte; this does not mean it was promoted to the default branch or independently installed on a device.
 * Theme and biology restoration work precedes the Artwork Intelligence implementation on the same development branch.
 * The current branch is not equivalent to an accepted production release.
 
-Next work: Review the current Artwork Intelligence implementation against ART-COLOR, ART-GEO, ART-PREFETCH and ART-CACHE; evaluate color-scoring alternatives; measure performance; verify browser behavior; identify obsolete machinery; and review the restoration candidates before authorizing further code changes.
+Next work: (1) retain **v0.3.50 on dev as the exact accepted Theme Overlay baseline**, without promoting it to the default branch without explicit approval; (2) design and implement creator-selected Fakémon backgroundType editor persistence; (3) retire unused ART color processing and replace pixel-mask/hole machinery with faithful exterior contours; (4) implement bounded geometry-only prefetch and streamlined caches; (5) settle cold-first-reveal geometry behavior; (6) integrate ART geometry consumers and run appropriate browser regressions. Do not redo or recalibrate accepted original-Pokémon backgroundType data and per-type mixes without a new request.
 
 ⸻
 
 Completion rule
 
-A work item is marked Accepted only after its defined behavior is implemented and the relevant verification is complete, including user browser testing where required.
+A work item is marked Accepted upon explicit user acceptance of the implemented feature with relevant verification documented. Distinguish accepted standalone builds from code committed or deployed to GitHub; do not claim browser tests that were not actually witnessed.
 
 Items may be reopened if subsequent testing reveals defects or regressions.
 
