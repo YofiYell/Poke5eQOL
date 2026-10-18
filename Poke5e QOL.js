@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Pokemon 5e QOL - v0.13.2 Ready Card List Handoff
+// @name         QOL [v0.13.4]
 // @namespace    yofi.poke5e.qol.v01239
-// @version      0.13.2
+// @version      0.13.4
 // @description  Core navigation and controls; canonical universal Scarlet/Violet type palette; neighbor data warmup and decoded pre-paint portrait synchronization.
 // @match        https://poke5e.app/*
 // @run-at       document-start
@@ -139,19 +139,19 @@
     return {register,status,requireQol,report,notice,ready:publishReady};
   })());
   const previous = window.__yofiQolBootstrapStatus;
-  if (previous && previous.version !== '0.13.2' && previous.phase !== 'failed') {
+  if (previous && previous.version !== '0.13.4' && previous.phase !== 'failed') {
     modules.register('QoL',previous.version || 'unknown legacy version');
   } else if (!previous && window.__yofiPoke5eQol01020) {
     modules.register('QoL','unknown legacy version');
   }
-  const registration = modules.register('QoL','0.13.2');
-  if ((previous && previous.version !== '0.13.2' && previous.phase !== 'failed') ||
+  const registration = modules.register('QoL','0.13.4');
+  if ((previous && previous.version !== '0.13.4' && previous.phase !== 'failed') ||
       (!previous && window.__yofiPoke5eQol01020)) {
     modules.status(registration,'blocked: another QoL copy is active');
     return;
   }
 
-  if (previous?.version === '0.13.2' && previous.phase !== 'failed') {
+  if (previous?.version === '0.13.4' && previous.phase !== 'failed') {
     previous.reinjections = (previous.reinjections || 0) + 1;
     modules.status(registration,previous.phase);
     const repair = () => {
@@ -160,7 +160,7 @@
       try { window.__yofiQolRecover(); }
       catch (error) {
         previous.lastRecoveryError = String(error?.stack || error);
-        console.error('[Poké5e QOL v0.13.2] Same-tab recovery failed:',error);
+        console.error('[Poké5e QOL v0.13.4] Same-tab recovery failed:',error);
       }
       return true;
     };
@@ -176,7 +176,7 @@
     return;
   }
   const bootstrap = window.__yofiQolBootstrapStatus = {
-    version: '0.13.2', phase: 'waiting-for-head', attempts: 0,
+    version: '0.13.4', phase: 'waiting-for-head', attempts: 0,
     error: null, startedAt: Date.now()
   };
 
@@ -364,7 +364,7 @@
         bootstrap.phase = 'blocked-by-existing-qol';
         bootstrap.error = 'An earlier QOL version has already installed its shared guard. Disable older QOL versions and reopen this tab.';
         modules.status(registration,'blocked: another QoL copy is active');
-        console.error('[Poké5e QOL v0.13.2]',bootstrap.error);
+        console.error('[Poké5e QOL v0.13.4]',bootstrap.error);
         modules.notice('yofi-userscript-version-conflict',bootstrap.error);
       } else if (bootstrap.phase === 'initializing') bootstrap.phase = 'waiting-for-body';
     } catch (error) {
@@ -375,7 +375,7 @@
       // Do not delete the guard of an unrelated, already running QOL instance.
       if (window.__yofiPoke5eQol01020 === true)
         delete window.__yofiPoke5eQol01020;
-      console.error('[Poké5e QOL v0.13.2] Startup failed:', error);
+      console.error('[Poké5e QOL v0.13.4] Startup failed:', error);
     }
   }
   if (document.head) invokeWithHead();
@@ -387,7 +387,7 @@
   }
   function runQol() {
 
-  const VERSION = "0.13.2";
+  const VERSION = "0.13.4";
   // The browser controls site/navigation layout; the detail card controls
   // all entry-specific presentation. Do not confuse these two arenas.
   const RESPONSIVE_WIDTHS = Object.freeze({ compact: 600, wide: 800 });
