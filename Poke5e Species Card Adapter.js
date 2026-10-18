@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Species Card [v0.1.26]
+// @name         Species Card [v0.1.27]
 // @namespace    yofi.poke5e.species.card
-// @version      0.1.26
+// @version      0.1.27
 // @description  Pokemon/Fakemon adaptive card presentation with direct native navigation.
 // @match        https://poke5e.app/*
 // @run-at       document-start
@@ -138,7 +138,7 @@
     window.addEventListener('load',detectQol,{once:true});
     return {register,status,requireQol,report,notice,ready:publishReady};
   })());
-  const registration = modules.register('Species Card','0.1.26');
+  const registration = modules.register('Species Card','0.1.27');
   modules.requireQol(registration,runSpeciesCard);
   function runSpeciesCard() {
   // Standalone companion. Disable earlier Hero Layout Lab builds, not the QOL script.
@@ -148,15 +148,15 @@
   // the same nodes and both install recurring timers.
   if (window.__yofiHeroLayoutLab) {
     const active = window.__yofiHeroLayoutLab;
-    console.error('[Species Card v0.1.26] Conflicting adapter is already active:',
+    console.error('[Species Card v0.1.27] Conflicting adapter is already active:',
       active, 'Disable ALL earlier Hero Layout Lab / Adapter userscripts and reload.');
     modules.notice('yofi-userscript-version-conflict','Species Card conflict: disable extra Hero Layout Adapters / Species Card userscripts and reload.');
     return false;
   }
-  window.__yofiHeroLayoutLab = '0.1.26';
-  window.__yofiSpeciesCard = '0.1.26';
+  window.__yofiHeroLayoutLab = '0.1.27';
+  window.__yofiSpeciesCard = '0.1.27';
 
-  const VERSION = '0.1.26';
+  const VERSION = '0.1.27';
   const STYLE_ID = 'yofi-species-card-hero-css';
   const PREPARE_EVENT = 'yofi:species-card-prepare-before-reveal';
   const PRE_REVEAL_EVENT = 'yofi:species-card-before-reveal';
@@ -2539,12 +2539,12 @@ article.yofi-scores-layout section.moves > dl + dl {
     const cache = new Map();
     const probes = new Map();
     return {
-      height(source, width, kind) {
+      height(source, width, kind, copyPromoted = false) {
         if (!source || !(width > 0)) return 0;
         // Quantization and within-pass caching avoids measuring every 1px
         // variation of a word wrapping boundary across 100 candidates.
         const w = Math.max(1, Math.round(width / 2) * 2);
-        const key = kind + ':' + w;
+        const key = kind + ':' + w + (kind === 'copy' ? ':' + (copyPromoted ? 'promoted' : 'native') : '');
         if (cache.has(key)) return cache.get(key);
         let probe = probes.get(kind);
         if (!probe) {
@@ -2555,6 +2555,11 @@ article.yofi-scores-layout section.moves > dl + dl {
             'height:auto!important;max-width:none!important;box-sizing:border-box!important;';
           const clone = cloneWithoutIds(source);
           if (kind === 'copy') {
+            // The live description has zero box padding in native and promoted
+            // layouts. The detached clone lacks its normal parent CSS selector,
+            // so make its measured content box identical in either state.
+            clone.style.setProperty('padding', '0', 'important');
+            clone.style.setProperty('margin', '0', 'important');
             const css = getComputedStyle(source.querySelector('.small-text') || source);
             // Native copy styling survives the temporary measurement host.
             const inner = clone.querySelector('.small-text') || clone;
@@ -2582,6 +2587,12 @@ article.yofi-scores-layout section.moves > dl + dl {
           probes.set(kind,probe);
         }
         probe.outer.style.width = w + 'px';
+        if (kind === 'copy') {
+          // Wrapping belongs to the candidate, not the layout currently
+          // applied: native copy allows anywhere, promoted copy uses normal.
+          const inner = probe.clone.querySelector('.small-text') || probe.clone;
+          inner.style.setProperty('overflow-wrap', copyPromoted ? 'normal' : 'anywhere', 'important');
+        }
         const h = Math.ceil(probe.clone.getBoundingClientRect().height);
         cache.set(key,h);
         return h;
@@ -2740,7 +2751,7 @@ article.yofi-scores-layout section.moves > dl + dl {
       creditH=measurer.height(credit,laneWidth,'credit');
       creditH+=Math.max(0,parseFloat(getComputedStyle(credit).marginTop)||0);
     }
-    const copyH=measurer.height(nativeDesc,copyWidth,'copy');
+    const copyH=measurer.height(nativeDesc,copyWidth,'copy',p.scores||p.tiles||p.abilities);
     const hasAbilities=!!view.abilities?.querySelector('.ability,.yofi-native-hidden-pair');
     const abilitiesH=p.abilities&&hasAbilities?
       measurer.height(view.abilities,rightWidth,'abilities')+5:0;
