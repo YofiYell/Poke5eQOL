@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Species Card [v0.1.28 Unified Subject Layout]
+// @name         Species Card [v0.2.22 Combined Artwork Area]
 // @namespace    yofi.poke5e.species.card
-// @version      0.1.28
-// @description  Adaptive species layouts with measured normal-artwork subject bounds for compact and expanded presentations.
+// @version      0.2.22
+// @description  Compact 9.5-10.5% combined subject-area bounds with 18.5% bbox cap; preserves selector and image containment.
 // @match        https://poke5e.app/*
 // @run-at       document-start
 // @grant        none
@@ -138,7 +138,7 @@
     window.addEventListener('load',detectQol,{once:true});
     return {register,status,requireQol,report,notice,ready:publishReady};
   })());
-  const registration = modules.register('Species Card','0.1.28');
+  const registration = modules.register('Species Card','0.2.22');
   modules.requireQol(registration,runSpeciesCard);
   function runSpeciesCard() {
   // Standalone companion. Disable earlier Hero Layout Lab builds, not the QOL script.
@@ -148,15 +148,15 @@
   // the same nodes and both install recurring timers.
   if (window.__yofiHeroLayoutLab) {
     const active = window.__yofiHeroLayoutLab;
-    console.error('[Species Card v0.1.28] Conflicting adapter is already active:',
+    console.error('[Species Card v0.2.22] Conflicting adapter is already active:',
       active, 'Disable ALL earlier Hero Layout Lab / Adapter userscripts and reload.');
     modules.notice('yofi-userscript-version-conflict','Species Card conflict: disable extra Hero Layout Adapters / Species Card userscripts and reload.');
     return false;
   }
-  window.__yofiHeroLayoutLab = '0.1.28';
-  window.__yofiSpeciesCard = '0.1.28';
+  window.__yofiHeroLayoutLab = '0.2.22';
+  window.__yofiSpeciesCard = '0.2.22';
 
-  const VERSION = '0.1.28';
+  const VERSION = '0.2.22';
   const STYLE_ID = 'yofi-species-card-hero-css';
   const PREPARE_EVENT = 'yofi:species-card-prepare-before-reveal';
   const PRE_REVEAL_EVENT = 'yofi:species-card-before-reveal';
@@ -174,8 +174,77 @@
   const BBOX_TEST_SOURCE = 'Poke5e archive / upstream 881f3cae / alpha>=1';
   const BBOX_TEST_TABLE = Object.freeze({"abomasnow":[22,22,453,453],"abra":[22,86,453,389],"absol":[93,22,381,453],"accelgor":[22,42,453,432],"aegislash":[58,22,416,453],"aerodactyl":[22,103,453,371],"aggron":[22,22,452,453],"aipom":[22,54,453,421],"alakazam":[22,46,453,429],"alcremie":[91,41,382,424],"alolan-diglett":[82,58,389,415],"alolan-dugtrio":[31,53,453,423],"alolan-exeggutor":[135,21,360,454],"alolan-geodude":[18,101,440,366],"alolan-golem":[64,41,390,437],"alolan-graveler":[20,102,460,422],"alolan-grimer":[26,60,446,418],"alolan-marowak":[105,19,380,435],"alolan-meowth":[98,47,345,426],"alolan-muk":[10,116,461,351],"alolan-ninetales":[21,79,455,411],"alolan-persian":[48,79,428,418],"alolan-raichu":[62,45,405,427],"alolan-raticate":[48,99,428,397],"alolan-rattata":[47,88,425,368],"alolan-sandshrew":[33,75,414,418],"alolan-sandslash":[54,34,418,438],"alolan-vulpix":[74,38,437,418],"alomomola":[122,22,353,453],"altaria":[43,22,432,453],"amaura":[77,22,398,453],"ambipom":[22,62,453,413],"amoonguss":[22,44,453,431],"ampharos":[79,22,396,453],"annihilape":[43,23,411,427],"anorith":[27,22,448,453],"appletun":[36,71,432,414],"applin":[132,95,358,369],"araquanid":[34,60,441,418],"arbok":[44,22,430,453],"arboliva":[13,68,466,426],"arcanine":[22,34,453,440],"arcanine-hisui":[9,62,466,424],"arceus":[76,22,398,453],"archaludon":[52,13,422,462],"archen":[22,93,453,381],"archeops":[81,22,394,453],"arctibax":[40,83,461,437],"arctovish":[100,80,403,399],"arctozolt":[59,54,378,440],"ariados":[22,42,453,432],"armaldo":[22,47,453,427],"armarouge":[100,13,374,462],"aromatisse":[84,22,390,453],"aron":[22,32,453,443],"arrokuda":[26,111,443,322],"articuno":[46,22,428,453],"articuno-galar":[39,32,434,465],"audino":[59,22,415,453],"aurorus":[41,22,433,453],"avalugg":[50,22,432,438],"avalugg-hisui":[51,69,427,399],"axew":[76,22,398,453],"azelf":[86,22,388,453],"azumarill":[29,22,446,453],"azurill":[51,22,424,453],"bagon":[97,22,378,453],"baltoy":[22,22,453,453],"banette":[22,34,453,440],"barbaracle":[22,41,453,425],"barboach":[22,123,453,352],"barraskewda":[17,142,462,326],"basculegion-f":[20,120,463,384],"basculegion-m":[21,103,469,355],"basculin":[22,51,453,424],"basculin-blue-striped":[22,58,453,416],"basculin-white-striped":[60,79,416,396],"bastiodon":[22,45,453,429],"baxcalibur":[96,23,390,456],"bayleef":[110,22,364,453],"beartic":[22,38,453,437],"beautifly":[22,30,453,445],"beedrill":[59,22,416,453],"beheeyem":[96,22,379,453],"beldum":[22,124,453,350],"bellibolt":[56,80,364,391],"bellossom":[42,22,432,453],"bellsprout":[52,22,422,453],"bergmite":[43,22,432,453],"bewear":[63,46,428,428],"bibarel":[22,51,453,424],"bidoof":[22,47,453,428],"binacle":[42,22,432,453],"bisharp":[121,22,354,453],"blacephalon":[43,0,432,475],"black-kyurem":[22,58,453,417],"blastoise":[38,22,436,453],"blaziken":[75,22,400,453],"blipbug":[133,67,328,390],"blissey":[32,22,442,453],"blitzle":[109,22,365,453],"boldore":[22,53,453,421],"boltund":[24,75,461,404],"bombirdier":[49,49,457,442],"bonsly":[100,22,375,453],"bouffalant":[22,56,453,419],"bounsweet":[46,47,430,413],"braixen":[95,22,379,453],"brambleghast":[15,33,453,432],"bramblin":[33,49,458,434],"braviary":[22,41,453,433],"braviary-hisui":[18,35,444,426],"breloom":[60,22,415,453],"brionne":[35,84,439,387],"bronzong":[22,119,453,356],"bronzor":[65,22,410,453],"brute-bonnet":[50,99,424,425],"bruxish":[34,87,439,344],"budew":[106,22,369,453],"buizel":[22,108,453,367],"bulbasaur":[22,36,453,438],"buneary":[128,22,346,453],"bunnelby":[98,22,376,453],"burmy":[119,22,355,453],"butterfree":[22,41,453,434],"buzzwole":[67,46,412,435],"cacnea":[22,91,453,384],"cacturne":[31,22,444,453],"calyrex":[68,4,402,475],"calyrex-ice":[88,30,399,445],"calyrex-shadow":[56,30,447,470],"camerupt":[22,63,453,412],"capsakid":[92,25,382,450],"carbink":[22,31,453,443],"carkol":[88,70,392,425],"carnivine":[22,61,453,414],"carracosta":[22,61,453,414],"carvanha":[71,22,404,453],"cascoon":[22,64,453,411],"castform":[104,22,371,453],"caterpie":[22,22,453,453],"celebi":[22,50,453,425],"celesteela":[18,45,462,433],"centiskorch":[23,50,445,387],"ceruledge":[33,8,438,463],"cetitan":[17,112,458,364],"cetoddle":[32,82,463,389],"chandelure":[47,22,428,453],"chansey":[22,48,453,427],"charcadet":[109,13,343,466],"charizard":[22,68,453,406],"charjabug":[47,99,426,379],"charmander":[46,22,428,453],"charmeleon":[53,22,421,453],"chatot":[41,22,434,453],"cherrim":[62,22,412,453],"cherubi":[46,22,429,453],"chesnaught":[22,58,453,417],"chespin":[87,22,387,453],"chewtle":[111,51,331,402],"chi-yu":[36,71,452,388],"chien-pao":[14,68,469,406],"chikorita":[72,22,402,453],"chimchar":[109,22,366,453],"chimecho":[136,22,339,453],"chinchou":[22,68,453,406],"chingling":[22,49,453,426],"cinccino":[22,27,453,448],"cinderace":[124,15,364,463],"clamperl":[43,22,431,453],"clauncher":[22,93,453,382],"clawitzer":[22,125,453,349],"claydol":[34,22,440,453],"clefable":[22,24,453,450],"clefairy":[22,22,452,453],"cleffa":[22,38,453,437],"clobbopus":[50,96,429,354],"clodsire":[19,146,463,368],"cloyster":[22,31,453,444],"coalossal":[72,33,417,451],"cobalion":[98,22,376,453],"cofagrigus":[22,65,453,410],"combee":[22,116,453,358],"combusken":[22,29,453,445],"comfey":[73,45,401,427],"conkeldurr":[22,59,453,415],"copperajah":[60,61,414,399],"corphish":[22,27,453,447],"corsola":[22,34,453,440],"corviknight":[44,44,366,447],"corvisquire":[84,49,425,433],"cosmoem":[55,68,420,391],"cosmog":[47,60,428,417],"cottonee":[22,109,453,365],"crabominable":[18,95,457,362],"crabrawler":[48,69,428,408],"cradily":[61,22,413,453],"cramorant":[74,42,390,445],"cranidos":[59,22,416,453],"crawdaunt":[22,40,453,435],"cresselia":[36,22,438,453],"croagunk":[61,22,414,453],"crobat":[22,110,453,365],"crocalor":[75,78,405,423],"croconaw":[40,22,434,453],"crustle":[22,64,453,410],"cryogonal":[25,22,450,453],"cubchoo":[72,22,403,453],"cubone":[56,22,419,453],"cufant":[62,76,420,405],"cursola":[38,63,421,445],"cutiefly":[50,39,425,419],"cyclizar":[41,45,424,459],"cyndaquil":[22,73,453,402],"dachsbun":[9,49,461,421],"darkrai":[31,22,443,453],"darmanitan":[43,22,432,453],"dartrix":[47,70,428,408],"darumaka":[22,33,453,442],"dawn-wings-necrozma":[0,60,475,416],"decidueye":[47,67,427,406],"decidueye-hisui":[53,19,445,454],"dedenne":[22,49,453,425],"deerling":[103,22,372,453],"deino":[77,22,397,453],"delcatty":[71,22,403,453],"delibird":[74,22,400,453],"delphox":[22,64,453,410],"deoxys":[22,56,453,418],"dewgong":[22,23,453,452],"dewott":[96,22,378,453],"dewpider":[109,55,370,425],"dhelmise":[117,24,407,436],"dialga":[41,22,434,453],"dialga-origin":[65,16,406,458],"diancie":[53,13,422,463],"diggersby":[22,61,453,413],"diglett":[22,38,453,437],"dipplin":[114,8,360,467],"ditto":[22,55,453,420],"dodrio":[61,22,414,453],"doduo":[107,22,368,453],"dolliv":[93,32,368,449],"dondozo":[22,99,453,376],"donphan":[22,115,453,360],"dottler":[63,109,423,391],"doublade":[22,75,453,399],"dracovish":[61,70,363,428],"dracozolt":[41,91,462,391],"dragalge":[22,50,453,424],"dragapult":[30,44,450,443],"dragonair":[39,22,436,453],"dragonite":[70,22,405,453],"drakloak":[27,58,446,418],"drampa":[25,96,449,361],"drapion":[22,116,453,358],"dratini":[22,28,453,447],"drednaw":[31,111,461,369],"dreepy":[39,122,443,371],"drifblim":[22,22,452,453],"drifloon":[105,22,369,453],"drilbur":[22,22,453,453],"drizzile":[15,8,455,462],"drowzee":[76,22,399,453],"druddigon":[22,53,453,421],"dubwool":[78,53,403,434],"ducklett":[71,22,403,453],"dudunsparce":[60,132,408,395],"dugtrio":[22,29,453,445],"dunsparce":[48,22,426,453],"duosion":[40,22,435,453],"duraludon":[71,47,387,429],"durant":[22,115,453,359],"dusclops":[22,50,453,424],"dusk-mane-necrozma":[0,18,475,457],"dusknoir":[22,77,453,397],"duskull":[53,22,421,453],"dustox":[22,101,453,374],"dwebble":[22,41,453,434],"eelektrik":[71,22,404,453],"eelektross":[22,122,453,352],"eevee":[62,22,413,453],"eiscue":[103,47,356,432],"ekans":[22,24,453,451],"eldegoss":[66,52,395,442],"electabuzz":[22,26,453,448],"electivire":[22,71,453,403],"electrike":[22,93,453,382],"electrode":[23,22,452,453],"electrode-hisui":[0,0,475,474],"elekid":[22,92,453,383],"elgyem":[97,22,377,453],"emboar":[22,22,453,453],"emolga":[22,90,453,385],"empoleon":[64,22,411,453],"enamorus":[98,34,337,436],"enamorus-therian":[26,107,428,411],"entei":[39,22,436,453],"escavalier":[60,22,414,453],"espathra":[50,21,430,462],"espeon":[22,31,453,444],"espurr":[70,22,404,453],"eternatus":[12,78,463,433],"eternatus-eternamax":[10,76,466,400],"excadrill":[22,65,453,409],"exeggcute":[22,68,453,406],"exeggutor":[22,26,453,448],"exploud":[22,24,453,451],"falinks":[20,68,439,434],"farfetchd":[57,22,418,453],"farigiraf":[148,18,347,441],"fearow":[22,37,453,437],"feebas":[79,22,396,453],"fennekin":[91,22,383,453],"feraligatr":[48,22,426,453],"ferroseed":[51,22,423,453],"ferrothorn":[22,80,453,395],"fezandipiti":[0,0,474,475],"fidough":[52,109,414,402],"finizen":[60,106,436,334],"finneon":[22,46,453,428],"flaaffy":[66,22,408,453],"flabebe":[31,22,444,453],"flamigo":[146,18,328,457],"flapple":[68,74,432,399],"flareon":[22,45,453,429],"fletchinder":[22,35,453,440],"fletchling":[22,54,453,420],"flittle":[59,44,416,445],"floatzel":[68,22,406,453],"floette":[59,22,415,453],"floette-eternal":[45,9,410,462],"floragato":[107,40,379,446],"florges":[60,24,414,436],"flutter-mane":[26,61,449,414],"flygon":[22,75,453,400],"fomantis":[104,47,365,427],"foongus":[37,22,438,453],"forretress":[22,68,453,407],"fraxure":[22,30,453,444],"frigibax":[37,95,381,434],"frillish":[22,27,453,448],"froakie":[32,22,443,453],"frogadier":[22,68,453,407],"froslass":[131,22,344,453],"frosmoth":[20,84,464,388],"fuecoco":[53,16,419,459],"furfrou":[83,22,391,453],"furret":[58,22,417,453],"gabite":[23,22,452,453],"galarian-corsola":[71,94,375,388],"galarian-darmanitan":[92,36,399,435],"galarian-darumaka":[93,89,395,398],"galarian-farfetchd":[33,117,428,358],"galarian-linoone":[33,64,447,351],"galarian-meowth":[47,82,413,406],"galarian-mr-mime":[33,45,427,465],"galarian-ponyta":[92,87,402,373],"galarian-rapidash":[73,43,421,421],"galarian-slowbro":[44,76,449,431],"galarian-slowking":[69,0,406,475],"galarian-slowpoke":[42,221,444,378],"galarian-stunfisk":[40,127,423,367],"galarian-weezing":[64,30,431,434],"galarian-yamask":[39,74,429,402],"galarian-zigzagoon":[35,76,427,373],"gallade":[61,22,414,453],"galvantula":[22,72,453,403],"garbodor":[22,49,453,425],"garchomp":[31,22,444,453],"gardevoir":[22,24,453,450],"garganacl":[42,26,372,434],"gastly":[22,23,453,452],"gastrodon":[63,22,411,453],"genesect":[58,22,416,453],"gengar":[26,22,448,453],"geodude":[22,156,453,319],"gholdengo":[84,25,323,446],"gible":[22,26,453,449],"gigalith":[36,22,439,453],"gimmighoul":[115,37,378,458],"gimmighoul-roaming":[11,19,466,455],"girafarig":[102,22,373,453],"giratina-altered-forme":[0,46,475,429],"giratina-origin-forme":[0,18,475,457],"glaceon":[22,59,453,416],"glalie":[22,40,453,434],"glameow":[36,22,438,453],"glastrier":[90,10,406,469],"gligar":[22,22,452,453],"glimmet":[143,37,321,431],"glimmora":[25,89,470,398],"gliscor":[42,22,432,453],"gloom":[22,61,453,413],"gogoat":[49,22,425,453],"golbat":[22,52,453,422],"goldeen":[22,117,453,358],"golduck":[22,25,453,450],"golem":[22,35,453,440],"golett":[28,22,447,453],"golisopod":[31,30,428,428],"golurk":[37,22,438,453],"goodra":[41,42,434,453],"goodra-hisui":[28,69,431,428],"goomy":[22,22,453,453],"gorebyss":[22,75,453,399],"gossifleur":[64,61,433,411],"gothita":[89,22,385,453],"gothitelle":[88,22,386,453],"gothorita":[92,22,383,453],"gouging-fire":[13,30,462,445],"gourgeist":[51,22,424,446],"grafaiai":[36,82,433,433],"granbull":[70,22,404,453],"grapploct":[52,49,404,426],"graveler":[22,130,453,344],"great-tusk":[16,107,460,368],"greavard":[72,24,401,447],"greedent":[46,55,364,406],"greninja":[22,110,453,365],"grimer":[22,89,453,386],"grimmsnarl":[16,49,460,445],"grookey":[82,32,392,443],"grotle":[22,22,452,453],"groudon":[22,90,453,385],"groudon-primal":[5,92,469,383],"grovyle":[22,51,453,424],"growlithe":[86,22,388,453],"growlithe-hisui":[42,39,432,424],"grubbin":[47,142,425,336],"grumpig":[22,27,453,447],"gulpin":[22,58,453,417],"gumshoos":[47,70,424,407],"gurdurr":[22,35,453,439],"guzzlord":[25,81,455,394],"gyarados":[60,22,414,453],"hakamo-o":[94,35,419,439],"happiny":[96,22,379,453],"hariyama":[22,28,453,447],"hatenna":[70,86,389,380],"hatterene":[92,7,354,453],"hattrem":[21,61,464,409],"haunter":[22,50,453,425],"hawlucha":[22,80,451,395],"haxorus":[67,22,407,453],"heatmor":[22,74,453,400],"heatran":[22,107,453,367],"heliolisk":[22,72,453,403],"helioptile":[22,77,453,398],"heracross":[24,22,450,453],"herdier":[35,22,439,453],"hippopotas":[22,79,453,395],"hippowdon":[22,85,453,390],"hitmonchan":[75,22,400,453],"hitmonlee":[22,51,453,424],"hitmontop":[22,28,453,447],"ho-oh":[42,22,433,453],"honchkrow":[22,90,453,385],"honedge":[100,22,374,453],"hoopa-confined":[31,20,461,462],"hoopa-unbound":[8,46,463,431],"hoothoot":[25,22,450,453],"hoppip":[22,62,453,412],"horsea":[41,22,434,453],"houndoom":[32,22,443,453],"houndour":[61,22,414,453],"houndstone":[29,72,456,408],"huntail":[22,62,453,413],"hydrapple":[118,12,357,463],"hydreigon":[22,25,453,450],"hypno":[35,22,439,453],"igglybuff":[71,22,404,453],"illumise":[69,22,405,453],"impidimp":[52,91,423,419],"incineroar":[136,34,360,440],"indeedee-f":[99,73,369,436],"indeedee-m":[121,40,354,430],"infernape":[22,55,453,419],"inkay":[34,22,440,453],"inteleon":[136,14,348,460],"iron-boulder":[12,32,462,443],"iron-bundle":[26,104,383,441],"iron-crown":[133,12,342,462],"iron-hands":[5,81,470,393],"iron-jugulis":[25,64,456,448],"iron-leaves":[124,17,374,458],"iron-moth":[16,72,468,472],"iron-thorns":[81,50,409,451],"iron-treads":[11,100,460,415],"iron-valiant":[32,13,451,466],"ivysaur":[22,36,453,438],"jangmo-o":[46,48,426,424],"jellicent":[22,41,453,434],"jigglypuff":[22,33,453,441],"jirachi":[22,75,453,400],"jolteon":[47,22,428,453],"joltik":[22,70,453,404],"jumpluff":[101,22,374,453],"jynx":[22,62,453,412],"kabuto":[22,79,453,396],"kabutops":[46,22,428,453],"kadabra":[53,22,421,453],"kakuna":[121,22,354,453],"kangaskhan":[26,22,448,453],"karrablast":[98,22,376,453],"kartana":[29,35,445,439],"kecleon":[41,22,434,453],"keldeo":[22,31,453,443],"kilowattrel":[8,32,459,377],"kingambit":[102,11,410,451],"kingdra":[43,22,432,453],"kingler":[22,104,453,371],"kirlia":[108,22,366,453],"klang":[22,58,453,417],"klawf":[42,88,447,408],"kleavor":[42,34,456,443],"klefki":[22,83,439,386],"klink":[22,55,453,419],"klinklang":[22,108,453,366],"koffing":[22,57,453,418],"komala":[48,67,428,407],"kommo-o":[28,68,447,408],"koraidon":[47,38,420,434],"krabby":[22,106,453,369],"kricketot":[110,22,365,453],"kricketune":[93,22,381,453],"krokorok":[39,22,435,453],"krookodile":[30,22,444,453],"kubfu":[114,25,375,433],"kyogre":[22,139,453,336],"kyogre-primal":[5,59,469,417],"kyurem":[22,41,453,433],"lairon":[22,58,453,417],"lampent":[67,22,407,453],"landorus":[58,22,416,453],"landorus-therian":[61,22,414,453],"lanturn":[22,110,453,364],"lapras":[22,30,453,445],"larvesta":[24,22,451,453],"larvitar":[112,22,362,453],"latias":[22,55,453,419],"latios":[22,93,453,382],"leafeon":[53,22,422,453],"leavanny":[130,22,345,453],"lechonk":[53,112,387,391],"ledian":[95,22,380,453],"ledyba":[51,22,424,453],"lickilicky":[34,22,441,453],"lickitung":[22,38,453,437],"liepard":[22,51,453,424],"lileep":[41,22,433,453],"lilligant":[77,22,398,453],"lilligant-hisui":[97,55,380,458],"lillipup":[73,22,401,453],"linoone":[22,148,453,327],"litleo":[22,28,453,446],"litten":[98,47,377,428],"litwick":[103,22,371,453],"lokix":[126,9,399,457],"lombre":[51,22,424,453],"lopunny":[55,22,419,453],"lotad":[22,54,453,420],"loudred":[33,22,441,453],"lucario":[97,22,377,453],"ludicolo":[59,22,415,453],"lugia":[22,70,453,405],"lumineon":[49,22,426,453],"lunala":[45,28,422,443],"lunatone":[38,22,437,453],"lurantis":[124,33,371,437],"luvdisc":[124,22,351,453],"luxio":[22,43,453,432],"luxray":[22,38,453,437],"lycanroc-dusk-form":[14,100,466,374],"lycanroc-midday-form":[47,94,426,383],"lycanroc-midnight-form":[91,47,384,427],"mabosstiff":[67,79,443,422],"machamp":[48,22,427,453],"machoke":[57,22,418,453],"machop":[58,22,416,453],"magby":[83,22,391,453],"magcargo":[54,22,420,453],"magearna":[95,46,380,428],"magikarp":[44,22,430,453],"magmar":[22,27,453,447],"magmortar":[35,22,440,453],"magnemite":[22,120,453,355],"magneton":[22,41,453,434],"magnezone":[22,86,453,389],"makuhita":[62,22,413,453],"malamar":[54,22,420,453],"mamoswine":[22,71,453,403],"manaphy":[22,110,453,365],"mandibuzz":[102,22,373,453],"manectric":[82,22,392,453],"mankey":[22,85,453,390],"mantine":[22,120,453,354],"mantyke":[22,81,453,394],"maractus":[73,22,401,453],"mareanie":[57,44,433,398],"mareep":[59,22,415,453],"marill":[22,69,453,406],"marowak":[59,22,416,453],"marshadow":[84,0,390,475],"marshtomp":[50,22,424,453],"maschiff":[81,144,426,354],"masquerain":[22,73,453,401],"maushold":[25,140,443,378],"mawile":[22,70,453,405],"medicham":[119,22,356,453],"meditite":[30,22,445,453],"meganium":[117,22,357,453],"melmetal":[18,110,459,379],"meloetta---aria":[98,22,376,453],"meloetta---pirouette":[108,22,366,453],"meltan":[101,63,351,414],"meowscarada":[65,10,425,465],"meowstic-f":[58,22,417,453],"meowstic-m":[42,22,433,453],"meowth":[73,22,401,453],"mesprit":[84,22,391,453],"metagross":[22,97,453,377],"metang":[22,70,453,405],"metapod":[48,22,427,453],"mew":[25,22,450,453],"mewtwo":[61,22,414,453],"mienfoo":[34,22,441,453],"mienshao":[22,31,453,444],"mightyena":[26,22,449,453],"milcery":[49,112,410,355],"milotic":[30,22,445,453],"miltank":[54,22,421,453],"mime-jr":[89,22,386,453],"mimikyu":[96,47,399,428],"minccino":[22,51,453,424],"minior-core-form":[73,65,400,414],"minior-meteor-form":[73,65,400,414],"minun":[71,22,403,453],"miraidon":[90,21,365,453],"misdreavus":[22,40,453,435],"mismagius":[95,22,380,453],"moltres":[22,136,453,339],"moltres-galar":[20,38,460,434],"monferno":[22,55,453,419],"morelull":[146,48,311,425],"morgrem":[68,56,391,412],"morpeko":[116,82,350,399],"mothim":[22,120,453,354],"mr-mime":[22,32,453,443],"mr-rime":[44,35,437,424],"mudbray":[89,47,386,426],"mudkip":[32,22,443,453],"mudsdale":[48,53,428,426],"muk":[22,128,453,346],"munchlax":[79,22,395,453],"munkidori":[114,7,360,467],"munna":[22,24,453,451],"murkrow":[43,22,431,453],"musharna":[31,22,444,453],"nacli":[74,102,380,411],"naclstack":[40,95,444,413],"naganadel":[0,114,475,361],"natu":[22,22,452,453],"necrozma":[14,64,444,395],"nickit":[20,27,450,441],"nidoking":[22,71,453,403],"nidoqueen":[28,22,446,453],"nidoran-f":[22,31,453,444],"nidoran-m":[42,22,432,453],"nidorina":[47,22,428,453],"nidorino":[43,22,431,453],"nihilego":[112,37,354,437],"nincada":[22,129,453,346],"ninetales":[22,30,453,445],"ninjask":[22,82,453,392],"noctowl":[113,22,361,453],"noibat":[22,47,453,427],"noivern":[22,80,453,395],"nosepass":[22,39,453,436],"numel":[24,22,450,453],"nuzleaf":[34,22,440,453],"nymble":[99,92,381,426],"obstagoon":[93,40,389,459],"octillery":[22,53,453,421],"oddish":[42,22,432,453],"ogerpon":[29,12,446,463],"ogerpon-cornerstone-mask":[36,12,438,463],"ogerpon-heartflame-mask":[26,12,449,462],"ogerpon-wellspring-mask":[33,12,441,462],"oinkologne-female":[41,34,388,430],"oinkologne-male":[31,35,425,424],"okidogi":[0,30,475,444],"omanyte":[48,22,426,453],"omastar":[22,48,453,427],"onix":[32,22,443,453],"oranguru":[20,85,450,408],"orbeetle":[80,43,395,448],"oricorio-baile-style":[72,47,403,428],"oricorio-pau-style":[47,65,425,413],"oricorio-pom-pom-style":[37,128,438,388],"oricorio-sensu-style":[47,94,426,399],"orthworm":[14,48,462,427],"oshawott":[70,22,405,453],"overqwil":[64,31,420,450],"pachirisu":[62,22,412,453],"palafin":[60,106,436,334],"palkia":[22,36,453,439],"palkia-origin":[74,15,400,460],"palossand":[27,77,449,378],"palpitoad":[60,22,415,453],"pancham":[92,22,383,453],"pangoro":[22,57,453,417],"panpour":[45,22,429,453],"pansage":[56,22,418,453],"pansear":[56,22,418,453],"paras":[22,60,453,414],"parasect":[22,34,453,440],"passimian":[74,50,448,437],"patrat":[33,22,441,453],"pawmi":[8,56,454,448],"pawmo":[58,10,426,461],"pawmot":[30,14,429,468],"pawniard":[22,70,453,405],"pecharunt":[12,67,463,408],"pelipper":[27,22,447,453],"perrserker":[37,49,400,429],"persian":[22,44,453,430],"petilil":[113,22,361,453],"phanpy":[22,31,453,444],"phantump":[29,28,453,443],"pheromosa":[83,29,392,449],"phione":[22,83,453,391],"pichu":[49,22,426,453],"pidgeot":[31,22,444,453],"pidgeotto":[51,22,424,453],"pidgey":[36,22,438,453],"pidove":[23,22,452,453],"pignite":[44,22,431,453],"pikachu":[22,35,453,440],"pikipek":[47,61,425,399],"piloswine":[42,22,432,453],"pincurchin":[30,67,429,371],"pineco":[52,22,423,453],"pinsir":[30,22,444,453],"piplup":[93,22,381,453],"plusle":[90,22,385,453],"poipole":[122,0,353,475],"politoed":[90,22,385,453],"poliwag":[22,68,453,406],"poliwhirl":[22,49,453,426],"poliwrath":[22,91,453,384],"poltchageist":[27,73,447,402],"polteageist":[39,41,449,424],"ponyta":[70,22,405,453],"poochyena":[22,46,453,428],"popplio":[47,84,426,410],"porygon":[32,22,443,453],"porygon-z":[67,22,408,453],"porygon2":[22,27,453,448],"primarina":[37,54,437,428],"primeape":[30,22,444,453],"prinplup":[41,22,433,453],"probopass":[41,22,434,453],"psyduck":[71,22,404,453],"pumpkaboo":[36,22,438,453],"pupitar":[66,22,408,453],"purrloin":[75,22,399,453],"purugly":[41,22,434,453],"pyroar":[38,22,437,453],"pyukumuku":[47,86,428,361],"quagsire":[55,22,419,453],"quaquaval":[114,30,378,461],"quaxly":[105,40,359,439],"quaxwell":[110,23,365,459],"quilava":[107,22,368,453],"quilladin":[22,30,453,445],"qwilfish":[25,22,449,453],"qwilfish-hisui":[65,95,435,366],"raboot":[52,19,413,433],"rabsca":[90,7,413,467],"raging-bolt":[71,10,405,461],"raichu":[22,46,453,429],"raikou":[22,61,453,414],"rainy-castform":[103,3,442,475],"ralts":[106,22,368,453],"rampardos":[22,69,453,406],"rapidash":[51,22,423,453],"raticate":[22,26,453,449],"rattata":[22,47,453,427],"rayquaza":[22,42,453,433],"regice":[22,25,453,450],"regidrago":[59,50,446,416],"regieleki":[26,152,471,366],"regigigas":[22,92,453,383],"regirock":[22,25,453,450],"registeel":[22,79,453,396],"relicanth":[22,89,453,386],"rellor":[70,172,415,401],"remoraid":[61,22,414,453],"reshiram":[41,22,434,453],"reuniclus":[22,134,453,340],"revavroom":[30,71,436,423],"rhydon":[22,59,453,415],"rhyhorn":[39,22,436,453],"rhyperior":[22,92,453,382],"ribombee":[94,47,428,428],"rillaboom":[51,65,422,429],"riolu":[36,22,438,453],"roaring-moon":[24,16,430,464],"rockruff":[81,50,394,428],"roggenrola":[105,22,369,453],"rolycoly":[90,128,375,366],"rookidee":[41,104,412,389],"roselia":[22,40,453,434],"roserade":[85,22,389,453],"rotom":[22,30,453,445],"rotom-fan":[22,67,453,408],"rotom-frost":[22,80,453,394],"rotom-heat":[61,22,414,453],"rotom-mow":[61,22,413,453],"rotom-wash":[22,69,453,406],"rowlet":[78,47,397,424],"rufflet":[101,22,374,453],"runerigus":[8,91,465,384],"sableye":[22,32,453,442],"salamence":[22,63,453,412],"salandit":[68,48,401,425],"salazzle":[70,38,384,428],"samurott":[22,32,453,443],"samurott-hisui":[76,21,415,454],"sandaconda":[46,111,425,373],"sandile":[22,89,453,385],"sandshrew":[41,22,434,453],"sandslash":[22,31,453,444],"sandy-shocks":[47,48,367,448],"sandygast":[47,66,427,384],"sawk":[59,22,415,453],"sawsbuck":[56,0,419,475],"scatterbug":[112,22,362,453],"sceptile":[36,22,439,453],"scizor":[63,22,412,453],"scolipede":[22,34,453,440],"scorbunny":[132,21,343,454],"scovillain":[56,44,425,454],"scrafty":[94,22,381,453],"scraggy":[73,22,401,453],"scream-tail":[38,94,438,406],"scyther":[46,22,428,453],"seadra":[22,51,453,424],"seaking":[22,36,453,438],"sealeo":[22,75,453,400],"seedot":[76,22,399,453],"seel":[22,40,453,434],"seismitoad":[22,45,453,430],"sentret":[143,22,332,453],"serperior":[64,22,411,453],"servine":[43,22,432,453],"seviper":[22,31,453,443],"sewaddle":[68,22,407,453],"sharpedo":[61,22,414,453],"shaymin-land":[22,54,453,420],"shaymin-sky":[22,36,453,438],"shedinja":[22,34,453,440],"shelgon":[43,22,431,453],"shellder":[22,27,453,447],"shellos":[75,22,400,453],"shelmet":[22,36,453,438],"shieldon":[28,22,446,453],"shiftry":[22,38,453,437],"shiinotic":[35,57,439,428],"shinx":[22,41,453,434],"shroodle":[72,98,383,367],"shroomish":[22,70,453,405],"shuckle":[22,44,453,431],"shuppet":[55,22,420,453],"sigilyph":[67,22,408,453],"silcoon":[22,43,453,431],"silicobra":[75,97,380,389],"silvally":[83,46,413,427],"simipour":[37,22,438,453],"simisage":[58,22,417,453],"simisear":[25,22,450,453],"sinistcha":[81,13,394,462],"sinistea":[29,113,427,378],"sirfetchd":[127,15,355,456],"sizzlipede":[28,182,437,328],"skarmory":[22,85,453,389],"skeledirge":[22,128,454,348],"skiddo":[25,22,449,453],"skiploom":[22,70,453,405],"skitty":[22,56,453,419],"skorupi":[22,47,453,428],"skrelp":[70,22,405,453],"skuntank":[22,82,453,393],"skwovet":[92,33,359,418],"slaking":[22,86,453,389],"slakoth":[22,119,453,356],"sliggoo":[107,22,368,453],"sliggoo-hisui":[33,55,442,421],"slither-wing":[87,38,388,437],"slowbro":[42,22,433,453],"slowking":[108,22,366,453],"slowpoke":[22,64,453,411],"slugma":[55,22,419,453],"slurpuff":[44,22,431,453],"smeargle":[52,22,422,453],"smoliv":[118,66,385,431],"smoochum":[105,22,370,453],"sneasel":[23,22,452,453],"sneasel-hisui":[76,58,399,417],"sneasler":[53,31,357,456],"snivy":[49,22,425,453],"snom":[90,127,399,344],"snorlax":[22,65,453,409],"snorunt":[66,22,408,453],"snover":[22,80,453,395],"snowy-castform":[23,7,422,475],"snubbull":[61,22,414,453],"sobble":[99,29,375,445],"solgaleo":[56,43,418,429],"solosis":[22,27,453,447],"solrock":[22,24,453,450],"spearow":[27,22,447,453],"spectrier":[18,62,442,406],"spewpa":[22,48,453,427],"spheal":[22,62,453,412],"spidops":[44,92,455,421],"spinarak":[22,107,453,368],"spinda":[64,22,411,453],"spiritomb":[22,34,453,440],"spoink":[110,22,365,453],"sprigatito":[76,39,398,436],"spritzee":[49,22,426,453],"squawkabilly":[5,55,467,402],"squirtle":[29,22,446,453],"stakataka":[0,4,475,471],"stantler":[72,22,403,453],"staraptor":[60,22,415,453],"staravia":[92,22,382,453],"starly":[58,22,417,453],"starmie":[22,31,453,443],"staryu":[34,22,440,453],"steelix":[22,51,453,424],"steenee":[62,49,408,425],"stonjourner":[59,41,386,437],"stoutland":[22,81,453,393],"stufful":[50,47,426,426],"stunfisk":[22,110,453,365],"stunky":[22,51,453,424],"sudowoodo":[51,22,424,453],"suicune":[22,30,453,444],"sunflora":[41,22,434,453],"sunkern":[61,22,414,453],"sunny-castform":[51,14,439,466],"surskit":[22,63,453,412],"swablu":[22,108,453,366],"swadloon":[22,64,453,411],"swalot":[22,22,453,453],"swampert":[22,82,453,392],"swanna":[51,22,423,453],"swellow":[22,68,453,407],"swinub":[22,100,453,375],"swirlix":[86,22,389,453],"swoobat":[43,22,432,453],"sylveon":[79,22,395,453],"tadbulb":[151,73,339,393],"taillow":[22,71,453,404],"talonflame":[22,79,453,395],"tandemaus":[36,136,439,363],"tangela":[22,42,453,432],"tangrowth":[55,22,419,453],"tapu-bulu":[69,28,413,446],"tapu-fini":[89,35,398,435],"tapu-koko":[98,35,393,439],"tapu-lele":[100,30,362,439],"tarountula":[95,62,393,420],"tatsugiri":[113,92,386,389],"tauros":[22,39,453,435],"tauros-paldea-aqua-breed":[2,103,475,385],"tauros-paldea-blaze-breed":[81,43,467,429],"tauros-paldea-combat-breed":[31,82,475,411],"teddiursa":[94,22,381,453],"tentacool":[22,61,453,414],"tentacruel":[22,71,453,404],"tepig":[51,22,424,453],"terapagos":[32,67,422,435],"terapagos-stellar-form":[42,17,420,459],"terapagos-terastal-form":[13,87,462,388],"terrakion":[22,54,453,421],"thievul":[37,27,448,447],"throh":[22,53,453,422],"thundurus":[75,22,400,453],"thundurus-therian":[22,48,453,426],"thwackey":[135,27,343,395],"timburr":[22,63,453,412],"ting-lu":[32,24,449,428],"tinkatink":[29,76,471,410],"tinkaton":[18,43,472,436],"tinkatuff":[2,53,465,432],"tirtouga":[22,121,453,354],"toedscool":[97,83,371,369],"toedscruel":[63,42,389,445],"togedemaru":[67,46,420,429],"togekiss":[22,122,453,353],"togepi":[37,22,437,453],"togetic":[96,22,378,453],"torchic":[107,22,368,453],"torkoal":[22,28,453,446],"tornadus":[88,22,386,453],"tornadus-therian":[22,44,453,430],"torracat":[66,47,410,426],"torterra":[22,41,453,434],"totodile":[101,22,374,453],"toucannon":[62,67,418,418],"toxapex":[21,67,454,396],"toxel":[60,78,431,384],"toxicroak":[22,43,453,432],"toxtricity-amped":[133,64,339,411],"toxtricity-low-key":[142,46,333,428],"tranquill":[22,31,453,444],"trapinch":[58,22,416,453],"treecko":[32,22,443,453],"trevenant":[22,39,453,435],"tropius":[22,27,453,447],"trubbish":[22,38,453,437],"trumbeak":[40,103,428,399],"tsareena":[66,35,396,438],"turtonator":[59,63,440,428],"turtwig":[83,22,391,453],"tympole":[57,22,418,453],"tynamo":[22,81,453,394],"type-null":[80,47,393,427],"typhlosion":[92,22,383,453],"typhlosion-hisui":[57,20,385,450],"tyranitar":[39,22,435,453],"tyrantrum":[22,56,453,418],"tyrogue":[22,22,453,453],"tyrunt":[22,69,453,405],"ultra-necrozma":[4,70,471,415],"umbreon":[58,22,416,453],"unfezant":[76,22,399,453],"unown":[47,22,428,453],"ursaluna":[20,68,449,397],"ursaluna-bloodmoon":[40,12,434,462],"ursaring":[89,22,385,453],"urshifu-rapid":[113,35,379,438],"urshifu-single":[97,15,377,441],"uxie":[48,22,426,453],"vanillish":[87,22,388,453],"vanillite":[80,22,394,453],"vanilluxe":[34,22,441,453],"vaporeon":[41,22,434,453],"varoom":[79,120,418,380],"veluza":[22,87,444,407],"venipede":[22,68,453,407],"venomoth":[22,97,453,378],"venonat":[53,22,421,453],"venusaur":[22,70,453,405],"vespiquen":[54,22,421,453],"vibrava":[22,83,453,392],"victini":[64,22,411,453],"victreebel":[22,54,453,420],"vigoroth":[97,22,377,453],"vikavolt":[48,57,428,421],"vileplume":[22,41,453,433],"virizion":[84,22,391,453],"vivillon":[36,22,438,453],"volbeat":[88,22,386,453],"volcanion":[48,0,426,475],"volcarona":[22,51,453,424],"voltorb":[22,27,453,448],"voltorb-hisui":[0,9,475,465],"vullaby":[36,22,438,453],"vulpix":[22,46,453,428],"wailmer":[22,103,453,371],"wailord":[22,118,453,357],"walking-wake":[14,80,460,412],"walrein":[22,40,453,434],"wartortle":[25,22,450,453],"watchog":[141,22,334,453],"wattrel":[101,71,436,429],"weavile":[28,22,446,453],"weedle":[68,22,407,453],"weepinbell":[22,71,453,404],"weezing":[22,54,453,420],"whimsicott":[22,43,453,432],"whirlipede":[22,73,453,402],"whiscash":[22,73,453,402],"whismur":[22,28,453,446],"white-kyurem":[22,68,453,406],"wigglytuff":[60,22,415,453],"wiglett":[138,112,325,402],"wimpod":[16,95,419,365],"wingull":[22,86,453,388],"wishiwashi-school-form":[33,109,442,370],"wishiwashi-solo-form":[45,150,427,352],"wo-chien":[50,48,436,420],"wobbuffet":[97,22,377,453],"woobat":[22,103,453,372],"wooloo":[72,86,432,409],"wooper":[22,47,453,427],"wooper-paldea":[67,97,397,390],"wormadam-plant-cloak":[62,22,412,453],"wormadam-sand-cloak":[67,22,407,453],"wormadam-trash-cloak":[77,22,398,453],"wugtrio":[69,70,389,418],"wurmple":[61,22,413,453],"wynaut":[22,62,453,413],"wyrdeer":[105,11,405,466],"xatu":[88,22,387,453],"xerneas":[75,22,399,453],"xurkitree":[59,21,417,458],"yamask":[22,66,453,409],"yamper":[80,45,386,419],"yanma":[22,119,453,356],"yanmega":[22,73,453,401],"yungoos":[43,133,436,338],"yveltal":[22,41,453,434],"zacian":[10,70,462,410],"zacian-crowned":[11,15,462,450],"zamazenta":[36,24,447,467],"zamazenta-crowned":[44,12,431,459],"zangoose":[45,22,429,453],"zapdos":[22,88,453,386],"zapdos-galar":[35,61,418,428],"zarude":[61,17,413,440],"zebstrika":[59,22,415,453],"zekrom":[74,22,401,453],"zeraora":[15,48,464,439],"zigzagoon":[22,100,453,374],"zoroark":[22,34,453,441],"zoroark-hisui":[56,39,377,445],"zorua":[69,22,405,453],"zorua-hisui":[99,45,391,436],"zubat":[22,33,453,441],"zweilous":[22,22,453,453],"zygarde-10-forme":[47,79,428,397],"zygarde-50-forme":[23,23,447,453],"zygarde-complete-forme":[19,48,457,428]});
   const bboxTestEnabled = true;
+
+  // Source-pinned conservative alpha silhouette profiles, 32 vertical bands.
+  // The pixel paths come from the user's geometry manifest revision 881f3cae.
+  // Each byte is the minimum occupied X in its band relative to the verified
+  // subject bounding rectangle, quantized to 0..255. Data is inert unless
+  // subjectBBoxFor() confirms the *same* archived normal portrait identity.
+  const CONTOUR_PROFILE_SOURCE = 'poke5e_geometry/exterior-alpha-v1 / 881f3cae';
+  const CONTOUR_LEFT_PROFILES = Object.freeze({"abomasnow":"MCUcFA0IBAIAAAAAAgYRKiUlKjIvLSwsLTExKCIiLEY=","abra":"WFVVVVZYWVxdXV1dYGhlY2McGhoeBQEAABcbHiIjHBw=","absol":"n48AAw0VGx4gHh4xOjApJycTEg8ODQwLDISHh4ein58=","accelgor":"nZeVlJSUCQkREhsgAAUVHipDaJWZnqSttbW1q6uwsLs=","aegislash":"fHh1cm9ta0xMTEQ5LiYjIykAAAEECQ4UGiErU1dYZWc=","aerodactyl":"qRsSEREPCQUCAAAoLDEzMjIzOFdYWFhYVlZXW15eZYw=","aggron":"RDAQFBIEBB4YEw8PMD4lHxsbGxsfHBMKBAAAR0E8OkA=","aipom":"qaZ1b2tpMjAIBAICBAkbGwcBAAABBV9hZGhxhoaGiY0=","alakazam":"WltdYCAgHhUVEhgRCwAAAQoPPTs5NzERDAwcJSotNDk=","alcremie":"NC4uR0M6Mx4XFRUPDAsMEAsFBAMAAAEFEzw6OjATERE=","alolan-diglett":"VVNabHVbS0E5NDAvLSwsKyoqKioqKyERDAQCAAACH04=","alolan-dugtrio":"bmZhXFlIKicZFhUVCwsLDAMDCx0eHyAhEwwGAgABAjg=","alolan-exeggutor":"JywLCyEXCAAAGRlmZmZmZ2ZmZmZmZWRgV1JPT01MR0M=","alolan-geodude":"vrWysrKyHhsVDQUBAAAAAQEDBQgKDxIUFhgZHB8iJy0=","alolan-golem":"RDgsKSgnJiYlJSYjIB0cFgwEAAAgIyctKSgoKiIeHsU=","alolan-graveler":"eE9IRkRAPDIxMDAxMDAwHhcTEQcHAAAECQoKCgoKCw4=","alolan-grimer":"mppkU0tEQD08PBgAAAAFBQUeIENGSUlJS0xFQD8/Qm8=","alolan-marowak":"MjMrGgoEAwMHCQkOTxAODg8PCQkJBwUCAAAEOTk1NbY=","alolan-meowth":"W100Ly0sLCwTExUbEhIcQRcRERMHAAAABxZ9eXRxcXE=","alolan-muk":"CwcDAQAAAAACCR8fHx8gLS0tLSwsLC4+Ozc2NjY5R1A=","alolan-ninetales":"Y2MxJxwbHDYcFhUVFQwMDigUBgUFAwAABAQZHCtERX4=","alolan-persian":"cmkaExEREhUZBQUAAAICBAsdJDA3ODo8P0BBQj48PD4=","alolan-raichu":"UlFRU1VZW15nb25ucFdQUFNea2oyEwoDAAAAAwgTJG0=","alolan-raticate":"IyMjHgAAAQcLCxAQDw8RExkbGRkaIC4xNDkyLCsrMj0=","alolan-rattata":"zsQ9NzQqKistLS0tLy0pHBoNBwUFHBQAAAMDRVFOTlA=","alolan-sandshrew":"o5iDdGhfWFRQTEpIRkUAAAEDBQkNEhkhLDpPVVZWWF8=","alolan-sandslash":"kpFdXFxdXiorLTAyNg0NEhgUFBcgIiAAAQ0iKVVWXmw=","alolan-vulpix":"LigRERESDw8QAwAAAAQJER0rMC4uLi4uLzEzNTg4Nzc=","alomomola":"h3dqQh0RDQkEAgAAAAAECA4UGBYVFRUWFxodI0JIUVw=","altaria":"eWZbV1dWTEdGRSshGhYNBgMDAwQDAAAABgMEByJ1fX8=","amaura":"X1xZVwAAAgYNFh8oKSw1bmlkX1tXVVRUVU8+MDA3i4k=","ambipom":"wbsWFRUVGBwCAAAFHCIvMT1ERUZHSUxPU1ljbWVcXFw=","amoonguss":"ZVZLQjkzLCcjIR8fICY8XRYOCAQCAAAAAAIFCRFFTFg=","ampharos":"X19fYFlXVVVWhoqJhoICAAAICgwPExkfJzJAQzgvLCw=","annihilape":"YmNocXZ2Cw0PDxQPEBUVLi4xLScmHBMNCAMAAAIIM50=","anorith":"cnJzdHZ5fHM3IB8ICA8GAAIVGhobITg2NDMzMzY3O0M=","appletun":"g4ODg4VoY1dPSUdHRkREQ0NDRUcjFw8MCgcAAAACCnY=","applin":"NjIvLi4uLjEzNzwsHRQMBwMBAAAAAAIDBwoOFBojLDo=","araquanid":"kY0SDAUDAwMECAsJCAYDAAABAQAAAAAAAAABAhocHR8=","arbok":"ZlpQRD05NzY2Njg8QUVNVFsQEBMWDwcCAAAABxIlY28=","arboliva":"dnFsaGVlZWdkZWdrBwcHAAACAwMEBwcHCBEyYFhNSko=","arcanine-hisui":"GhkYDQwHAwMEBAUICxMSDgwHAwQGAQAfHyEnQ0NFSnw=","arcanine":"NSQiGBYAAAQKCgcHFRsZEhITHR0dICIjJSYlIx0bG0k=","arceus":"e3FsODg3MS4uNjc6MzMyLRsaDQAABAoMCQcHRHFtaWk=","archaludon":"mXJuajc0Mi8tKiclIh4bFxIMBgAACx4pOzk2MzAvMJM=","archen":"U0hAOTUzMzM1OD5hGxISFBEPCQQAAAAFBARLSUl2p60=","archeops":"shoDAwAAAwMDCwsFAwMHH0k9OTpAWmRpgI5nY1lZbGw=","arctibax":"npqWax8TDgcDAQAAAQQIDRU3OjcyLiomIyEfHh4eP0A=","arctovish":"Kx8XDwgHBwUDAwIBAAAAAAECAwQHCAgICAgICAoMaGg=","arctozolt":"emhmZV5cXFNTVk5COjY1LywsLkJECQAAGig/enFiXV0=","ariados":"cG5tbGxsbGxtbnBJQz88NCwmIRsXEg4LBwQBAAAAX9Y=","armaldo":"IiIjJi8jIiMbGx8aGiguGA8JBQQBAAAAAAACHhYWKYI=","armarouge":"a2ZMNzMzHw4FAAAAAgcHBwUFBlpWT0c+OTQwLywrKys=","aromatisse":"GxwdGxYWFhgeJSYmICAlCQkJCwoICAgJAwAFITZPZmc=","aron":"RTMrJhYRDAkFAwEAAAEEBQUEAwQFCRIUGSJJSUpMmp8=","arrokuda":"1M/Lx8TCm5WSjouIZEY8My0pJSAYEQwHAgAABB1IS2w=","articuno-galar":"cnBwQjs0LyomIh8cGRYTDwAABTk0MjEyNDpGYHiDhoU=","articuno":"CQkHBwAAAAAEBAMFCBMbHS8vMDI3OUFGQzErKio1PkE=","audino":"OS4mIAEAARUZFBQVHjQpHREDAAAIKignJyksMTU2OTs=","aurorus":"FBQMAwICBgEAAAkICAoKDg8ODg4QEhUZIB0UERAQEyk=","avalugg-hisui":"tpWCdWRgW0I9OjYyJR8eGxQQDgYFAwMBAQAAAAAAAAE=","avalugg":"mYNmFkQcAAAFBwsJCQkICAsLCgcHBQEBAQcUM4qKjzU=","axew":"npiTjIZ/d25RPzEoIBwYFhUVFQIAAiIiICBdW1pcYmQ=","azelf":"VFNTU1RUTUU+ODMxMTwpJgAAAAMJEyMjJiUkJCUoKzI=","azumarill":"wDIjHR1JTFJXVEpDPTczMAcAAAInJycoKy4zOkAwLi4=","azurill":"LiUgHRsbGx4aFxUBAAABAwgOGSQbFREPDg4OEBQbJDM=","bagon":"OikTCgUFBQkPDQQAAAAFDyNHOzk8REBAQERLQEBHxMk=","baltoy":"dnJtamZYTEQ+OTU1MzIyNDg+LR8VCwQAAAMJEmdrcHQ=","banette":"bWdiXlZLMDAwMTIzMzQ1OTEeEQgBAAYGFx4YGCIiRkg=","barbaracle":"UCMiIictLjA1PkU0REVIS0IAGRILBwcHRERERDkzM6I=","barboach":"HxsYFhQSEA8ODg4ODg8PDg4OBAAABwgnKn5+fn9/goU=","barraskewda":"cGtnSkVBPTk2NDAuLCklIBYVDQYBAAAPPT09cXN1eMo=","basculegion-f":"cG9ta2loZmVkUD8MCgkHBwMAAAABAwUICgoMDQ4RbHE=","basculegion-m":"eXd1c3EYEw8NBQMDBQYICgkJCQYCAQAABgcSDw0LCgk=","basculin-blue-striped":"UE5MPT0+OC8oIh0aFxUTDggEAQAABA4YJ0d8gYeNlZ0=","basculin-white-striped":"bmtnVlZWVjk1MywiGxMOCQUBAAAEBg4LCQoOExkjM6E=","basculin":"kn9+fl5SSUM/GBgcCgABGRkiIicxPFKNjY6PkZOWmp8=","bastiodon":"ODIsKCYmKCkpKCYlIyIgAAAJFBMQDw8SFBAMCw1PbIk=","baxcalibur":"T0xMREdRUlJZV09FPSgUBAQAADk2MzAwMTQwJCQnrrE=","bayleef":"dF5LPC8kGxMMBwIAGBkiRhQUGxMCAAQWFBQwMDEwLy8=","beartic":"b2hlXFxdYxIJBQEAAAACDCNFQj89Ojg2NDMzMzU1NZo=","beautifly":"a2ZgWg4IBQIBAgQLDAwOExMUGRQOCgYDAQAAAAIIu8U=","beedrill":"p0pFQkAxKSksR0pFPCIcGBMPCwcEAABCRkEsKCjg4OU=","beheeyem":"TkI7ODc2NjY2ODg4MisiHh4pSGkQAAACBwxbUE5PWXM=","beldum":"PTMjEgIAAAACFQ8MCwoJBwcHCAgJDA4REhUYHy2ZnKE=","bellibolt":"fV9YVVRUQysjIiIjJyQfGhcVEwcBAAACBAcMGEVWcas=","bellossom":"Pjg0HxkVExMUDw4ODxMaQDAlHhgUEQ8NDAkGAAAdM0s=","bellsprout":"WE9JRUI/PDgoJSUnHhQMBwMDGiljY2NjMyYcDwYAABE=","bergmite":"JYuDfXZvai4uLy8xMTI1OTIpGBELBQAAAgcPFiQpK1k=","bewear":"EwgDAAAAAAADBQgNERYcIikwLy8uJyMiIiMnMjQ2OT0=","bibarel":"eHRsa2ZhYGAeDwkFAgEAAAAAAgQHCxAWHCMsNUFPU1s=","bidoof":"r5WSkm8oIiAfHyIhHBkJAwEBAQQAAAACCQwOEiInKDA=","binacle":"npaSkRoaHR8AAgkQFBISExYZHSMqNTIqIh0dISUpMDk=","bisharp":"WyMiIyYsMzEwGhMMCQcHBAAAAAAFJDI8NTAnGQsFCq8=","blacephalon":"XVVPTScSDwMAAAACBwcPX2BldXV4gZOJgoKEko54eH8=","black-kyurem":"YFlZYF9aWlxqenx+gYFiVSgPAAASFRUuNz5FVWJeXV0=","blastoise":"eXl6fX0fFhYWHB8bFRAPERETEQ4IBQMCAgICBAAAAQA=","blaziken":"dmhZTD0wIxcMBgMCAAACFGFbVU5HQDozLSYVDwoNFBQ=","blipbug":"SUlLTVFVWRISFAAAEgoHBAMDAwQHDBYYGQ4OPz9DVlg=","blissey":"NzEsKiMdGwoKBAQGDgsLCwAABhgTEyUqLzdBTVRUVVg=","blitzle":"yMjIjIhpaGpsYmVrcXAKCQkKBgMCAgIDBQEAAAADBws=","boldore":"d3NxVVJQIyEgISMlKjAuDQoGAwAAAAIEBQcJDhQZHCA=","boltund":"MCIaDwsJBQAAAQYJEisrLi4vMDI1NjUzMS8tDQsLDxY=","bombirdier":"Rz07MRgVFTs2LikiHBoaGhwdHyImKi4wMC0qJhUDAAA=","bonsly":"c2tmZUs4MC0tLS84T0o5LCIaDwQAAAAECgYGBgltbXE=","bouffalant":"Yk9MREI4Nzc1NQAAAAEECBEjP0ZPVlZWV1lkZ2qLiok=","bounsweet":"R0RCQkNGXTwsIRkRDQgFAwAAAAMzMjIzNDY5PklOWnQ=","braixen":"fTk5OQADDRgdJCQrPzY3OkNBFBQWGSElNz5FSEI4Ly8=","brambleghast":"cXJFREIlJSUiHwAAAwgMDAwMDg8RERELCxYYMTY+X4Q=","bramblin":"XVhLPC4iHRgAAQIGBwMAAAECBAUHCAgOGB0gJSsyPFQ=","braviary-hisui":"xsPAvREDAAYSGR0gKCAgICMlJikpKjtHPjw8PUxSgH8=","braviary":"AAABAwcKDhIWHCI5OCchHhwcHBwcGhYWGDQzM0lJf38=","breloom":"HRcVFRYbIigoKUVHJhsZHRcPDQ0OGBgcKisSBgAABG8=","brionne":"t7V8d3Q3BAEAAAABAwcNFSYwMjQ4Oz9ER0dHR0dJTVU=","bronzong":"bWllZWVlYlwKBwUDAQAAAQkWVlVTUVBOTEtJSUpNVWA=","bronzor":"cm1rYk9DHRIPDg4RFRMSEBAQEA0EAAAABAwuOUpKS08=","brute-bonnet":"Hx0dHRULBQEAAAAAAAEBAgMDBQUGCAkLDhRERERERYw=","bruxish":"WlZUU1JRT01LSEVBPjk0LyojHAIAAAAEBAMDAwYjNks=","budew":"iXtwaWRgXV1dXWBNOS0fFhAKBgMAAAAAAwYMFCAsMDY=","buizel":"n05HQz87Ny0mIh4bFxQSEhMXFBEPDgYBAAAAhoqwsrQ=","bulbasaur":"xLd4aGAhHBkWFREMCQYEAgEAAAAEDBceHx8hIyYpKS0=","buneary":"NSwiIiIpKCcoKSsvHA0EAAAABA0WDg4USUlOUFpsbG8=","bunnelby":"uCIFBAAAAAMJERomNEhfbGllU1NVVWttdHRsampuZ2c=","burmy":"joOAdnBwamliOi0nJSUkDQUAAAACCwUEHyEjJzQwKCg=","butterfree":"NjYTCQYDAQAAAAECBAYICw4RFRcaHSElKjVDQ0RGS1E=","buzzwole":"LzI6QkhQUSMhIBAQDQwMCAQAAAACCA0NDWZ9jKOmqas=","cacnea":"aGdnaGlKSUlJS0FAQD4yJx4WAgIEAQAAAAEECBJJk5o=","cacturne":"b29sZVtSQDs/U1ZaJCEKBgAAAAEKPT06NjY4MzM5PYA=","calyrex-ice":"SEI+Ozk1Lh0eJSQiIiM0PA8LCw4AAQMHElxeUktLS0s=","calyrex-shadow":"Ny4hISEjJiw0Q0M+FxQUIBAQDgoKCwMAADIEBBInPaA=","calyrex":"RTImHhgCAAECBgsPFR0nPFlZUUM9PT9PT25vb29vb3M=","camerupt":"bm1samhdOzYiIiIiHgsCAAAREBAQERMPDg4PFB4wY2g=","capsakid":"TQcHBwoNCQUCAAAABAcKEBIUGR9NRTc3UklHNDQ2O0Q=","carbink":"IQAACBQiNDQtJSIZFhQRERQWHCEhICIoNDdCRk9eYmw=","carkol":"Li4yQRgXFzYwKSYmGBQUEg0BAAABBQ8TDQsJCAgNR0g=","carnivine":"akdHMzIiGxcTDwAAAAACBAcLEh5jY2NjZV9dV1VVVmk=","carracosta":"TEVAOzg4ODs7MioiGxQOCQUCAQAAAAEEBQcLFB0vPpY=","carvanha":"Dg4ODg4PDxASEhAKBQQEAwIAAAIIEh8vQ0VHSk1RVVk=","cascoon":"qaYRExsjKzI5NTEuLCsrKyssIhYKAABAOzUvL4mGg4I=","castform":"YVBDPDY1NTcqHxQNCAMAAAAAAwcMFB8sNS0qKisuN2M=","caterpie":"CQEAAAQVExISEhMWGhscICcvLCoqKi47Ozs7PlhfaXg=","celebi":"mJc2LSciHhwZGBgYGBkcBwYAAAUOFhwfJCoyP1tmi40=","celesteela":"dnZlYl5aV1NPPz8+Ozs5NDIsHxMICAcDAQABCg0eY2c=","centiskorch":"JBYQDQ0MDA8SFgIAAAACBCgoKiMfHh4mJiQjIyM8PHw=","ceruledge":"dnh3d2hhWVldYmdkSkNDQTsyIBcQCgUBAEpKSklHR0c=","cetitan":"QkIfHyAiJCcqLC4tLS0lGxQLBAAAAjk9Pj08NjQ0l50=","cetoddle":"w7m2tLOwQEBAQEFCPzs4NjUAAAABAwUMFBsoNTU2OT8=","chandelure":"gn9+foCDhYF8IBoUDgkFAQAAAAQNDhASFhsgIycvP3Y=","chansey":"ZVkXFgAAAAIEBhYjIR8eHBwcHB0eICImKi8zKyUlJq8=","charcadet":"hHloY2M0IhYMBwIAAAEEChMhP1gvLC00PTk5Oz5AQok=","charizard":"WktFKSMaEA4KBwMBAAAAAAECPkVTLyciHhwcHSIpPT0=","charjabug":"YzsuJiIgHRsZGBYVFBMTEhEREAsGAwAABRUiLDZDUWA=","charmander":"LSQdGhkXFxcVExMVHSwfBwAACws0NCsjHRsbGxYNDRM=","charmeleon":"a1s/ODAvMC4pKSozSj0lGhIIBQAAAQ8lISEhJRcREh8=","chatot":"kIyGgXxjKyAOBgIAAAEFCwoIBwgQERMYIigwKCMjLzg=","cherrim":"LyUfHBsbHCEfFxEPEB8dHBwcHiAiJSciGgoAAAocPEY=","cherubi":"RjkwKSMfH0NNW4N+dUMrHxUOCQUDAQAAAAEDBQoQGCI=","chesnaught":"Pz9CREZJS0ZCPz44KBYJCAUCAgEAAAAMTk5PT0ZBQZo=","chespin":"e3RKSwAAAwkPGCIpJyYmKCwJBgcPJGJfXl5eUEI4NjY=","chewtle":"mZCFfGlGLiAWDwwGAQAAAggWIzJEUldTS0tJQ0A/P0M=","chi-yu":"sq2qp6V7bGlnY1lQS0Y6MBoVEgsFAwMDAgEAAAIdHSA=","chien-pao":"rqmlpJiQjqOhoJ9zaA0GAgEAAAECAwQNFSEgID5CkJM=","chikorita":"7M6QeWhcUkxJRkI8LicjISAgFBAPCAQCAAAAAwcNIiY=","chimchar":"h3lcWFhDLiIaBAAAAAADCRAcHihEX1tYVE5IPTArKzw=","chimecho":"HRUVGR8PBAAAAAASQVlJQEBAREhKTU5SVVldYWZjXl4=","chinchou":"OCwkHhgUEA4LCQYEAgAAAAABAwcOVV1oirzRz8/P0dU=","chingling":"c29vb3FvamhlY2JiYWE9KSAAAAAEDg4DAQECBQsiLD0=","cinccino":"LiklIyIhISEiIyUoLDAzNy0hGA8JBAEAAAABByotNWM=","cinderace":"IR4dHR4fISQqMgAAMktLU1JUX2JjbHVzc3ZzcGhnZ2c=","clamperl":"PTk5IQ4JBQIAAAcLBgYHCBojIw4HBAMFCQkKDxgkO0g=","clauncher":"dG9qZmNgXlxbWVg1KCEbFREMCQcEAgEAAAAAAAJZWaY=","clawitzer":"lZKObGFYUkxGQj45LyonGQwHAwEAAAAcIxoWFh5lZm0=","claydol":"op6VaTw0Ly4uLCokIyMnIhcTEQsAAAEnMjM3Oz4/Q3M=","clefable":"GxwfIicMDBEWAAAHERwKChcuLCwsLCwsLi8xMzU5PEA=","clefairy":"FxcXFxcYDg0AAAAEBQgKDRAUFBQVFRYXGBocHyImKi8=","cleffa":"gnlwaUw4JhkNBQAAAQUKERkiLCkhHBkYGBgYGyAnN0Q=","clobbopus":"dGtkXhUNCQUDAQAAAAABAwcPEhYcIiYrOkxfWlFRUVg=","clodsire":"LCIcFhENCgcFAwIBAQAAAAAAAQIDBQcKCQkJCQsRPok=","cloyster":"28y8r04AAAILExskMjIvLi4yMyEcHB82Pj9ARk5JSUk=","coalossal":"dXFqZGFZUy8sKywnJiciEQwCAAAMIyMjIyYpIxIQESw=","cobalion":"bVxMOzAfDgwPGBYHAQAAAgojIyYlIRwYGBkdJCgbFhc=","cofagrigus":"xMTGuLi4hA8PEAEAAAUEBBIUTE1lMzExLBsVFRYgICw=","combee":"MzM0NjY2AgAAAAABAgQHCg8VJy43PDw8PDw8PD5FTFQ=","combusken":"o4WEhBwWAAAADiIiJhsWFiYrLi4vMzk4REROVVBOTlA=","comfey":"PTYoGBgaHiUkHhoVBAAAAAACAgQMEw8PEBMhK0NHS2Q=","conkeldurr":"fiYfBAICAgIBAQECAgICAgICAgICAQEBAQAAAAALsbY=","copperajah":"KyEaEw4KBgQBAAAAAAEDBgoOFjc1NDIyMj19fHp6eoA=","corphish":"S0ssLC8QBQEAAAAECQsPExkhMT4/QEU0MSklJCMjJSg=","corsola":"19S/KCYmKzE4EhEBAAAEFB8jPEdMTE5QUVFSYmx4fH8=","corviknight":"mJaPfn6DYV1dYV1WUUxJRkVEQDguIRMAACArTlZXV1s=","corvisquire":"uamcQy0dGBUNBwEBCwcEAQEBAQQIDxkNBgYBACwrP1I=","cosmoem":"d3FsaRwcHSEmIBYPCgQBAAAAAQUKEBkjJCIiI2drbnQ=","cosmog":"AAAAAwsZFRUWGiMlJycnXU9KSUlKR0ZGSExbYGJnZ2g=","cottonee":"YFlCOTQxLy4uLzMvLCgmAQAAAAABAwUJDhQlNTg7QV4=","crabominable":"1Lu6urq6kYyMlpuQTkc+KhwKCQgAAAEEBAYMDw8YHR8=","crabrawler":"q6R+e3l3d3d3d3d5fYCAgHt4RzkcEQoFAwAAAAABBQs=","cradily":"HBwcLT5LCAAAAScjGRYWHCgwNz5PlI+Fe3RtWFJSU1k=","cramorant":"OzxEVGhkYF9fYWZvSD00LSciHxwaGgYAAAIRKkVRVlc=","cranidos":"d3d3dikkIB0aGBcRCgYEBAQEBgMBAAAIMTM1NDMzOkI=","crawdaunt":"V1I2Njg7P0FCQkVFRUVCQkJGJBQLBgIBAAACGRkiREU=","cresselia":"wbewq6imCgEAAAADCA4UHSczQVA5IQ0MPzcxKiYiICA=","croagunk":"JyEZFBERERESFh4tPkA+PTkrHREJBQIAAAEQKCYmK78=","crobat":"AAALFBshJSgrLC5faHB2e3BbTkM8NjIuLCypqbzCxso=","crocalor":"XD0oEA8PDxAVEwcFBQgLExMTExcAAAAJNTUxMTI1Pb0=","croconaw":"ODIuKxAQEBMWGw0KCQgIDBACAAAEPDw6NzY2NjolJSY=","crustle":"e2lOLygjHhsZGRobHB0eICIjJSgVDgoHBAIBAAAAAWI=","cryogonal":"Ukg+OykgFhYWFwYAAAABAh0hIAYGBwgIFiIiIyU0U1o=","cubchoo":"MiQdGhkZGRoPCgoLDBIaHx0dGxkZFxcXBgAAAAMIEow=","cubone":"ODg7QkhISEhHQToyLS0wMjI2QTwzKyAZGRseFQQAAAI=","cufant":"yMJzZF5EMSQdBAAAAQ4NDAwNDQ4PEBMVEQsICAkNFlM=","cursola":"OTc3OCoqLRsZGRsbAgAABRgSCwsLZ3NzcW1fXl5faHI=","cutiefly":"ODc3Nzc4Ojs+QEMmJBoSDg0AAw8UGiQpNjg6Oz1BREU=","cyclizar":"j4+Tm5iTkIqCdA8FAQAAKS0wMzc9RVBOSkdBPTo5OVM=","cyndaquil":"bW1tYGBgRkYAAAYPFhgYICYmIxEMDC8uKk1OT1BTVVg=","dachsbun":"6OPMIRgRCwcCAAABBQcICw8QEhEQEBERJjo8ODc4P18=","darkrai":"lYloYlwbFA8LBwQCAAAAFRcYGTMtJBsUDwoICiA1RkY=","darmanitan":"d3VybWxsbGxsbWpeEQwDAAADFCwmHxgSEhQUGyqIjJY=","dartrix":"DQcEAgICAwYHBwcEAgEAAAAAAAEDBQYJCw8SFxYJBQU=","darumaka":"jXAgICEiJiwbFgICAQAAFhwjJSYnKSwwNTxDSE5WVVY=","dawn-wings-necrozma":"IRwYBwAAAwYKDAsLCwsLDAsGAgIGFBYYGx8iJis1Mi8=","decidueye-hisui":"VEpKTFFLPDMrJiQuIhgAAAsFAwMKF0I+OyQkFQoICAk=","decidueye":"DQ0OBgUFCg0FAAABBwcJEA8QHx8iMjNISU1ma393dnY=","dedenne":"PDYzMTExMTM4Pi0ZGR8dHBw5JyM+PAsKCgAABQwdJks=","deerling":"fGBbRUVBJx0XAAACCBIhQkdDQUBAQUVJTlJWVlNOSEg=","deino":"g3pwZ0ghFg4GAAABBAkJEiZNVEJFOj0+QDs7TE5QTks=","delcatty":"BQcLCAACICMmKy8tIiI9NTAXFhYgHR1GSEpNUFNUU1Q=","delibird":"PTs4JiYtMwAAAAADBQoQFyEwLiooJiMjIyMlKSYaGiY=","delphox":"Mh4cGBIMDAIAAAACCAgJDxMYGBwjJihOT09RVFJJSUw=","deoxys":"WkZFRUVTU0tGQzs2NC4oJSMeFxIPDg4OCwQAAAASHh4=","dewgong":"l42Hhk0uIRsVCQgICgsVCAcFAAABCg4fLjM6Qk5diZM=","dewott":"iIF/flw6OjogICUwNSoqZ2VjXldHDgIAAA0VGyEjFRM=","dewpider":"WEE1KiMcFhQRCwYFBg8WHCMrOCcNAAAABAQEBAUGBwo=","dhelmise":"PDs7JCQpLSohCgUEAwAAAAAAAAQGCwUEBAc4OUBBYGA=","dialga-origin":"JSsTFis0NzQwLzA3AAIPEBMXHCIoKiglIBwXFBQWGR0=","dialga":"lZqboKSpsUxMMzM4QCgoNUIAAAMKEh43Ojg3MzMzNXY=","diancie":"ZmVkQUFDR0tPQCwXDgkEAAA/NjAvLCwuNjU2Oz8/Qkk=","diggersby":"UDUqIRkUDgkHBAIBAAAAAAEECUtISEhJTlBTW1NQUFQ=","diglett":"WU9GQDs3NDIwMC8vLy8vLi4uLi4uEw0KCQQBAAADHCs=","dipplin":"cXN1eHuAgoWHiYuNj2JhYWVtU0ZBAgIDDAIACCk7O1M=","ditto":"Zl0rJSIiIiIlJykrKSglIh0YEgwIBAEAAAACBQ45TFs=","dodrio":"PkRMUVZSBgANHygoJiMjZmdnaWxyfIWCfHZsTk1NYZA=","doduo":"6+Td1rGlXgIAGS5JUm5xcGppZ2hpaneQlpGKin5vZmY=","dolliv":"VFQZBgEAAAEGEjw8P0pOU1xfYHhsXEc+OTxgWkkhICU=","dondozo":"b0ZDMS0tIB8fHyEjHxwbEQkEAQAABC8vLy8vMTU7SFg=","donphan":"dW1iVlBMQCwWEg4MDDcAAAACBQkQGTMzNDU4PkBDREg=","dottler":"XEw8LyIeHBkXFRIQDgwKCAYEAgAAAAEGCxEXHiY0Tk4=","doublade":"GRMTExQVFBIQDgwKCAYEAgEAAAAAAAECBQcJCwwODxA=","dracovish":"OiINBwMAAAACCBcXFxobGhobIEBFa2xveGtpaWylpa0=","dracozolt":"XldSTzcbFQ8NAgAACAcKGBYTEhISExUZHiMbFxcaTEw=","dragalge":"OzULCAsPEh8XCAgOQkdLTEAJAAAdaWNjgIBzWlpibGg=","dragapult":"UxoaHiUuNDRHNzIyMjUuIhcNBwIBAAAAAQQIDRMbJjU=","dragonair":"nVlZXmFjY2Rqa2xtd3dyFQwHAAABAwMEBwsRGzBSWWI=","dragonite":"kwsICAs2Njg0DAACBgsWLSkmHhkWFRUYGyQRCQkYg4s=","drakloak":"gnwxKyUVCAAAAgsVICkvNjxWPz4+P0FEXWBeXV1dXpY=","drampa":"aWNeWlhWVFRSUiQhHA4HBQUBAAAAAw4UFBdfYF1dXXU=","drapion":"TklGQ0EvLyMiIiIRERIUEQcBAAAAAQQZGWNiYmJiZLQ=","dratini":"ycl1dHZ7f4CAgoyRk5SrsLS5vMDDGAIAIjtMWmdyf48=","drednaw":"aAIBAQEDBAUICQkFAQAABREaHR4eHh4fISIhHx4eHls=","dreepy":"NjIvFBANCwsKBgIAAAtQUlNVTEpKSkpKS0xPUVRYXWw=","drifblim":"dXV4fWVaUEpFQT49PT09P0FFPzQqIBcOBwAACgkflJc=","drifloon":"Fw8OBwAAAAkKCAgICQ0SHzJqZ2NjY2NjZGdscnuFkJA=","drilbur":"CAYEAgEAAAAAAAECBAcLERceKTZHREFAQEBCRkVCQkI=","drizzile":"UE1MTE5MQDgxLSooKCgJAQAAA359d2RZU1JSW05ISM4=","drowzee":"BwQCAAAAAAABAwYJDREVFRUTEQ4LCQYDAgICAwYJCQk=","druddigon":"ZF9MTFBLMSwbGhocIS8vLzAwLxQRBQAAAAISFkdOWqQ=","dubwool":"n1FRalZDKiEcEAkFAwMEAgAAAgICBQ0ZHiYlIyQoMIU=","ducklett":"ODMcFhUUFBQCAAAAAwcMFB8sMDlYWFFNTU5TV3teWVo=","dudunsparce":"RkY0JRoTDgoHBAIBAAAAAAIECQ8TGBoZGTU3VW+KkJk=","dugtrio":"f3ZwbWppaT0yKyYjIiEhISEiIiIjIyQkGAsFAwAAGEA=","dunsparce":"5+Lc19DMyGJZVVFQTk1NMh4TCwUCAAAAAgULBwUqOTs=","duosion":"hnlxXUo8MCceGBMPCwgGBQQDAwQFBQEAAAACBg8eQ1U=","duraludon":"eXNkXVZSUlNWW1xaWVcoBgYKAAAOFxkoIh4aFhUVnJ0=","durant":"aGJgMColIREQEBARFS4qJiMhHhsYFhMEAgEAAAAYGSY=","dusclops":"bV1ZWVpTTkhEQkA8NjAsGxYLBQAAAAEWFjQ0OGhnZ2k=","dusk-mane-necrozma":"DAoJBwUFBQUFBQUFBQUDAwoJBxAQFRkZFxMEAAA5ODg=","dusknoir":"Y2NlRTo6Ojs8PTs0KiIbFg4GAgAAAAABBAMBAQECBQs=","duskull":"Pjg3OT0zJh8cHBgRCwgGCBEQEAYFBgQAAAoTX2JhYmk=","dustox":"lZOSkQQCAQAAAAAAAQECBAUJCQsNEBQYIiMoLztBS2I=","dwebble":"kIllVUo/KSUiIiIiIB4cGQwGAgAAAAABAAAAAAABAwY=","eelektrik":"NjAtLCwuMjcmFQoFAAAAAgUIERxNTVBfVk5KRkZGSVA=","eelektross":"WU9HQDs2Mi4rKScmJSUlJSUlBQIBAAAAAAEDBwkLDoU=","eevee":"BAIAAAAAAgQHDBIbHh0cFwoBAQAAAAsVHiUnKi4sKy4=","eiscue":"op6bazYNAgAAAAAAAAAAAAABAQcgUEpBMC4wVVpRUFM=","ekans":"JRoTCgQAAAIJIR0dHiU0KiIcGRkZFAkDAAAAAQUMFSU=","eldegoss":"VEAzKB4YEwoHBQIAAAAAAQIFBQsOExkgKDdHSDs8RWs=","electabuzz":"T0dAOTMvLCkoLzA/RUtLRUA9Ozk5OTYtKCUVBQAADZc=","electivire":"BAEAAAAAAQIFCxMeFRQUDwsIBgUFBAICBAQvKiklJCQ=","electrike":"6nVfTD4yKB8YFBQVFxEJAgAAAgkVIiIjJyUeHBwdJYI=","electrode-hisui":"UUAzKiIbFREMCQYDAgEAAAAAAQIEBgkMERUbIio0QFE=","electrode":"UUI1KyMdFhIOCgcFAwIBAAABAgMEBwoMERUbIiozQE8=","elekid":"Z2FgYGBgYGFiYmNfW1hWVSgcFA4JBQEAAAIFC2tscIY=","elgyem":"c2VZT0ZBOzg1MzMzNDU4Oz9ETFVXT0cuFQoFAAADGkU=","emboar":"WFVRSUVEQ0MVEQ4NCwcEAgAAAAACBQsrKysrLicmK6k=","emolga":"LSgjIR8fHx8gHBgWFRQUFAEBAAAFBgcJDA8TFx4kLlQ=","empoleon":"kYyBfn52dnZ2d3BbMi0pIhoTDgkEAQAAWmBoVUxLUl8=","enamorus-therian":"JyQjIyMkJyIZAAABCB8mOUZDQ0NKR0M6NTMzM3V1d3k=","enamorus":"TkxMTlVeXl5ia1dVTEtLRDcgEgcCAAAAAw0PFBsXBgY=","entei":"LSIYFRQRDg8QExYXGBoWEw0NDRkfICEWFhYWDAIAAAQ=","escavalier":"ZFRGPTcyMTEyOHtzbWlnXlBHQz0yJRoNAgB2dXV1g4A=","espathra":"DQcFBQEAERUUFBQWGhwmNDRGYXB5Z1lVVFJPT1JnYWE=","espeon":"Hx4eHh8hIiQKAAAPGC4yO0VEQ0NCQkJDRUhJSUhGQ0I=","espurr":"ZUgfFAsHBQMDAwAAAggICQ81QkRGRT41MDAyMjZMUVY=","eternatus-eternamax":"PDs7PDg4Q0hNHRYKAAAGCkdAQTIkGRMMCAiQlJ+mqqo=","eternatus":"7OIXOTImIR0ZEg8OCQgFAwEAAggIFwYGDAxoZFlXZ2I=","excadrill":"trd5bWVfWlhWUk1JRT8gHhwZEgUEAwIBAQAAAAAAAAE=","exeggcute":"pklGLysoJiUlJR8VDgoGAwEAAAAAAAIECQ4VInh9g4o=","exeggutor":"jjc3O0BFSRIFAAA7Gw4GBRkUERART1VgYEM0NTs+Qkk=","exploud":"RzMuLCkWERESFBMRERAQDw8MCQcEAQAABSQkHxkZGpA=","falinks":"ppw1NDQ0NTY2Njc3ODIrHRYRBAABBQoMDRAVICAhJi8=","farfetchd":"iUMDAAAECA4UGyIoKy8wMCwrKis1NjtKTVBSVFRVZaI=","farigiraf":"hX5+g5aOiopzbW1jXlZWTkM4NiYfGhcVDg4MBAAAASY=","fearow":"U0tFRURERERFRkhJS0xOPzUzKysrKyshFggCAACKiYo=","feebas":"bm5ub3BwcHFvUkM5MSsnIyIhIiIhHx4fHx8iEQQAAQg=","fennekin":"qqGZko2IBwcIDQwAAAYMFiIlJiYmJiYmKC03TVpaXKc=","feraligatr":"aGVjUlFRUU5BNCYYFAsIBAEAAANBPTs7PEE9OT1Dxc0=","ferroseed":"ioSARUVHSkM8GBgbISQhHxkJAAAKGiAiJiEdHD1laWw=","ferrothorn":"2s3MycnJyQ8GAQAAAQICFBYZIkA/QUZEQkJDSEdHY2U=","fezandipiti":"UUJCQkJCOi4uLjEmHhYRDAgEAgIBAAABAnt6b2VeXmQ=","fidough":"IBgSDQgGAwEAAAAAAQQGDhMXISUlJScqLTMzMzh2dng=","finizen":"aF5YUzksIxoWEQ4KBwYFAwMDAwMDAwUGAwEAAAABJMM=","finneon":"rqikoZ6cmpiXMy4pJiQiIiIiHhgSDgoHBAIBAAAABRI=","flaaffy":"GBENDAsEAwYOGBEQEA0NCAAACSonIyEgICIlKjQ9MzA=","flabebe":"ICAeHiAuVFVaYUlISBMRERQKAgAABBFFRU1manF6hZY=","flamigo":"IA8GAAAAB3poVEU+OTc4P0NVaJNHQ0NJlZaWlpaXbWk=","flapple":"WU9HHx4dHR0UEhERDAcEAQAAFBQWPzokHR0eICQpMDk=","flareon":"SUE7NCkoJiMhHhYRDw8ODQwMDAwRFxkbHBUJAAAAWFg=","fletchinder":"yb+5sqyoVUA1KyQfGxgWEgkCACIiIiQpMkkzLy85X18=","fletchling":"083IxMG/vEI2LyomEgAAAiMlJyouMzhASVo8PEA5PFY=","flittle":"HxgVEw8EAAAHEygxNzMxLy4uBgYGBAQECA4VHylQV1g=","floatzel":"YVpRRTYxKSAgIygmJhkREQ8LBwMCAggFBQUIDgIAAYI=","floette-eternal":"tK2qpaCbkYN8UFAAAQc9RE4+HREPDxw+OjYyMDAyTlg=","floette":"aGFgYFpXV1dZW19lYFErEQUAAAMPOjYxLisoJydLTlk=","floragato":"JycoKi0xNDgnJy8yMjU9CgcBAAACBxslJiklGw4ICA8=","florges":"nkAAACspKCUrLBAPDwcHCRgbHSAjJiouMjg/R1QXF1U=","flutter-mane":"KiorGBgYGBcXFxUKBQMCAgEAAAABBA8ZHyUnLCwsLTY=","flygon":"NiESBwAABAkPFRwiPFdgQz46OTMvLSsrKyssLjE1O0U=","fomantis":"b19TTDIuLi4yISAgIykzMC8vMDQ7QRAGAQAAAAQKFWE=","foongus":"Tz4wJx0WEAsGAwAAAAAEChIfM0pFPjkwJSAgMjQ2PEY=","forretress":"cEtCPz89ODQvJSMiIiMRAgAAAAkTExUvMDE1PUBGTHM=","fraxure":"VlRSOS8oJSMjIxYMBQAAIhkZJVdaVU1GPzw7OjIrKaY=","frigibax":"RkA9Ozk4ODgyLy0sLCwvMgQAAAEGDRk4NTU2T0pKTKo=","frillish":"i4lzZV1YVVVVVVdQUBIAAAACCSIxQDUuKigoKCksMpc=","froakie":"R0E7ODU0MzIkHQwGAgAAAAIGDhwjHx4eHyMoLRoTExU=","frogadier":"IRkXFhYMCQcHDBYlMjI0QEJFQkA/PTsvLCw3JwAAAww=","froslass":"ZQcGAgIFCAYFBQcMFCUqHRIIAgAABQ0QExkoMzg/SFM=","frosmoth":"Y2MiEQkDAAABBQwUHSYwOUFHTlJXWl5fX15bWVdUUlI=","fuecoco":"U01LS1RdWj4zFgYBAAACChgaFxYUEA8QFCQjHx0cHHw=","furfrou":"PA4NDQUFCA0HAwADGBYUExISExQWGi8yMzQzLikfHh8=","furret":"l4h9dXBtbW1vdA8AAAYNFxweHh0dHR0fISQpMDlFWWs=","gabite":"LSQfGxshKio9Vk01Kh4VDAQAABw7OTk7Q0M7OkFKnKw=","galarian-corsola":"0MzKJiIiIiQsFRADAAABBBEgJC5ES0xOUVNWZnN6fYs=","galarian-darmanitan":"PC8kHhkWFRUVFRcbIB0WEQ0LCQIAAAIGDAoDAwUGBws=","galarian-darumaka":"OTk6Oz4HBQUAAAUQExgYEgkFAwMDBAgQHi83QlJtd3w=","galarian-farfetchd":"AwEAAAABBQgOERYaICQmKCsuMTI5OTs/Q0ZIPTk5Q1s=","galarian-linoone":"BAMCAgICAAABAgUHChEfGhQOBQULjJKXnJ2dnqCrtrs=","galarian-meowth":"WU87Ojo6Ojs9Ly8xDAgKBgAACgpEUFZednt7fpeam5s=","galarian-mr-mime":"QTYjHBsbGyMrLzNQT05OTxAIBAAAAgkUGyJ4dXNzeIw=","galarian-ponyta":"GhUUEBAOCwsLCQIAAAAFBgQEBAcIAAABAAAEIiIjIzQ=","galarian-rapidash":"gzwwKCUeFxIPDAsLDAwPEQ4KBgQDAwQGAQAAAg4ZHi8=","galarian-slowbro":"Qj08PD1ARUVFRUI9AQAAAAEDBAgLDxQaHBweIyEhISE=","galarian-slowking":"SjYzMy4nJCAKAwMFChMWJRcKAgAAAyUpJSQkJSsrK5o=","galarian-slowpoke":"UkpEPjo1Mg8KCAcHBwcICgkIBwYFAwEAAAABBAgLDxQ=","galarian-stunfisk":"pISEhGtra21ub3Fzc2dWQxYPCwUCAAABGyAhIycrND8=","galarian-weezing":"aEIvLzEzMzMzMzMzMzIyFgQAAAEWCwoKEhQTFhEODQ0=","galarian-yamask":"hYWDZ19aVlRSUgoCAAAAAQcRgYGCZWBcV1VVV1pcX3U=","galarian-zigzagoon":"LCkiIiIiHxsZGBUSEhIQEBYVFQ4HAgABBTc/Q1ZcdX8=","gallade":"gYGCg2hQOysbEAYAAGludXFkYmJjV01COC4mHhgTDw8=","galvantula":"fHp5eHBwblxSTz44Mi4pJSEaEQ0LCAQAAAYGDA9mZm4=","garbodor":"XldWVlYlAAABAgAAAwICBA8JBgUFBQgMFRslJSYuM0I=","garchomp":"V1M6Oj1JY2ZiUkU9HBQQDgwMFgQEBgkCBAYEAAAfHh4=","gardevoir":"nZWQj46Oj5GWn52ViHloVVBUpJqKYzYfEwkCAABuhIo=","garganacl":"gH9/XVhYWD8/PyokJCQkJD84Jw8IAwIBAQAABhFIU40=","gastly":"X11dPTovLi8CAAAIBAICCQsODg8JCQkLFRscHjw8PUk=","gastrodon":"zcaIekRDQ0VHTl5iZ42QZGA4MDAvJyEXFRMMAwAABTg=","genesect":"HhoaGhw5MSwjGRALCw0jHBAIAwEAAAEzND46NC4jI+A=","gengar":"MDAwMTEyCwABAwkRFRkaGBcXFxcUEA8PEBIYISdTXHs=","geodude":"2RcUCwkEAgAAAAAAAAIDBAYICg0PEBESFBUWGBodIik=","gholdengo":"g316d3d5U0dBPz9NfH+CejQBAAALCw9rYlxcYGdpa24=","gible":"lXplVEY6CAAAAAQKEhMiLjE1KxwcGBg6Oz1FUlxcaJQ=","gigalith":"c29saGViUU9OTU1MTVJUGxkXGBsdIAMDAQAAAAAAEJ0=","gimmighoul-roaming":"l0xMODIsJiAaFAYAAAMwMzpCQ0JCSk1QT0pHRkZGS8A=","gimmighoul":"pnkSBgEAAAECBAUGCCQSEhoUDg4QExcdIywzIw4KDBs=","girafarig":"JCQJAAAABhcYNjg4ODg1MS0oIRgPAwIECxAWGCEoPTo=","giratina-altered-forme":"MSAcGA0IAgARHx8gODhBSE5NSkZCPz45OTw/PDc1NYE=","giratina-origin-forme":"bF43Mi0mJSMSDAcEAQABAQQMEhUUFR4KBw8vIyM7Q1A=","glaceon":"pqampqanqKwBAAAAAQIEBwkQHCxOTExKRkI/Pz9AQkM=","glalie":"AAEEBQgLDRATFhkVFRUWFRQQEBESFBofHyAjJi03SVM=","glameow":"0n5zbmcODQwMDQ4QFBgUBgAAOjo8PDs6NTU1OD08OTk=","glastrier":"NjAsKCQGBgcMCgQAAAEqLCwoHQoEBAYLAAEFCxciISE=","gligar":"ZRQUFhseIQEAAAIHEB8oLSggFAsICCgREhMSEhcfKSk=","glimmet":"Z2ZmAAAGFSUkHhEKCjs+Pz8/OzYyMTExMjU+TGSesLk=","glimmora":"W0o/NCwlHxoVEQ4LCQcFAwAAAwMGCQ4VGx4kKjI7RVE=","gliscor":"Fg4KCAcHAAAFDBATFRQSEBApMjk9dnZ6homSkIuHhoc=","gloom":"c1tQS0ApHxgRDAgEAgEAAAAAAgcuMTYzMTE1XUo/Pj8=","gogoat":"MiIYEg4NDQ0FAAADCRQbHBwhISsvOkJASVJhXldNR0Q=","golbat":"BQkNERQWGRsbGhgWEg8IAQADExsgIyYfHyMoKisrLG0=","goldeen":"XFtYSkhGRislHBoZGBIODQoFAQAACjk/OjY1NT5DRUc=","golduck":"Yk5NTExMS0szJxkJBwEAAAFfWFFLSEhIPjMvLy9An6I=","golem":"gl9WTkdCQD8ICA4MBAAALC0sLD8/QEJBNC4sKzK0tMM=","golett":"JBQNCQQDAgAAAAcJDiorKysrLC8xMTc2My4sKyopKS4=","golisopod":"f1pRUVE+PTw7ODUoHBoXCwcDAAAWFj9AREJCm7bEysw=","golurk":"eHgfHyAlIiEhIiYWDwoHBAMAAAEBBE1FQTc0NDEhHyA=","goodra-hisui":"in93cWw0GQ8LCQkAAAMQEBIUGSosTUhFRERGcXd0dbI=","goodra":"eXJxbW1wb29ze2JVbHIuCxIMCQAGBgYICg4SGSU6Gxs=","goomy":"IBwYFhUUFAEAAAACBQsIBQIBAAAAAQMHDRQdGxoaQHk=","gorebyss":"oo11YVRLRD44NCsrKSQfGBEJAgAAW2Jna22Klpmdoqk=","gossifleur":"ZlxPRT88HhQBAAABBQYGBgYHAwMPFh4oPToyFRUaJDo=","gothita":"b2oVDAgFBAQEBgkJAwAAAAADCRAcISEjKTI9P0FGTlo=","gothitelle":"fBsbIxMTJRUVMisrGhUIAABISEg5NDMzNjItKyssMTM=","gothorita":"BQIAAAICAAAABQwbGhkZHiQzS1tRUVRub3J1dXNubm4=","gouging-fire":"WVctCQYSJTE5GhsmAwMGCQwRGCcrLDAqIxQGAQAAFnQ=","gourgeist":"OzEsKioALDM1NDQzLSMbGBgYGRINCgkJCg8VH0BHT1Y=","grafaiai":"ZmM3NzknJygqDgAAAgQHCg8VHixBQURITFJcV05MTHI=","granbull":"PDQvLCwsUlRgYCUTBgAAAws8JyYnLCwsLCwtKCEbGxs=","grapploct":"aVxTTEdDQD49Ozs8PUFESRIHAgAAAQ0ND3FlSD46Ojo=","graveler":"XVtYTklGRUVFOTQxLyMfHBsWExISEQcFAwMEBAIAAAA=","great-tusk":"bWdcWE5LEw0JBQMCAQAAAAABAgMGCQ0SGigsLS8wMzY=","greavard":"dHBrY19fX1VRUVJaOTAcEQoFBQUFCgUCAAAAAgkUIio=","greedent":"Pzg3NzcwJSAeHRoYFhYVFQEAAAIMDicuJyYnMD9ve4I=","greninja":"mkxMGRQSERIWNz9GUWBiXFxPSkhGQT04MigZAQAAJEA=","grimer":"XVVPS0hGRUVGS1hSRD43DwgFBQYBAAABA0I8OTk5PFQ=","grimmsnarl":"gYJJSUpKODUsLC0zMyURBwYAAAYbHERERklMSTc1Nac=","grookey":"kkxMTlNIQ0NGU0xINR8eHiMpMj4XCgMBAAACBQ4jQEM=","grotle":"Vzg3OCoqHh4jIiIiJBwZFxQREA8OCgoPCwYBAAJMS0s=","groudon-primal":"29q4qKCakiUBAQEBAAACAAAFDBQbICYtMztEUGlnZmY=","groudon":"kIV5c25sZmNgDggEAgICAwUGBAAACw4WHSYzMjM2Nzk=","grovyle":"tYxCKh8fHyQxO1FYWxoOCQkLDAgFAgAAABg2mpqbn78=","growlithe-hisui":"uLW1SUU3LCUaGhgXFxkXFhYaJSUIAQAAAQMMHRgLCxU=","growlithe":"n5CFfXptYFtYWFdXWGI5GBAGBQAACAMDKS4uLzI1Ojs=","grubbin":"e3FrZWBcWFZKNSggGRIMBwIAAAApHx4eICk3SGtsb5U=","grumpig":"SUlFQTMuLi41OSQWDQYBAAAEKSYiHx0dHR4hJi8+OTk=","gulpin":"vq+km5ONh4NmSz4zKyUfGxYTEA4MDAQAAAACFx4nMT8=","gumshoos":"t6+oop6alpOSkZGKhH98fHx8eGpRUVMDAwMAAA4zdnk=","gurdurr":"DggEAAAAAAAoMjMzMzU5Ojw/SE1QUll9cWxlX19gYFw=","guzzlord":"urWzCAIAAAEHBwcEAgICAwceHyInLTc/Pz08PD08OTk=","gyarados":"a2gyLSkEBAAABAAACQkODw4ODQgIR0lTVVtns6+vw9c=","hakamo-o":"ZF1ZWVkpHxsaGhQQDQoJCAgICAkNEBQbEAkFAgAAAAA=","happiny":"sqWclpGOcmtpRDk3MCgiGQ8JBQIAAAACBQoQGCMlJy4=","hariyama":"KygYDAcHCBEYGx4jBgMBAAAAAAEICAkLDxIREhp4jaI=","hatenna":"trOysrO0ta+ppJ2Yk41kVk5IRAYAAAACBgwWJVxhYWE=","hatterene":"3Mi3p3lmXFZUVFNNR0I/Ozk4ODUwLygLAAAjIyR+UlY=","hattrem":"raFqV01EPzo3NTMyMTExMjM0Njk9QhQUBAABBAoTIjM=","haunter":"Z2ViYV9dW1lHR0lFRRcPCAgBAAAFJWp2b21tbW1vgIM=","hawlucha":"AEk8NC8rKSgoOEBDQTozJwkIAAAACAgIAwgIHTg4Ojw=","haxorus":"HhYOCQUCAAAAAAIECBBEOi4jICAgJi4sLC43KCEhLaw=","heatmor":"UEY/ODMvLCkoJiYmJigoKCYkIQgEBAQFAgAAAAEHTMw=","heatran":"VU9KPzEvLy86PTkpJiEeGBMQDw0FAAACAwEBA4qQk5M=","heliolisk":"MyUfHyAjKCYmKDIqHx4fGxQAAAAILCsqKiorLC9DPj4=","helioptile":"hnx1bWllY2FeWlhWVVUAAAUOFBkeIiYqLjEuLi8zNjU=","heracross":"Tk1MSUZGWVxKSkpWWldVVVFLRjYmDAgEAQAABDw7wM4=","herdier":"MS0pJyAfCwwPEhIaExMLCAQCAAAlIyUpKSpJTENCQmw=","hippopotas":"ZGBeXV1YWFhJMighGxcKBQMBAAAAAQQICg0RFh4oOJw=","hippowdon":"NTIyLy0sLC0vM0JDSUlLSykHAgIAAAESIR4MAgIcHEE=","hitmonchan":"nxUHAgAAAw0/XWxzfH9oaGZmbXZ0dHd/iYyNh3pycnM=","hitmonlee":"My0pKCYmIQsCAAADLC8zNzs9Pj9AQEBAQEJDRkhIRUU=","hitmontop":"MiMcGBEMCQkjIztETjEYEQ8PBwIAAAACBw8YJDM+QEU=","ho-oh":"FAoJBwcHBwgKCw0QExgbJCoyPEVQTiMLAAADBQgMFRY=","honchkrow":"BgYHAgAABAEBAgwbFRMTLCxDQ15ed3+KkI55c3N3lZU=","honedge":"amdmXFdYV1ZIMhYJCA0aISUkIiIfHBgUDwgDAAAOExk=","hoopa-confined":"JR4VDwsJBwcAAAgLDxQbJzY4PjRIT15hd3JydHRzc3Q=","hoopa-unbound":"jIB4cTgwLCwtREdWAgAAAAIGSz84HRwcH1NTVlxUVJY=","hoothoot":"NTc6PkJGUUhBPTg0MjAvGwoAAAU1OkBIU1paaVZSUlQ=","hoppip":"yMTBqyYHAAAJEhs/Pzw8Ozs8PT49PDw8PkBERUhfYGI=","horsea":"V0xFQDwBAAAAAgULR1RpbmZaUElEIxUOCwoKCgwQFiA=","houndoom":"IRcSERERFBs3ODYyMTEzODk3NjQyMC0nHBcUEQUAAF8=","houndour":"MycbFAkAAAEEDxkrLS4wMDExMzY4Oz0+PzU1KykqMlo=","houndstone":"TkhEREVGTU5OJh4ZFRUVFioMCAUEBAIAAAEIE1RQUFM=","huntail":"zc7SlpApHBYVFRoiKCgcFQ8LCAgIDA8LAgAAAgIBAUU=","hydrapple":"VEAcFhcjKScnf2lWST86OTk5HwoCAQAABwkMEBkRBQU=","hydreigon":"xLMeIR4eHgICBg4AAg4YFhYVCgkJCwshJWNofH1/g4s=","hypno":"UwsGAwAAARYXFxgYGR81OTxGTEc9MykkIyIjJywkGxs=","igglybuff":"gn1uY2BgUkE1KyIdFxQREA8PAwACDBofJi45RlJQUFA=","illumise":"KiwuNDEnIR0ZGBgZAAADCRETEhMXHkhIR0dISkpKSkw=","impidimp":"KyMdGBUTERERERMVFgMAAAUOHRoZGjo7PUFHU6KipKg=","incineroar":"j4mJgoKGdD02IBAFBgYJBwcICAEAAxERBgMDB0pKzs4=","indeedee-f":"PB4UDw0NCAAAAQhCTWVYGxgWGk5MSkpLTVFYY2xwb28=","indeedee-m":"JhsTCAIAAAAFDBYuMDtTPCckJCssKiosMDY+Sk9SVVs=","infernape":"dmhHQkA8KysrLC4xNTYqJhkTDwwGAQAAAAMFPj5ioaE=","inkay":"YVVLQTgwKCQkKSwnIh8cGhgYGRwjLSceFQkEAwIAAGE=","inteleon":"j3xvZS8uLhMTFyQoPD1SUVFRSEE7NTEvLz9PTEY7BAA=","iron-boulder":"WFVTUVBOTEtIQTIwGhohHRwbDQ0OEQ4JAwICAgAAADE=","iron-bundle":"dHV3bGxwd35+fX1URT4zIxoUDwYCAQAAAQQKFBokM28=","iron-crown":"PmJ1fIeHjIyHhIE9GxshJSIYFhYVEQ8NCwAAAgICC1U=","iron-hands":"GxYWFhYWBQIAAAABBAwZNS8oJSUlJyovMTI1ODo0MzQ=","iron-jugulis":"NTUTExYZHAMDBQ0EAwQSIyoTEwQEAQABBwdhZGmPj48=","iron-leaves":"AAEJERgdHBwcIzUzMCsbFRUWHicoKDg+P0VJS0VGUEw=","iron-moth":"whcYGx0gIyYpKy4xOCsdDgEABhktKiUgHBcSDQgHCLg=","iron-thorns":"RTIvLi0tMC8tLCwrBAICBh8iHBMQDw8PEBUMAACUlJY=","iron-treads":"UEE7NjEZFhcjIBwAAAABAgMHChAQEBESExUaHCAiKDM=","iron-valiant":"R0VDQjwzJycmHQAABAoTHSEkHhoWExAOCwoKCgoMDRE=","ivysaur":"aVdVUU5LSQ4JAgEBAAIGDRckLiEYGBkbJTw7OTk6O0A=","jangmo-o":"MCQeGBQRDw0IAwAAAAMGCxIbK0Y/Pj49PUZDPjcqKDo=","jellicent":"b3FoUEM8KyIcGRcXFxcZHB8lKzMbFgkCAAAABAwtNWI=","jigglypuff":"OTUzMS8uLSwrJiEdGxkXFhYKAAACCRUhJSslHBsbHJA=","jirachi":"dnBrZmJfXFVCMygfGBYSEhEREREREREREg4HAQAKEWY=","jolteon":"aVdHPTYwKhYPBAAAAwkSDw8XFxcUEhIuMDI0MjApKSo=","joltik":"fVxZVkw/Ozk3MismGRQRCwkICAAAAgAABQcIC1u2t8g=","jumpluff":"RT81LyooJycpKjE4SlZBMCMaFREPDwAAAAUCAgMHDxk=","jynx":"Zl9ZVFBMSkhGRENCFQUEBgAABAQuQDYwMCUWERAQMz8=","kabuto":"UkE1KiMcFhIOCQcDAgEAAAAAAAMIERIPDw8PEBEUGSI=","kabutops":"T0dBPDg2NTU1Gg8NCQMBAAAAAAACBQwUITEvMDu4trY=","kadabra":"RUU2NkpKSktOUExLSjMlHBYRDw4ODgMAAAAFDDYzMjI=","kakuna":"RTAhFQwFAAAAAw0aFxUVFA8PExsbHB4hJSw1OD1DSlQ=","kangaskhan":"cGtnV0Q/Ozg1MjIyNkxWUwkICAAABAgNFSwbEA4PH5g=","karrablast":"hICAgIiCdmdTRDgwJyEcBAAAAQYQEBARFBkdJigsMjw=","kartana":"SkI8NjEtKgMAAw8aJScoLTM9XV1STEpHREI/PTo3NDI=","kecleon":"OSIiIyUmJiAaFhMODA0dLEMyBQAAGk5QUFBQUlhhXFw=","keldeo":"VxsVERAJCAgFAAADCA4VHSIiJT87Ozw8PkRAPDg1MzM=","kilowattrel":"2MOypZqPhXx0bm5ucHJyc3NzcnEgGRURDgoHBQMBAAA=","kingambit":"VVNQT05OTk5OT1BTBwcJDBIdAAEMHRkRESkpKjQ4MzM=","kingdra":"d3VWVldYT0c/FgAAAypXdn1/f4CBg4aMl7SysrKzt70=","kingler":"op6al5WTkpGRHBcSDwwLCw0PDxAQEBIXHiIcFg8BAAA=","kirlia":"ICAkKjE0MSslHxkUDw8eHh8RAAAKHGJlaGpsbXBzeH0=","klang":"GBERExUSDgAAAAAEFhkYGBgjRktNRj8/QUVKT3J6enw=","klawf":"sbCwsLJ5HhkVEhAOCgkCAgICBAQMEA4OCAQDAQAADQ8=","kleavor":"JSQjAAACBggJCw0PExYZIigwOTcxMTU6Pj45LSoqMaY=","klefki":"pqGhoaYnI4B5dG9rZ15ePTgyHw8LCw5pW1JSAFFRUak=","klink":"IRkVFRcbGRYRAAAAAAEGHSIhHh4gLWxsbnB0kJeXl5k=","klinklang":"JSEhIiMhHRQUFBUWJCcmJSYuBQIAAAAABBUsTGVsbG0=","koffing":"DQoFAgEBAAABBhMRERIXLikoKCktMzU4GxUUFBISFBk=","komala":"NCokIB4dHR0gKCw5OSMVDAYCAAAAAAMGCg4TFx0iKC8=","kommo-o":"OjQwIyEhIiczMC8uLCgmJSQkJiUYEwoEAQAAAQMGEy8=","koraidon":"joV+end1c3Bta2dhOTlAT09USkdKU0VFEAUAAEBKRkQ=","krabby":"pCwpJiMfHBkXFRQUFRUWFhYVFRUWGRsbGxsYFAMAAAA=","kricketot":"FgoEAgIEJicsIRgTERERExAKBwAAAAUIDRMeFhERGJU=","kricketune":"Ix8cGhgXFxcSDgoGBAIAAAACMyojHRkVExISQTs6Ojw=","krokorok":"OTEqJyQjJCo6PDIpIyAgICkkHhgTEA4ODhMcEwAAC3E=","krookodile":"WFZVUUkeGBINCQYDAQAAAAABAgUIDBIYHx8fIBwTEh4=","kubfu":"a2FYUhQODg8SFhAGAAAVFBMTExUZLzw1MCwoJCEPERc=","kyogre-primal":"nZePNB0ODAQAAAEKEBkiNTAtKikoKCo7d3h7fYGFiIo=","kyogre":"HRALCwIAAAEHCQ4UICglIiEfHhwcHB4jLEZ4f4aNmp8=","kyurem":"zbm0r6ypTEQ7PEQ5MAwJBgUEBAQDAAAAKytjV0lIS6M=","lairon":"dT82LyomIh0WCwYEAgEAAAAAAAECBAcJDg8PDy5zc3Q=","lampent":"QD8/P0FEQDctJh4WEAoEAAAEWF5QQzoyLCcjISAgIic=","landorus-therian":"ZF1YVlJPT08RBwEAAAEJDgoJCQsWHB4eHh8lMDs7Pj4=","landorus":"aTAYEg4LCAcGBgEAAAIMEBQYHCEkJCkqMDNHT2p/dnY=","lanturn":"VlJKRjEiGxYIAwAAAAABBAsvLi4uLzM4P05WU1NTVXg=","lapras":"YFVUVVBMS0tMYWtoZGBcV1JOSUVDQUAsGRAJBAEAAFM=","larvesta":"bWloaGpkXl1dCwwQERALCAYFBAMCAAAODQsAABQUJ0Y=","larvitar":"TklFQkA9OzksIRYPCQUEBAQGBQAAHRUMCAcIDgsLq60=","latias":"Lh8RCQUFBw0TGR8lKS4yLw4CAAAxMjU6ODhFc3NzdHU=","latios":"YF9fX15eXl1dXV1dXFxbHxsWEg4LBgQBAAAACH14eHo=","leafeon":"4DAhFgwGAgAAAAABAwcMEhwfLTkuICAmQUAsLDk1Li4=","leavanny":"SkVEREE+Pi4mJiYuPEgnFQkEAAAAAgYLWF9kbHSAhIE=","lechonk":"bl9SS0U/OxUMBwQCAAAAAh8eHRwcHR0eHyIrPzw8PIA=","ledian":"ekE0KyIbFRUVGA4KBgUFCA4fFQMAAAAGGxsjb3Jyc3c=","ledyba":"a2ReWFVVVVZKOTIOBAAAAAMNJCw3GhYVFRgmNTU1PJE=","lickilicky":"W1lZWlpST0c6MCchHRoaGg0CAAAOHh4fIiYrMzw/QkQ=","lickitung":"TEM+OTYyMjIiFA0KCQkMHBcRDAgFAgEAAAABAgcOJSg=","liepard":"BgMBAAAAAAAAAiEhICAbGxwfIyszNz05MislHhoZGRw=","lileep":"PykmJhsNBQAAIBUPCggICTg4ODtkdHdvY0pGRkdAP0A=","lilligant-hisui":"BQIAAAABBQ0XKUtTSDIlHh5DRUlOVFdWUVFDQkNOXmA=","lilligant":"nERERUlQV1FPTkIIAAAABA0dRDctIRkRDQoJCQoMTFQ=","lillipup":"JyIeHBsaGhcIBgcNFR4dHAAABQwJCSEhOk5RVFZWVl4=","linoone":"8ezmVUY6MR4YFhUUEQ4LCAUEAwICBAIAAAAEHBsZGRk=","litleo":"Ih4bGhobHCAmKykmJSUlJikuMzw5BwAAAAEFDBlOUVg=","litten":"3M/PzM/o3su5hiIhIB8fHx8fHx8gIiUOAAAAARh7c3M=","litwick":"dm1kXFVPSkhISElBKhwRCwYDAAAAAAMGChEZGBgkJCc=","lokix":"QDw4NTMzPj46NzUzMi0pHhUHAAEOESIeHiAkKS0xMC8=","lombre":"ZFNDNzY3HRkUEA0LCQgICAkOG1FGOzIoHhUNAgABCkM=","lopunny":"TkxLSkZAOzczLichGxcTDw0JBwYBAAAIFGhqdn2BgoE=","lotad":"dV1PQjYtJR0WEAwIBAIBAAAAAQIFCQ4WIjY4ODg6QZM=","loudred":"oiANBgEAAAACBxA4HBYQDg4QFRwmNklGR0RDQzs0NDY=","lucario":"aDY2OD5ETExDQ0ZGSUAxFhYUDw8aIyMkKSkkHhAAAAM=","ludicolo":"l5hVMS0rKiosOSAQBAAAAQQIDxYVCgMBAQMJElRic3U=","lugia":"yLu2tlRJQDgyMTE7P0QjBQEBAQAAAAADCg0feoWSk5U=","lumineon":"GhYUEhAQEBARExUZHiIeFhALBwUEAAABCBAcHi0sLC0=","lunala":"wL29vSwhGhQQCwgFAwEAAAAAAAEDBgkNERYcIis0P00=","lunatone":"QC4fFhAMDBA/SlFXUzshGxsbKkFDOAAAAQQJDxYfLD0=","lurantis":"g3k9ODMvLzI3JCMbCgoSLiohHxoXDggDAAAVFVZdXmI=","luvdisc":"hXRnXVROR0I9ODMtJR0SBAAADBYfJy40OD1BRkxVY3Q=","luxio":"Pz4ZFRIRERESFBccGRIAAAccNTU0MzMzNDQ1NTAuLjQ=","luxray":"GxcVEwEAAAAAAQMEBQcHCQ4PMzU4O0A9OTUxLCEWFhY=","lycanroc-dusk-form":"UjExKiUhHh0bGQAAAAABAwgQQ0FAPz07OTk5O0GRlJs=","lycanroc-midday-form":"wrq2cG5qOzkUFBUWGBocGhQRERIPDQsMJDUsIgwFAAA=","lycanroc-midnight-form":"joJnX1pOSUhIRTw5OTk5NxIRDw8REQYFBQQDAQAAAAg=","mabosstiff":"JR8ZGBEDAAAAAQMFBwsLCwwOEBIVHSYtMzg3Nzc8Rkc=","machamp":"HBANDQ8SFBYZGyAvFwkGBggKERtGOzQwKCAfHhoPAQA=","machoke":"XlhHRUVMQjQfFAYFAwAAAAMEBAsgHRwbGBgZHBQBAAE=","machop":"kIuHgns8IREKAgAAAAgdPUJSQT84MzMzMzQ/bmlnZmY=","magby":"IhYQDQ0ODQ0QAAIQFhgaJGJeWFJPT1BUW1FJRj8+VFU=","magcargo":"7OXi3to0KSQhHxgTDg0NERISFBQYKychFRELBQAAAAg=","magearna":"LCQkN0xRUEhHR1BORQAAFUE3MColIiAgICAiJis0XF8=","magikarp":"fndPT09RTz8kFw8JAAAGCwgDAwMDAwYLEBQYGhsYF1w=","magmar":"fHp1cHBuaWhaWlxOBQQEAAAACQkJCx0hJSsyPz8+Ozs=","magmortar":"CgMDAwQIFBQWHBwfHBkZFQ8KBgEAAAMEHhcMAgAMiZM=","magnemite":"bGVeW1paW2BrZWBcWFZTBAEAAAEEBwoWHxsXFxgbHiE=","magneton":"NjMlGxgYGyIqMQwKCAgYAgAABBUuLzMuLCwvW1tbXF0=","magnezone":"hoaGioqJh3FDQUFDNzEsKSgeHhQLCAcGBQcCAQAAAAg=","makuhita":"bmksGxIMBwQDAwMEBgkMEQsGAwEAAAACBgwUFxcXIZU=","malamar":"hIRnaXJWV1RUVE5FQUFBQkdNVFdOPSodEwwHAwEAAAE=","mamoswine":"e2tmYFlUUlJPS0lIEQsIBQIBAAAAAAEEBwsSHU9OUlo=","manaphy":"enBnYFNFOzQuKiclIyIiIiIjJSgsAQAAAAIGCxUyMjM=","mandibuzz":"Kg8AAhUkJjQoIBoZGBgFBgsLISIjIxgLBAMKCgoYGUE=","manectric":"TUlFQTk0LigjHRcXBwAABSckHRsbJiY6PT4/PzoxLTE=","mankey":"CwUAAAAEGBkbGxwfKzMyMzM2Li0tLjUiHx8fMpCPj5E=","mantine":"SEhISSYlJSUmJyosMTY4NzEeEAgEAAAAAQlOZK+0uL0=","mantyke":"Ozg1MzIxMDAwMDEyAgAAAAEEBgkNEhgeJi87RElQWWY=","maractus":"joeHiop/GxELAgAAAAAABB5VXDUzKiQkMDxaQz1CU1I=","mareanie":"c1paW11KFRYaISknJSMFBQYeHBsZFxQQDAYCAQEBAAA=","mareep":"KBoVFRUXEg4KCAcHBwYBAAAABAIBAQYLCw8ZGhwgKls=","marill":"ZV9bDwgEAQAAAAECBgsUFRcXHx4dHR0xMzg8WFZVVVY=","marowak":"NSMhISRFUV4TExMTEw4LCwsLCAUCAAABCTk4ODg0NbU=","marshadow":"TEdGRhwWDQYBAAACBAEBAQIIFCQbGx0RCwsMDhIwMTQ=","marshtomp":"gXZtZ2JdWQ8FAQAAAwoTHyoODg0ODxIUGx8oMklOhYk=","maschiff":"EgsIAwEAAAQEBAQGBAQDAgICAgIEBAYHCxUSEhIVI1c=","masquerain":"NjQyMS0mIh4bGRgXFxcYGRwfJi85GQAABwQEChxMeH8=","maushold":"YyEbFxUTEhEQEBAREhQWGSAiBwMBAAAAAQIGFBISEh0=","mawile":"cmtmY2FfXFtZV1VST0xIREA7NS8oIBgNBgMBAAACCQk=","medicham":"k4+Oj3dpYks/Pj8NAAAGO0xgWEk+NS4qKCgpLDZEY30=","meditite":"dnFoXU1BNzEsKikeFhEREREUGScNCgEAAAEJLztUWV8=","meganium":"WFNOS0pKS09UV1xwjXdtTzg4PAEAAAMDAAAAAAIFDUY=","melmetal":"PTk1Mi8uLSsgHBsbGAgHBQIBAAAAAQMGBwkKFklISUs=","meloetta---aria":"KyoqKy8zLCkpKioiISIrPUBJAgIGCxMTDQcCAAB/f4E=","meloetta---pirouette":"GRkHAQAAAAMNMTU8QkZITjw8RCwOCAgLHVFRWGd6eHY=","meltan":"YjYmIh4bFRIOCwgFAgAACBMfKjZBQD9BSSIVDgwJE08=","meowscarada":"XFlYVlZWVlNTT08LCQoPEgEAAAgHBwcLZm1ubGpeV1c=","meowstic-f":"BwQBAAAAAAEECA0UGhweJCsrKygYFRcrJycsPUJITU0=","meowstic-m":"U1NTU1VXWl9kaioYDggEAQAAAAEFDhAUFhYZGx8lLnk=","meowth":"XFw8OzoUFBolNBQfP0ZSOyYVCQAAAjYnFhAQFWBcW1s=","mesprit":"W0c1JxsRCAMAAAAbREJBQUIkIyQlKjM1N0FCREdKT1Y=","metagross":"YFlBPDg0LysoJiMeFhIRDgwKCAcHBwgCAAAAAAEHCxI=","metang":"YFgvLjE6OjIuLCwsJyMfGRQPDAkIAgEAAAAABg4PERQ=","metapod":"LigkIh4aFhENCQcFAwIBAAAAAQMJEiAkKzI9R1V0jaM=","mew":"U0c9NCskHBYQCwcDAAAABBZ2c3FxcXFxcnN2eHyCwMI=","mewtwo":"hYaAfHpLSEhMNAwFAQAAAAIECAwRFhwjLTlaVlBKQ0I=","mienfoo":"gn92bmllZGRkXV1BJhsVEhERFywQAAEIEykvKSAXFBQ=","mienshao":"SENAQDs7PEJNQD42LigjIR4cGRYSDgkEAAAOPz9Gk5M=","mightyena":"CwkIAgABBAQFAAACGBYcKCgoKCotLzM2NDMtIh0dMVQ=","milcery":"dwQBAAABBSQkJSktKSgoKSsxP0dJSyYjIyMlKC03WV8=","milotic":"a0caEA0NDQ8VHycwNjxCRyweFA0HBAEAAAABAwcMFiI=","miltank":"Dg4RGiotDwAABAkPFBsjJicoKSstMTQ2OAUEBAgYICw=","mime-jr":"IiEhIi0xIyIjKSceGRcXGBUQDw8PEhxMAAADaGhwfI0=","mimikyu":"dnZwZ2NiXVlWU0g6LygoKCgsLzU6NjEtKSYjIQUFAAA=","minccino":"DQgFAwEAAAAAAAECBAYJDhUeKCgpLi4lJCQ1MzIzLy8=","minior-core-form":"UlBMQj49NzAqJh8TDwIAAAYJChAXGBodISYtNz1ASFA=","minior-meteor-form":"UlBMQj49NzAqJh8TDwIAAAYJChAXGBodISYtNz1ASFA=","minun":"GRMPDAkICAcHCAkMDhIZGhYSEhMKCQoPAgACBQcKDQ8=","miraidon":"dnRycnJycnV5fGxhXVtbXF8AAAYRJ2Rnc3lrZmRkZm8=","misdreavus":"UVBQUFBSUE0oHhsZGQAAAAMFDiIiJUI/ODMzNVRcXV4=","mismagius":"cnJlWxkZHSUbDAIAAAYVKy9samRdVE1NUVBRVmBqa3g=","moltres-galar":"s5uTJQgCAgIBAAEFCAgRFBwcHSQgHBwcNUk/PT0/Zmg=","moltres":"9j49PDwSEhIFAAACCw0OHCkpLzNAQ01SZmVlYl9dXWQ=","monferno":"AgAABAsDAQEeJSssLC4wMztDSFlcWDMWDAgHBwkKI3E=","morelull":"jXxuYVpSTEkPBgAAAAACBg4aQT4+Ozk5OUFVcm5kNTU=","morgrem":"rVVVVickJCQkJScsNkktFQcAAgoNGmEkIikCCCc+MDA=","morpeko":"BQMDAwQHAAAFGRYUExMTExUWFxMQEBATGBgYGRsiJSU=","mothim":"DgQBAAAAAAEBAxMVGBseIiguNkVFQkBAQDc3Nzg7Q4k=","mr-mime":"EQ0BAAALEhQYFhUUFBsvMTVFRkE/OS4iICAjHhsbHCM=","mr-rime":"FwsDAAAdHQkFBQgYN0BAOTUzMjIzNTo5OTolIB8fHyA=","mudbray":"BwUFBQYICxAJBw0QCAEAAAMKOjo8QEVLUlhUSklBQEA=","mudkip":"TEVBPz09PT0+P0E8LycgHRkAAAMHBQICFho+QEJDQ3M=","mudsdale":"p52RioR8eHh6QzAtJSUeFQ0HAwAAAAIMGRoXFxgXFhc=","muk":"YltWUk5LSEQ+OTQuLCopIxoSDw4MCwgEAQAAAAIJCww=","munchlax":"U05LSEVEQj40LywqKisuND0oFwYBAgYJDwoAAAYKH1U=","munkidori":"UU8xKh4TDQIAAAYPExgdIigmIiAdHR0dHiUtKiojGBg=","munna":"XUw/NCwlHxgUEAwJBwQCAAAAAAACBAYKDhQbIisuMTg=","murkrow":"ajczMC0rAAAGEiAYEhAQEhU2NS4rKSkpLDE8UFE1Kyk=","musharna":"nFxORkVBNi4nIh4dHR4oHBMLBgMBAAAAAAECBigpLjU=","nacli":"f3p4dHBWUUQ8NCAXEg4LCAQCAAAAAAACAwUIEBsmJic=","naclstack":"JyYmJiYmISEhISAgICAhIQsAAAAAAAAAAQEBDBJZWFk=","naganadel":"pJGPgICBgYB+fXBwbmRgXFhUUlBNTEI3LiMZDgYCAAA=","natu":"yLito5pZSDw0LiohBwAAAQgUIiQoLDM6RVRYPi8tNVI=","necrozma":"ent+bmdoVk9LSyUkJCQjIyIdFxcXEgsFAAAAAgQGHWo=","nickit":"zcqOjYyMjY6PkJKUl5qZmTcoIBsWFBMTExAQBwAAIiQ=","nidoking":"KysfISYpKy0jIxgLBgQBAAABEUM/PDs7Ozw4MTE2m6Y=","nidoqueen":"aWhcVlRUV2JtcWVXTzwdFxUVFxobMwAAAgYMFCEdGho=","nidoran-f":"WBwZFxMRERESDAYBAA8PJikoJiUlJSYmKCkrKSYma2w=","nidoran-m":"VE1FPSUlIyMjIhoUFBUYGx0dCgAADAwMDxIQBwQEPz8=","nidorina":"blRTU1NJSUpPVVxbJSUmKSEhAAAAAgUJDxUXGBodHx8=","nidorino":"DQsKCQcFAwEAAAEDAwQFBQcTHBsaGhgOCAgUDwsLM6U=","nihilego":"UD00LCopKS0rEBAQFjs4AAABFBQOCAUDAwQIVlZWVlk=","nincada":"Yl9dXElCPjs5OTg4IxkSDQkFAwEAAAAAAwULFhdNTno=","ninetales":"WUo+LCMeGhgOCAUDAwMEBQgNFAcCAAAAAgcQJCs5T6c=","ninjask":"AgEAAAAAAAEBAgQFBggLEQ8PERQaHCMREBAQERIVG1Y=","noctowl":"GQUCAAAAAAMEBQUGChQQCQUEBAUIDRciMkNTIhYVHE0=","noibat":"k2xfVlBNTExMRD45NjY2NzgAAAACBAgPGCQ5ZWhoaWw=","noivern":"WFASDwwJCAUEAgEAAAAAAAECBAcKDhIWGxwcHBxItLQ=","nosepass":"HBQJBgUEBAMCAQEAAAAAAAAAAAAAAQECAggOFhcYHCg=","numel":"OjAiFAoFAgAAAAIECBEdPkVISUpLS0tKSklKSk1RWI0=","nuzleaf":"jCoqKy4wLBEGAQAAAgQHEBMUGDItKSgoKCsuGRQSE2s=","nymble":"KCAaFxUVFRYYGwUBAAACAwMDAwUGCQ4XHx4dHA8PbGs=","obstagoon":"W1laUUooHxwcHBwcHCAlLCsoKCglHhgOCQkIAgAABww=","octillery":"Y2BfX19fW1hYWFhZW11fYmYeFg8HAQAAAgQFBgcLGy0=","oddish":"HhwaGRgXFhYWGBofJh0RCQQBAAAAAwgOFxMQDw8QFEI=","ogerpon-cornerstone-mask":"LyUgHQ0LCgEBAQAAAgIHLzo/QRwXFxcZH4KAenBra2w=","ogerpon-heartflame-mask":"RCcgHBkYGA4AAAIQEBATHEVKTCokJCQnK4mGgnlzc3Q=","ogerpon-wellspring-mask":"fUYWDQgEAQAAAAEECA4UFz9ARBoXFxgaIoKAenBra2w=","ogerpon":"TzgzIB8fDAoKCgsEAAAMCz1JSzUjIyMmKomHgnhycnQ=","oinkologne-female":"mp4UCQQBAQAAGhkZGRofIygtMjlAR01SV11jaGVgYGE=","oinkologne-male":"qJeIfhkZGRAFAgAABiIhISIjJSgsMS0tLTA0Ojo7QXw=","okidogi":"0HVUU1NUUzMvLi4FAQAAAgIEChEhQ0FBREdLTUlFRUY=","omanyte":"NCcdFhALCAUDAgEAAAAAAQIDBggMEBceJCQZGSEtNU4=","omastar":"cHBwb2RcTk9MSUZFQwAABAUFBAQEBQYIDRYlAAABBi4=","onix":"Hh4eHR0dHBsTDAYEAgEAAAIAAAMLFIeHf3t4eHp/j5o=","oranguru":"Rj85NTErJSEbFBIMCAcHBgAAAAIHJSEeHh4eISQuNzw=","orbeetle":"V0I0KB4XEQwKBwYAAAsSGw0DAgQ+QUNFRUZIRkI8Ork=","oricorio-baile-style":"raalj4R+fnRraDkrJxUJBAAAAAcJDx4sTXCBiIJ9XFw=","oricorio-pau-style":"e2tgXV1fZREQAAACAwM9R1xpZF5YU05GPjY2OU6Ae3s=","oricorio-pom-pom-style":"HxIPCAMCAgEAAAAEBQYLFh1MTVFbdn2Ff3Z0dHRva2s=","oricorio-sensu-style":"IBgWBQEAAAYDBAksLCwsLCwtLi8xMzY5PEE5NDIyMjQ=","orthworm":"HhMNBwQCAAABBQYIDRMzNzxCSk9PUFFTVlpfYmZrcn0=","oshawott":"US0iIB4eHhwbGxscHyUrLS0YAAACDC0sLC0xNTsuKys=","overqwil":"dHNxcG5tJSUqLzQ5Ojo5IgAANC0mHRYQEGRlZmdoaWo=","pachirisu":"vrq1kpCNhntzIx0aFhQSCgUBAAABBg8cJCQlJCMeHlc=","palafin":"aF5YUzksIxoWEQ4KBwYFAwMDAwMDAwUGAwEAAAABJMM=","palkia-origin":"X1tYVlZYWFlcYWdtBgYAAAIGDQ4dWFhWUlBQUVSYmJo=","palkia":"AwcAAAAFCzAuLCsUDwwMDAweIRwZGRshKh8YDw6EhIM=","palossand":"e3l3d3dybWdkX14ZFAkFBAEBAgUKEBUZHB8fEgQAABY=","palpitoad":"VUpCPTktHhUOCwsLDRAWGxYIAQAAAQkLDA8UGiMeHiI=","pancham":"WTw8HgwGBAQEBwsLCwsAABAoKygoVUZBNTAwNouYmJs=","pangoro":"i3hZRUEYGBkaGDgFAwICAgACAhJGPzkzMzMzNCwoKKk=","panpour":"alhUUkE8OjYrJyYlJigqLjQ8SXtWMBwbBgAAAQwPR1w=","pansage":"V1I8NjU1OUgLBgMBAQECBAgNFwUAAAINNldMREFBPz8=","pansear":"e3Fsa0IVDQcEAQAAAAADBgsSHiw2SD0zLSkmJSUnLFs=","paras":"Qz46ODY2Njc8TzglGhQOCQcEAgEAAAAAAQIFCQwUjIw=","parasect":"hHp0bmhhW1JFNywlIiIfFhEMCAUCAQAAAAABAgQHDIM=","passimian":"v6+knDAwMDEgDg4EBAoMDg4ODg8PDxUhDgQBAAAAAQY=","patrat":"cCgmJgoCAAAAAQIFCQ4UHCc0QkRFR0Q+Ozo6Ozg2ObU=","pawmi":"qQ4JBgMCAQAAAAECBQgMEhgTDwsJBwYFBQUGCAsPFhc=","pawmo":"bWRdWVYbGRMREBAQERQYHCElHBMMBgMBAAACBwomWVs=","pawmot":"e3JtaGZmYmJiYV1ZWFhYHQ4HAAABBQ1YWFhZW19mb28=","pawniard":"mI0AAAUMFR4nMjxDT2F0hIOBgH9/fnlzb2xpZl9cXFw=","pecharunt":"39fSw7SsFhQUEw8KBgMBAAAAAAEDBgoPFyQ5Oj5Gf38=","pelipper":"bGdnaRcKCiMBAAABAgMFBwoOExggJy4pIx0YFhYawMU=","perrserker":"UFJbWVdXAQABBAgMEhceJykxOzw1NTs7O01ST0lAQEE=","persian":"kJCQkpaZl4eGhpCQhQ4HAgAAAAABBAkQLi4wMjQ1Oj4=","petilil":"Qz88OwQEBgoQGSMxOigZDwgDAAAAAQYOHhMQEBogJUM=","phanpy":"GA4JBQUFDBIFAQAAAAIHFDw5LyUWFRYXGR0pb3Bwdng=","phantump":"RhoOCgkJAwAAHBwbGxwgKUJIS1NnZ3dyW1dXV1leaXQ=","pheromosa":"S0E5MiwnIh0ZFhMQDQsIBwUDAgAAAAAAAAIDBQUGC2U=","phione":"KCIWDwwLCw4RDQkHBAIBAAAAAAEEBwwVIxsUDAUCAgI=","pichu":"AAAAAAABAQECAgMDFyAdHBwcHyMYExQeMzU1NTgtKSk=","pidgeot":"twAABAkMExgeKDEuKipVYWt2gISCf359fGdUQzQxM0Q=","pidgeotto":"Dg4FBQUEBQYICAwVFR0gJzM7OjIOAwAAAx0dWlpaXG0=","pidgey":"PSEdGRcIAAAKEA4PEw8MCQYEBAQECBAeKDUpFhAQJTU=","pidove":"CwsLDQ8AAAEEAAABBQcHCxISGzg7P0RLVmd4WVJSWmg=","pignite":"XlxaWlpcGQ8JBQIAAAACBQoQFRQTExQYGRYUFBYbISg=","pikachu":"MCsoJSMiIiEhHRcUERERExcVBAAAAh8zNTY3ODpATlE=","pikipek":"uVZTUlBQUFBIQDk1MTAvIRQFAABcb21tSko7P1dnamw=","piloswine":"cmVeV0E2LigjHx4bGhkYGBgWEg0KBQIAAAkMCgoKDRY=","pincurchin":"goB/fn17NjY5OwAAAwkPFBshKC00OC0hFhQkPUJKSUk=","pineco":"cm8vHA4ODg8KBAAAAAoTDAgICxoUFBUxKyYlJytMbG8=","pinsir":"h4qMPjc0EQ8AAAIHERMYHiInLTdJU1ddV1NSSUFBSm4=","piplup":"UEAyKiIeGhgXFxkbICgBAAAEBw0KCgwjJCcuOT9DTlo=","plusle":"OSsgFg0HAgAAAAIFChETEA4ODhEXEhIaKT09PUBDS1Q=","poipole":"lpGMg2ZPQTQAAAIBAQIECxMfMVlXU0pJSUxVZnLl6/A=","politoed":"dnNzdoBxUkpFQwoBAAAOFBojU1BBNCsnJygiGBgisLA=","poliwag":"KB0WEQ0KCAUEAgEAAAAAAAEDBQgNEhkiMTIzNTc6PkU=","poliwhirl":"CwIAAAABCA8dIy0tKysqKisrLS8yNz1ETldAODc3OY8=","poliwrath":"YFlWU1FLRUA9FAkFBAQBAAAAAglYVlNQTDoyLy8wOKw=","poltchageist":"hj42MjIzLSsrKCMgHx8fICAhIyUnKRwbGxsIAQAAAg4=","polteageist":"bGxaUkxFREZODAAABxEYGx0dHR8jKC88RUNDRVFhaKE=","ponyta":"eDMgGBIREBEIAAAABTAwLi4tLCssMDM1ODk5NjMuKys=","poochyena":"ISAgICEhHBcGAQAAAQQRFRwmNjUzMS8pIhsPDg4SYWE=","popplio":"dm5oZGBeOjQzMzQLAgAAAQULER1gYF9eXhwUExQYLLU=","porygon-z":"kYyGWkwxHx8nOUxWGwYAAAQQcXN3fYibq6iloqCfn6E=","porygon":"zcpMPzItKCMeGBMOCggGBAMAAAMdMC8vLz1wgaOjqLo=","porygon2":"gRkXFhYWFxkaHR8jJywyODs4MwwCAAAAAQIHDBMhZ50=","primarina":"gHVsYVxAQENNV1ZWJCQiFg4IBAEAAAACBhAfKSYmJis=","primeape":"SURAPT0+RBILBwQEAAAAAgcJCg0TQEZGMS4uLjs+Q0c=","prinplup":"TUtLS0tKSEdHRkVCNy8mHxkTDwsHBQMAAAAgICokIig=","probopass":"XVs+PDw8PT0+QFhPRikkGxMKBQUICAsIBgAAAAkOEh4=","psyduck":"enl6fjw3KyIcGBUVFRYPDQ4QGSosKgAABg4YIzNBPDw=","pumpkaboo":"aWJeXFtbVlBMS0tNAwAAAAEAAAMKGB8eHiAiJSoxOkc=","pupitar":"VVVZXGBjBAABDRklMDszKiIaEwsEAyopKB8VEBAoKy4=","purrloin":"0cKzppgpLjQ8QkhOUldRAAANFhscHR4fHyMnLjtZXWY=","purugly":"ICAgHR0fISEkKC0zCAMAABoGCBAwLi0tLS0vMTQ3NDU=","pyroar":"jQ4MDAUAAAADECBLTVJCQkJERUZIRkNBQUFCQ0RFRpQ=","pyukumuku":"ODc2NjY2Nzg4AAAAAAMFBwkODQwKCgoKCw0RFhwlMEI=","quagsire":"XFFJREFAQEFFSlBUVVNQTElFQT48DQYDAAAABAkSJDU=","quaquaval":"XC8pKCowMTwQEBEEAAAOHx8gJCUpNUNGQ0FAQD8+QT4=","quaxly":"VEI1LSYhHRoTCAgNGD09PT0+RVZHMwEAAgsjam5KMDA=","quaxwell":"XA8MCggCAAAAAwMDBh8lNzgmJig4WWJjUE1NT1FWbGw=","quilava":"OztETVZYY2JXTkVAOjQvKyckIR4cGRYTDwsJCAkHAAA=","quilladin":"NTU2ODs/CQcAAQUPFiMxMTM0GxsbHSEoZXR4e3+FjJQ=","qwilfish-hisui":"SEU9MQQEBggLDg4MCggICAgICAIAAQ8TFRMTEzE6PFg=","qwilfish":"YGFjZmNbVU9LSCwrMURERUU8NDQUCgUCAAAAAQMFChA=","raboot":"onV1d2RiZWxNOCYYDQQAAAQ2NjZCPz9Aa5SZn6Onqq4=","rabsca":"LCEgGREFAgECAwEAAAIHEh4oOTo/QEI2MS8oKCoqKzg=","raging-bolt":"Pj46NjYkGAkBAABRTUlFREJCQkJEPz09QTAwMC8hH1w=","raichu":"ERQWGAgICxsfHx8gBAAABBEdHBwcHR0ZFhUVFRYbLCw=","raikou":"LiEREREAAQUHBQULDQ8jNTU1NjY4ODEpIh8fHyIrKio=","rainy-castform":"bmZgWFFKQzs1LykjHxoWExISExYZHhUIAQAAAwgMLjs=","ralts":"FhUVFRcaEg0HBAIAAAADGCgyQjMpIyIkPjQqIRoUFCI=","rampardos":"eGhdAAAAAQIEBQgLDxIWGh4jKC41PD1mbGdnaGhoaGg=","rapidash":"oZ6KimpjJA4MDBFaKCgODQQDAAAMS0wkHRkZOD1QVFQ=","raticate":"Pjw3AAIICAgOBQUaHB4eFAwLDA4PKysuJB4cHCljY2s=","rattata":"lpWUlZedPzs4NjYXFx4gHx8gIhYAAAIBRkZHUmRdXWA=","rayquaza":"FBUXGRseICIQDAcCAgQYGB8bEQsFAgAAAAADCBIXFxk=","regice":"ax8ZGRweGxgYGR0gHBgSDgoJCQUAAAEGDzg5Sk9TWF0=","regidrago":"LSsqKSgmJAcFBQYGBQMBAAAAAwoDAwMFCAoNDxIUFyI=","regieleki":"hUlISEZFRC0rKysjIiIbFhQPCwkIBgYFAwMBAAAATk8=","regigigas":"bVtIQ0A/Pj4+Pj88ODYsJgsFAgEBAQEBAAAAAQI4NTU=","regirock":"nz87NjErJiQjIyUoJSUlJSEeGRQOBwAAAAAEBwx7en0=","registeel":"XVVPS0czLCgmJiYmKS4sKSIZEgwIBgQCAgAAAAFJSUo=","relicanth":"0MZrYVlTTjgwKSMeGBURDgsJBwAAAQQHCyIlOzs8QEs=","rellor":"NCkiGxYSDQoHBQQCAQEAAAAAAQECBAUHCg0RFRshKTM=","remoraid":"5NfMxL23sq0tJiIeHBYNBwIAAAAGDiA4WFxkb8DGz9s=","reshiram":"QzAhFQgAAA4dWlY1NTk4LSgiIBUSFR8tMTFkZVZQTEw=","reuniclus":"VlVUEhAQEBAPDAsHAgAAAAEOERUbJzhQUlRYW19lZmk=","revavroom":"endyb2tQSz0wLS0tLSYeFxMPDQAAAggNDxIXIC1fY3o=","rhydon":"ISIcHA0AAAAABwsQGCgrLi4uLiYhHBoZGRsWERAVh4k=","rhyhorn":"X1lXWFlVPzUnHxoYFBMSExUPCgoJAwAAAgkNDxIVF38=","rhyperior":"UFBQTEk/NzEuJhILBgEAAAEFBQc1MTAwMTMtKCgoNZ4=","ribombee":"HhwcHBwdHh8hAwIAAAgICAoPGB8aGiMbFxc+PDw8PD8=","rillaboom":"W1lKSkc6OjExMTE0MzExMC0mHxoVExAPBQAADhUREBA=","riolu":"NjMxDQgFBQgfHBoZGRkcIRYDAAABDoWHiIiIjI+NjY0=","roaring-moon":"iIiKixoZDQ0NBQYBAQAAAQAEBAoKFh4kKzlPWlpxcpA=","rockruff":"KiEaGRkZGRoPDwAABxMTISEqLCw1Pzs7O0VPUVFLSUk=","roggenrola":"T0xIR0dITFFWRTUsIxoQCQIAAAAAAAAGEBogDQUEBaM=","rolycoly":"WVRNTUA/LywdFRALBQEBAAAAAAAIDxIfLDg7SE1SWmQ=","rookidee":"e3t8fX94cm09PT8/QEFDAAABBw4WImZtdnZ3fXx4d3c=","roselia":"hIB8Q0NIS09TVFRUDgkHAgAAAAACBgwiW1xfY2hqbG0=","roserade":"VzckIygmJCQmLAgCAAADDSUrMDQ5VFRVWV9mbnV2dnY=","rotom-fan":"AQAAAAEDBQkOEhgfJi87QUNHS1FaUk1LSUlJS09VXWg=","rotom-frost":"aGdlZGNiYFtTAAABAgQGCAoMDhAYIy45OTk5QmRobHA=","rotom-heat":"dnNwb2lfVUxHQ0FAQEAuLCceHBwZDQcCAAAAAASko6U=","rotom-mow":"X11dZXKFhYUnBQAAAAMEBwkLDRATFho8h5x+gIiQmKI=","rotom-wash":"YmBfXVxKSEY8NjQzMzMzLCYhGxYQDw8QEREJAgAAAAI=","rotom":"SktLTExOT1BQS0dFRUVGSUI5MSghGBMTIRsWEQwHAgA=","rowlet":"TTosIhwWEAwJBgQCAAAAAAAAAgUICw8UGiItMy4sLC0=","rufflet":"QikjHBgIBwMDAAAEBAsNFxEEBAcHBwgRKjkXCAYGEVo=","runerigus":"TUdBNykgGRMNBwEAAAEBBAQGY2Njc3doVlYyMC4uLjM=","sableye":"aWZkYmBfXFtYIQ8HAgAAXGJqdZqKgH19f4SEhYW2s7M=","salamence":"eXl/JwcHCg8MCAQECREMC0NIRT8AAAQLFSEpHx8gk5U=","salandit":"jpSbl5KPj4+Tm6uyraBoY2FhVTcrJSIhISEeBwIAAAM=","salazzle":"ioaFhYeMkZeekXZnQUFNWA0GBjguKiorMDoAAAAGFiY=","samurott-hisui":"KCUjFhoqLCwYAAACBBALCwwnPzItKSUjIiAgISMUFDM=","samurott":"YwAABBAcICAmJipGS1NSX1tRTD87My8rJiQaFRWcpKY=","sandaconda":"i4B4cWRbVVBMSEVAOTQxLiwrKCQhIB4bEQQAAAssRVc=","sandile":"8O3q5N7UNCwoJSQjIyMgHx8hCAIAAAACBgwTH0uVlZ0=","sandshrew":"Dg4PEBIQDg0NDhIKBgMDAgMFCQ8MCgoKDA8GAACVmqA=","sandslash":"eVxGRkk5OS4uDw8SGhQUEgsLIhYLAgACPj4/QEJFSEs=","sandy-shocks":"hHh4eHs8MTEkJDYuLkBOTlhGOQcHAAANERspZnydmZk=","sandygast":"kI6LiIVyb25tbW1hWVNNSERAPTo2HBYUExEJAAABMDM=","sawk":"fXVxEBAQBgYDAQAAAAABBgsQGCA5LyYhHhsYFRAMDAw=","sawsbuck":"fXx/hYKCj4+Sk4iIkZZ/LhkRER8lJB0SEA4LCAQAAAc=","scatterbug":"dHFubW1tb2M2JBUMBQEAAAAECxMjGhovRUddWlpzhIs=","sceptile":"RUE+OztBTFhUUQ0NDxAUGAAAExESLzA1OicWExmCkJA=","scizor":"v2BOUDs8QUgkFAwJBAMDBEJAPC4iHRsaFhIPCQMAAMY=","scolipede":"GR4jKAACEx0lLEBAQEVTTExGQD45OT8/P0BCR01IQ0M=","scorbunny":"ZFlRTElGRUVHSk88MBYWAAAHHzIfHh91hpGbnJ6hoaM=","scovillain":"Fw8GAQEAAAIOExUVHFJEQkJCNSMjIBsWEQkJCxQofIM=","scrafty":"VEM7NTEvLy4lIB8fIScwKysdFxEEBAwUCwIAAgAABxw=","scraggy":"Z2Q8JhkQCAQAAAAABAkTIzpELyEbFxcXGhsaHh8gHBw=","scream-tail":"YTAtKigVFRUWGB4aGBUUEhISAAABBQ0aHSEdExERHHU=","scyther":"MjxGTE9OTU1gZWdpZ2dJR0VEQ0NEOTEpIRsVEAcAAAk=","seadra":"WUoIBAEAAAELIy80OkZOTU1NTU9PUFhfYGBgYGJlaXM=","seaking":"SUpLFBQVFhgaGBQODAwNDxESEggCAAACIltZWVlfnqE=","sealeo":"mZGMd3d4eHl5dGxjWVBJQz87Hh4SCAIAAEJJU2RxdHk=","seedot":"enp6elZCMyccCQEAAAIGBAMDAwQGCQsQFRwaGBgYIIg=","seel":"c25oZGNjZWZnlI+Jf3VrYlxYVkxFQDwcDggCAAACP0s=","seismitoad":"SURCQUEvKigmJicoKCkfDwkGBgYHBQEAAAE5LywsLqY=","sentret":"SUlKVGBkShwNDQ8QFiQoMj9UVFVdZVZBKBMHAAAABA0=","serperior":"BAQHDgoICBYWFRIPCgUDAAAAAAMHDRgnQZOSbm5zc3M=","servine":"lJibnZ+fn6CMhoafpq20hoaHZGQAAAkVFhMogpOQkJU=","seviper":"paessTciFg8JBQIAAAACBAYICw8UIyAeHBsbGxwdHyU=","sewaddle":"JCEeGhcUERAQGiAkJCAQEBEFAAAAAggRIXBwcYeKj7I=","sharpedo":"raSbk4yGgHsJBgYGBwoOEBkhDgAAHh4hITNiY2dqbnM=","shaymin-land":"WFgxMSsWFBQWEQ8PDxQTDwEAAAEFChEbKDo8PD4/Pz8=","shaymin-sky":"XkNDDQ4BAAQLDCAsM0hOSEdMQyspMTQyMC4sKygmJSo=","shedinja":"LyUiIiMoAQAAAAwUAQEBAw8cIxYUFRcmKCwySUtPYm4=","shelgon":"cF9BMyYgEwsFAgAAAQMDAwEAAAEDBQoPDgwKBgYRg4c=","shellder":"kIgIBQUHCxEWFhENCQUDAQAAAAUdGBUVGB45OTk5PEI=","shellos":"JBsYFxcXGRgNCAUEAgAAAwsaOEBEQTw3NTQ0Nzg4OWQ=","shelmet":"mI2GgHwJCAgJDA8VGQoCAAAAAgEBAQYrKyEbGx0xX5E=","shieldon":"UkQ4LicgGhYTEA0MBQEAAAEFBQYHCQkMFBomKCwva2w=","shiftry":"KycjIQAAAgUKESEvLzEoIRoXISEhIyMhISMzbXFxcnk=","shiinotic":"Z1NFOS8mHhcSDwEAAAQJDShrbXR2cWtkXVRJRkZJSWE=","shinx":"qqikoJpSS0hGRUUjBQAABQwRERJMT0lKVVVUVFRUVnM=","shroodle":"f3l0c3JyY1VMRUA8OTY0MzIyMhAIAwEAAAABAwcEAwM=","shroomish":"hXFxcWpcT0Y+NzEsJyUiIiAfHxYOBwIAAAElJSpVWF0=","shuckle":"hoB9e3p6e31/g4eKjVtOSERDPjk2NQUAAAADDjMwMDE=","shuppet":"NDQ0NDQ0NDQrIBgRCgYDAAAAAAIGCxQiNTZCRkVFRko=","sigilyph":"5dfMwrkAAAcPGwQFFhMTMzJKQEBERUl4f317enl5eXo=","silcoon":"goB/fnwKCg4UGBwfIRwYFRQUFBUXGxYQCgQAAFBRUVE=","silicobra":"Sz0hEg4NCAMAAAABBQ0WKzxBSFJeaD03NjY2ODAoKJo=","silvally":"WVBIQDEsJiAbFhIPDxcgHiAqNTU2NS4tLS8xKg8CAAA=","simipour":"TUM9OTc2GhYWFhkfJjc1NTlGDQIAAAIHHSQuPkc+PT4=","simisage":"NzQyMjAvLy8wMTMMAwMECBAbBwcAAAkJEiskFBQJBgY=","simisear":"dE1NT0cYDw4ODxEXIDNCFw4AAAAIGklJRkREREA2NTY=","sinistcha":"BAAABAkNEREWHRAODwwLCwMCAgYODw8bHiMpMz5Ob5Q=","sinistea":"gGZTPzUwLxEIBAIBAAAAAQMFCg4TGyUfHBwfeHZ2d3o=","sirfetchd":"NS8qKCYmJiYmJiYmJiYmJiYmJiYmJgkBAAADHhwcERE=","sizzlipede":"sRAMBwQCAAAABwgJDA4QExcaHR0eHjs7UFNUU1JSUns=","skarmory":"JycnJSIfGRELBwMAAAASEzg5PD0/QEFDRUhLT1ZYYH8=","skeledirge":"MC0tIiAgFhYWFhYMCQcCAQEAAAIEAwMEBggJHB0fITA=","skiddo":"AgMFAAAABgQCAgIAAAEHCAgKChYWJTE6P0NAOzc0MzM=","skiploom":"TD84MS4uIxQKBAAAAAACBQkQFBQUFBIMCgoNNEJSWmM=","skitty":"UFAWAQAACw4SEg8ODAwMDA0OEBIVGyEmMjc9R1tcX2M=","skorupi":"pJuVkpKSk5emr7fApiMBAAIPExMVGSEwMDE3QDw7Ozw=","skrelp":"Z11RQTIsCgICCA4gHR0BAAAGlJR2dHR6YVtbYGZlaGs=","skuntank":"ynl6e2VZUUpCOjk7MikiFgAABAoUIiInL1VMSEhOTlI=","skwovet":"QSwqKh0SCwYCAAAAAgQJDwsJCxQ0NTk/SVZYV1dZXWY=","slaking":"U01GQj05NTIjIiAVDw0MDAwMDAsMAwEAAAAAAQUZOaQ=","slakoth":"IBgSDQkHBAIBAAAAAAABAgMFBwkMERUbHiAiJiwyPU8=","sliggoo-hisui":"qJ2UjnFxcXN2cW5tbW5wdCkZDgcDAQAAAAEDBwwTHi0=","sliggoo":"f38eCwkLGhg3eXRzcnN0dnl9STw3NDQ1AAALEBUeLkY=","slither-wing":"aF5WUEpFQD06ODY2NTUxMTIxLSQWEQsCAAMEAgAAV4U=","slowbro":"HhkZGRwjISEgICAfGRcWFRUWEgwIBAIBAQMGCQAAEoI=","slowking":"ZlNTUAYBAAAABQwbJSEhCwUFCBYRCwgGBgYGCRAVFRE=","slowpoke":"bWNeXV+lrbO5vcEYFBISExYTEg4LCwsJAwAAAAEECzk=","slugma":"TEc8Ojo9LhcSBQQEBQUGBgcOCwkJDB8WEwwGAAAACDw=","slurpuff":"eXJubW1uU0hAOzcNBQEAAAEFDQ4OFB8eHh4fIigwPEE=","smeargle":"d3JPQjs5MCciIiU1NTYLAAAAAwgQGipDZFVQTElHR0g=","smoliv":"bmNdWFVUCwsPFyM1KiEaEw4KBwMCAQAAAQQJEBERQXM=","smoochum":"o1MRExsnOzQlGRAKBAAADA0LCgoSJCQlKzA4OTQxMDA=","sneasel-hisui":"v7u4trW0tF9fYGJhMjI0KSkrBwAAAQIKCxRFRUVHSU0=","sneasel":"opMXBwYGGycwODs+RE1WUU9NS0sICAEADh0tbHF2fYY=","sneasler":"q51jY2RhYWFldnp8dVg2IhQIAAACBk5UWV5PSkqTkpI=","snivy":"AAACBQkPFRwlMkJPSUdHRT43MSsnJiw6PEFJUUw8PGQ=","snom":"e3Q/OTYzMi8tLQoICAgJCgwDAAABAwcKEA8NDAwOGzQ=","snorlax":"WVdWVVNQQjcvJyAbFxQREREUJiUlDgwAAAEEBQgLEh0=","snorunt":"Zl9ZU01IQj04My0oJSAcGRQQDQoHAwAAAQoWIjMzNDk=","snover":"a2hjX1tWUkxIQkFBSUM6MSsjHhkIAAAECQkJCSI+PkM=","snowy-castform":"YUY0JRgPCAMAAAEFFR0cHB4kKysrLzY6OTk6P0htqZc=","snubbull":"LRYMBgIAAAAAAwwtFhQUGB4lLzQwKxwWFh0eHjAwMTg=","sobble":"kYN5cWlkX11cXFxGLh4TCwYCAAAAAgYPHjlHRERGPDw=","solgaleo":"aGpxVkpKAQAAAQUMCAQAAAABGRkUEg0NDQgHBwgPSUk=","solosis":"VkM2LSYeGBQOCwcFAgEAAAAAAAEDBQcKDhQYICkzQFM=","solrock":"lIuCfTo2Nz5CRkhJQyEAAA0iPkAyKiMhIltbW1xjaGk=","spearow":"joyKiYKBDAwNEREUGB4hAAAEChEYFxtWVlZZV089Ojo=","spectrier":"FxcZFBQUFBMTEyMeFBERCgYGBAAAABcbQkE8OjptbW4=","spewpa":"LiEYEQsHBAIAAAAAAQQGBgkBAQIECwwNDxEUFhoWFBQ=","spheal":"NjMpIhMLCQkKBwUDAQAAAAAAAQIEBQgLDwoHBwk4TI8=","spidops":"2dVXTEhFRUZCNzMeCwAAAQIEBgcJDBASDwwJBgQBAQE=","spinarak":"b2VdVlEkGxgYGB8ZFA8LCQkJHhgSDgkFAQAAAkBCRUk=","spinda":"HRkYFxgYGyAlLjAoJCIhIgMAAAEJFRoWExIRERITFx0=","spiritomb":"gk8+LiUiHhkVAgEBAAAAAgQFCQ8UGR8oGxwsPEdITFc=","spoink":"jIF8enpyaV1LPzMqCAAACRwcHiIoMT8/P0JAQEd3bl0=","sprigatito":"JCAdHBoaGhocEAYCAAACBgICFRYdQ0ZKTldYWlxfYmU=","spritzee":"z8+MhYFqU0QsIBYQCwgHBwEAAAABBQwWIkZOTE1jZGo=","squawkabilly":"amZmZ2hoEhITFRgaHiMAAAMKFSUbFRVObGxtb3Jxb38=","squirtle":"Rjw2NTEwLCoqLDE5IxcCAgEAAS0tLCcjIB8fGhcYJ4A=","stakataka":"cl5NODIzNDU1PT0/PDw8PDgbGBcZFxMIBgMAAAIFEBM=","stantler":"FQEBCQkAABYPDyonJCQqNj9BQUFBQ0lRVFhZVlNNRkU=","staraptor":"LSAWDgkFAQAAAAABBR0aGRkZGx0lLDU/QEAvGBEQFXI=","staravia":"U01MTlhZPjApKCALBgcZFA8JBgUFBgkPGjA4CgIACxg=","starly":"foWGfk06LSYfGhcWFRIGAAAFBQYGBwoPFx8pKSgoNGY=","starmie":"eXQiIiIjJigrLi8zNTMpHxcPCwsVFhAJAwAABzg4Nzc=","staryu":"cm1oZF9cV1MAAAADBwsQFRkdIyYjIR4cGxgXFRQTExM=","steelix":"WD4zKRwWEAsICAgCAAAGFCdVg4OH0dHT0MzIuqacj4w=","steenee":"W1taQTQoHxgSDQgFAwEAAAAAAgUKEURIT1ltcnR3en8=","stonjourner":"uKwfHBoXFx8fIi8lIR4dGhgWEgwJBwUEAgIAAAACBgk=","stoutland":"Mh8bCgoLDREQEBIQDg4ODhEVGhkVERITDwsKCQIAAAA=","stufful":"HRoZGRkZGx0fIyAaGhwwDQUBAAAAAQUObW1tb3BwcHU=","stunfisk":"hX14c3BubGxsbGxtaWVeU0YAAAEFCw4OExgfJSgtMz4=","stunky":"t6yknJaSjopsbGpnThwbGxsbHBkXFhMHAAATMjQ0NFU=","sudowoodo":"fElISEwMCAgIBQAAAAU1RFdaVlNPTElCPjszLi4fGho=","suicune":"Sj82LykjHxkUDw8MDAgGBxgTEQ4ODg8PEhYYEg4BAAA=","sunflora":"cl5IRUI6OTIrKzMxNzQyPUZPKBwVDwoCABdlaz4yLy8=","sunkern":"BwAAAgkVJ1suLg4MDBQbISIgHhwbGxsbHR8jJy41QFA=","sunny-castform":"WVBLSUgiGhYUFBQXEggDAAAAAwoXFBQUGB9QTDglJTE=","surskit":"ko2KhoSBbGBbV1ZJQTo1MSwkHhcSDgkFAgAAAc7Q0tQ=","swablu":"S1BZFAoHBQUFBAIAAAAAAQQKDw8QEhcoLUhOUFFYhow=","swadloon":"WVVSUFBQUFFVS0Q/Ozc0MjAvLi4uLzAyHhsFAAABGXk=","swalot":"YldPSUVBPjw6OTY1MzIxLy0rKCUiHhsWEAcBAAABBxo=","swampert":"ODMyMTExMjM0NjErKyMhPTo1LCMeGRQKBAAAAx9Ig9s=","swanna":"LC0iIiEfFw4FAABSTjowKiYkIyMkJigoKigqPGFMRUs=","swellow":"HBIPDQICDBMRDggDAQAAAAEEBwwSGB4mMkUvKCUlKEg=","swinub":"UEU9NS4oIx4ZFhIPDAkHBQQCAQAAAAABAQMFCQ0UHio=","swirlix":"OTImGhUVEAoICAgHAgAAAgYPDg4QGDY/bW50dnd5fYM=","swoobat":"49bMxAAAChIWGRYWIScmJCQ8QkQ/P0RGS01fYmuQjo4=","sylveon":"JB8VEwwGAQAAAgwQEBMREBAXGRkUDw4ODxQnHR0XFx0=","tadbulb":"QS4hFxAJBQMAAAABBQkQGyk6S1NcbVVCMiYbFhQUFBo=","taillow":"KB8ZFhQSEgcHDAgFAgEAAAABAwUKEBYcISkyNDMzOlU=","talonflame":"AAIGCQwPERMVFhYbIigtMC4rKCgoKDEvISEhIydGR00=","tandemaus":"S0hGRRALBwQDAQAAAAABAgMGCA0VKCwwLisqKisvP0E=","tangela":"WS8sKysbFRMQCwcFBQMBAAABAgcLDBEWFxgcIiUoLjU=","tangrowth":"X05ANSsiGRMNCAUDAQAAAAACBAgNEhoeICAgHR0jNT0=","tapu-bulu":"WFNNSkpMLBMEAAAAFThdVVJMRT48PD1FVmR3d3Z3d3w=","tapu-fini":"7SMjIzI4PzkwKCMfGxkYGBgYGBoXCAsAABMyNz9HU2Q=","tapu-koko":"HBEMCwwXAAQJBQMAAAAABwcHBwhMS01KSUhISElzeYA=","tapu-lele":"f21dT0M3JB0dEAwMDwwIBQIAAAAABAwzNTc7QklUX3Y=","tarountula":"mZSJgHtKPDIrJSEdGxUIAQAAHiIkIR0ZFBQZGRobJXY=","tatsugiri":"LyglIyMjHxQMBwQCAAAAAAEDBgcLEhoUEA8PERUXHCo=","tauros-paldea-aqua-breed":"Rj03BQIBAAACBAkWFxcWFBQUGSEgICAeHiElLzQ4Oz0=","tauros-paldea-blaze-breed":"DQsGBAMBAAABAgUJDREXHCckIR8eGxUTEQ4ODAwdGho=","tauros-paldea-combat-breed":"UEk/NS0oIyAdHBcQAAABCRUYHCIlJiYqLCwsMFJQTU0=","tauros":"9PF2dnh6ub1LPAsEAQAAAgkSEg8PDzc2Mi4uLzEyMzY=","teddiursa":"EggDAAAAAwkTDQkHBgcJDRUfHRwdHyZER0pNVFxSREQ=","tentacool":"bWNcU01IRkRDQ0RFSEpNTk1OUFBQTk5QIA8HAwAAAAA=","tentacruel":"eGVcVlJQT09MQDw8PD5EVUsWDAYCAQAAAAMbHDVfYYQ=","tepig":"gjQ0NDY6PkVNWWl4BQEAAAUKCxEZGhoaFA4KCQgJCxE=","terapagos-stellar-form":"e29xcmVfX2BeYGhXTzk1LQcFAwkJBgYLAQAEKi8zP1c=","terapagos-terastal-form":"NDAFAgEAAAABAgYaGx4hKC4vLy8vMC4uLzQ8Pz9KW1w=","terapagos":"BQAACjY4Mi0qGhYUFCsuMTU6P0ZDPjkpJiYmKiosOHw=","terrakion":"XjU1NS4uDwcAAAABAgUIDBEWMDAwMDAxLCgmHhYLCAk=","thievul":"DgwMDAAAAAECAgMECRYTExMUGR8rPDMzMzIwLRkWFow=","throh":"Hx8HAAAABQ4ODxEUGBwhLkNDQDs2MzM1Mi4sLCsqKi0=","thundurus-therian":"eV9eUFBQT09SWEhCQkJDSEg/PhcXGBYAAAMHDA0MFiU=","thundurus":"dG5dEAkJCQcAABsjJCMwQkNDSzozMjIzMzQ8SFpdXmg=","thwackey":"1IBlEhESGxUKAAAECxohGhQSEhIZS05CLyUkJB0LCxk=","timburr":"b2JdW1ZRS0ojIiMnLjc8Ni4SAAAAAAECAgMvLi4vKyk=","ting-lu":"gYGCgoWOjoeEhIWIWUlGPigXDQwSEREBAAACAgICAwQ=","tinkatink":"SURCQkJLPzk0LCgkIiEgICEiJCgtKh4WEAIAAAEFCBQ=","tinkaton":"hIJPRUE+PT09QUhUVVc0Ly0tKCgdFQ0KCAcBAAADAyE=","tinkatuff":"amRKOTAqKCYmJygCAAACBBcVExMTFBgqMjY6i42RnLc=","tirtouga":"ZV9bWVlZVVBNSUYRDAkHBQQBAAAAAQMIDBUxMzU4PKI=","toedscool":"ppqUjouIhoWEgHt6enZrZWWCiIWAe3VwBwEAAAADCRE=","toedscruel":"Z1tVU1JRSDQwCQIAAAItNEFgYGBgYWFgYF9UR0dUUlM=","togedemaru":"0b+HfmlNJyAdHBgRDAcEAwEAAAAAAQMGChAWICw0MzM=","togekiss":"XFNLPjgGAAAAAgcLDxEVGB0jLjAzNjk+QkhPWGpqbG4=","togepi":"hzk2NDMyMAMAAAACAwYKDg0NDQ0NDxIVGiAoHRUUFBo=","togetic":"IxwVCQUCAAAAAQMHESdOUAwMEBknOjg4ODoCAgMGER4=","torchic":"sqOXbWpoZ2c7IxULBQAAAAQKFRISEx0oLDNDMSMjIz4=","torkoal":"bWdXS0U/Pj49Mi0sKyciFBEJAgAAAAUIDA4PFCkmJok=","tornadus-therian":"hwsFBQYAAAIBAQIHBwgZGzM4P0dTVlhYWFhbVT81Mzs=","tornadus":"fnl4aGhpNyASCgQCAAAAAAMHCxIaHx0dJycyQ1B/z+M=","torracat":"28XFx10sKioqKistLCknJgAABAQULDE/Ozg2LB0YGBs=","torterra":"hnBqWFhZW2BdXDo5ODAlFhQUFBkNAAAHExcWFRERE2o=","totodile":"FhAPEBYWICMqCAAAAAcTFxsqLicgGRUUFBUaJEYwLC0=","toucannon":"SjkrIBgRCwcEAQAAAAAEaGhpam5zeYOOkZeelm9paW8=","toxapex":"mi8vMDEyMRESFRkdIictMzk+KSouMCwWDxAXDAAAC44=","toxel":"PBQQDw8PDxARExULAQAAAwoRGxwgKTo9Q0U/PDw8PD4=","toxicroak":"T09PLRAEAAAAEBNLSEhISUxRW1FKR0dHS1ZTPz4/qak=","toxtricity-amped":"Dg4QFBYbAAIOGRkZKkNUT0k/NjMvKxobHBsbHCEpMzM=","toxtricity-low-key":"f3coLAAFGyMdHTBFRVlXW1tYUUlEQ0M3NzgzLy0tMEc=","tranquill":"BAQEAAAAAAAFCAkOFxkpMEZPT1JWXGVzf4mKdW5udI4=","trapinch":"LR4UDQcEAgAAAAEBAwYJDBIYICo4Tk1KQz47OTg4uLk=","treecko":"NzMwMDAwLy8wCwMAAAwQHlNQTk5PUFRUUk9CJiYnM2Y=","trevenant":"OTMzMzNAQEBCMjIYEgsBAAIEAQAAAgk8GSwmJgUFJEo=","tropius":"oZKSkpWRhw8GBQcHBw4WLEJcfoNtUDUYDwYAAAtZW14=","trubbish":"bWpoaGdnZ2hpbWheV0I5My8rKSUhHg4JBAAAAApDR0k=","trumbeak":"IyY2RVcPDw8QEhUYHgMAAAcSHxYTEzY2l5yZk3Vwb3M=","tsareena":"PzMuKiorM0FBQUFBQkE/OzUuJBsPBAAAAgcRIWh6fIA=","turtonator":"lYE+GBgbHyMeDQwPGhwfGxMLBAAAHykuMTcgHR0dHR4=","turtwig":"QkFBQkRHTFZsTzcpGxEHAgAAAAIDAwUJEh86PDw8P0U=","tympole":"U0QcDwgCAAAAAQULEx4oLjQ7RlRkY2NjZGZqbXN6hJI=","tynamo":"EQsHBAIAAAABAgQIDBEWHCMrMztBR05UW2RsdYKwtb0=","type-null":"d3RzcnJyclBQVAIGCw4KBwcICw0AABoWDw8PDg0OElc=","typhlosion-hisui":"UklJWDxBR1Nwd3x1bmZfWVJPT1xYVFBLRkAsIAcAHUQ=","typhlosion":"LikpLgQEChAWITMuIBMIAgIELCgiGhILCQkJDAAAv8o=","tyranitar":"HhkZISkrKzI5NzIpGggAAwMxMDAwLi0tLTI0OklFRVQ=","tyrantrum":"gnsbFhUVFBQRCwIAAAEECx0fJTg8PD1WVltjbWxsdoM=","tyrogue":"LCssLi8bFBISGBUUFBQVFx0mM1AnJCMCAAAHGxoaG0U=","tyrunt":"GQkJCQsNEBIWGBsZFxYWFhYWFhYXGRscHBkTDQgCAAA=","ultra-necrozma":"fl4HBxoQBgYzIRoUDgoGAwEAAD4/KystKCIfHBoaGhs=","umbreon":"iY2TmqKstgAAAgUICw8TGiIvSU5NSUZAPT0+QEFBQ18=","unfezant":"LickISAgIBwaEQoGAgAAAAIGDSAoNUBLXFpXOC4tMFw=","unown":"NCgfGRMPCwkJCQkJDREWHSUyOjk3NTMwLSgaAwAAAkY=","ursaluna-bloodmoon":"VVVEQD0wLy8uJycmJSAeHiQUDAMBAAAIUFBQRD09TL8=","ursaluna":"Y1pYTUlAPTs3NDMzNzMmIB4gICImIyAaFg8KBAEAAAk=","ursaring":"XVhYUlFSWFNEMygnGxYQCgcDAQAAAQULGRUUFBQPBAQ=","urshifu-rapid":"X1lSTEZFRkdBPjw6OjonHBUSEhIjJjI0KwAFDVdVUVE=","urshifu-single":"iIF6entbVDo7HhELBgQBAAEKFAwKCgsOFBwfISQTCAU=","uxie":"IhcRDgoFAgAAAAEFCxQeL0I+OTESEhIUFhoiPkhOWGU=","vanillish":"nExAPDw/RUlBHRwcGBIRERgdJQ8CAAAAAzQ1OkZHSUs=","vanillite":"jIN9e2leWFZWWEc9NS8sKiorLTEaAwAAAgYLamx3tr8=","vanilluxe":"OC4bFRUXDQ0OEAYAABwcHB4hJSkpFxc4OE5OTk5OTk8=","vaporeon":"YWFjZWdcUggIDhQfKjM4O01GOScXDAUDAAACAwMDCBI=","varoom":"hX16dnNwbBAJBQMDAwICBRcUCwUEAgEAAAECBQgLFB8=","veluza":"eHZ0cnBvbWtpEAAABQwUFiQqJCEcGx49QERtb3BydHY=","venipede":"KCMgHRsYEw8MDAsLCwsIBQQEBAQDAQAAAQIHDxETFWc=","venomoth":"1sm/BQEAAAABAgUIDBEVGRwfISMmLDQ+OTk6Pj4+QnQ=","venonat":"WVpigG0MAAADKkU/Pz4+NjYxLSw8Oz49QkdVWE5HRkc=","venusaur":"TUAxJyQiIiIuNioYCwYBAAAAGxkYGBkbHx4eLj4+TI4=","vespiquen":"JiYoLDM0P1I5GBUValE/MigfGRMPCgkFAQABBg0pLUM=","vibrava":"fHVwaWRfWlVQT0xMTU5PUT05JiMhHhwHAAIHBwceHHw=","victini":"MS8uLCsrKikoKCgoKCgaEw8ODg8TGhgBAQABFR0dGxs=","victreebel":"Uk43LCMeGBUSERE/PRYRDQwMJCUjAAAAAAEDBgwnOlk=","vigoroth":"jY2UnaOjop+dIhkPBwQBAAADEA8MCwsLDA4QFBohKjU=","vikavolt":"TEhGRENCPiYXCwMARkZDMTE7Ojk/SEhHRkZFREREREQ=","vileplume":"lYZoUkY8NS8rJBsSDAcEAQAAAAEFDjJDPj5CaWRWVlY=","virizion":"TVBle2dncnyIODg5NRoGACwqKCUlFRUVFhYXGRocHiA=","vivillon":"zMO7tK6pBAAAAAsLFxQTEhITFRcdJC9DQkJDRUhNVF8=","volbeat":"TUQfHyQvQEQ0Jx8aGBgaEgwKCwgDAAAAAAMHDRcjJiU=","volcanion":"W0VANzEsKCIgICQkJhwcISYsLTEgGxkZFhMIAACOkKc=","volcarona":"rB8fIyksLi8uLi4uLi8iFgwAAAoTGCEvLSwsLCsbHCc=","voltorb-hisui":"TD0xKCAaFBALCAUDAgEAAAAAAQIDBQgLEBQaICgxPUw=","voltorb":"TT4xKCAaFA8LCAUDAQAAAAAAAQIEBgkMERUbIikzP04=","vullaby":"kY2KiId6Z19bUEtLMxwNBAAAFCoqKi0wNjpASEg8Ojo=","vulpix":"LwkJCQkKCw0PBQAAAQUKEBYmKysrLC4xMzY5Ozg1NTs=","wailmer":"TEI5My8eDgQAAAACBQwUHB4eHh8gISMmKS4yOD5FT1s=","wailord":"HxcQDAgFAwIBAAAAAAAAAQIDBQgLDxQZIis5RlVld4k=","walking-wake":"FRIPDQsLAgAAAwMFCgoKDxwcHiElKSQjIyUoPS0pKTI=","walrein":"EQUFAAAJBQQCAgIMDxkZGRgXFxgYFREPDQwMDGZsdYM=","wartortle":"KyklJCQlIiIiJiwsLiwRBgAACBQ+PkE8NzIxMS4sNzo=","watchog":"wa4oHRYJAAAAEDEtIREIAwAACwcDAAAABQsVIioUEBU=","wattrel":"Fg0HBAICAgMGAgEBCQcEAgIAAAABDyIyUVElIiEoKVw=","weavile":"XFBFPjcyLi4zP0E7IhsbJEM0JhcLAwAABwlMSUhHSqs=","weedle":"aF9VOCQaEQQAAAIHCg0RGBELCw4XHiQiIiY7Oz1RWms=","weepinbell":"qZMIAAACCAwQEhUWGBkbHiIpJycnKCouMjU3ODk5PEA=","weezing":"cGojHBgWFhYbKQYCAAACHR8iIiIlJygsMzc3KCIhISM=","whimsicott":"XFZUNykhGxcVFBQUFRELBwQBAAAAAAEECA4ZHB0tMTk=","whirlipede":"e3VnQgAAAQMFCAsOERQYHSImJygrLjEwKigoMkdVYGA=","whiscash":"MygfGBIOCgcEAgEAAAAAAgQGCw4ODxIMBwYGCBhdX2M=","whismur":"jIeFgiYZEAsFAgEAAAABAwcOFhUUFBUWGBwgJiorLjY=","white-kyurem":"HhoYFBISEhISEgIAAAABAgQFBAIBAAEVFRgYFBEMDBg=","wigglytuff":"AAAAAwcMExwnNkE+Ozk3NTQyMS8uLCwtMDY+S01LS0w=","wiglett":"GhAKAAAACxMjUGZze3+DhoiKi4uKiIeEgn1sTzAdHR8=","wimpod":"pUgAAQkTGyQrIiIqPk1XV1dXWVlaXElJTVBWW2NqdYA=","wingull":"DgAAAgULERgfJi42P0dFNi0pKSkphoyTmaCnr7fAytQ=","wishiwashi-school-form":"TSAfGxgOBwQBAAAABQAAAAEECAwVHRsTExsjw8TIzM4=","wishiwashi-solo-form":"IRgRDAkGBAMBAAAAAAABAwUHCQsPFBsnMi0qKCcnJyk=","wo-chien":"DQ0XDQ0OFRobGBgZIiEeHR0eHBoaHh4dGhQPDwUAARE=","wobbuffet":"IQsHBQUEBAUFBQYHBAIAAAACBAUKDhIYHCMnBwAAAAQ=","woobat":"uLg2JxwTDAUBAAAbGxkZGklIRUVGTU1OTk5YWFhlbW0=","wooloo":"QTcnIRoSEAkFBAQCAgEAAAEDBQYJDRAWGh0cHBwfcXI=","wooper-paldea":"Y1kaGhcSEhMyNiwYFhYiIxMFAQAAAAIHDhhXVVRUVFU=","wooper":"aCYmKSsZGRweExMcGxsvLi4IAgAAAAIIERw9VVRUVFU=","wormadam-plant-cloak":"b2tqamZmbW1sVVJSIRUOCgcGAwARGxs1NkhMUlNSWlo=","wormadam-sand-cloak":"gnx7e3Z2d318VVNSTj4bFRQEAAAAAAcnKjhMT1NVYGY=","wormadam-trash-cloak":"aWJhYF0GAAMLEBUaITMqHRYQDQ0ODhEdPUBES09LTlM=","wugtrio":"k4+NjIyNjgoEAgEAAAABAgIEBggLDhIWHCIsLS05SE0=","wurmple":"x8K8t7GshoaGgXVya2UhAAAEBwkNEBQTFA4OGRkiQV0=","wynaut":"RkJCQkNGS1JTT0tJRkNAPTo4NR4BAAAECQ9cW1tbZWo=","wyrdeer":"QkJHICAsN0ZITE5dXWkMBgMAAAADDBMREBAODxEUFVc=","xatu":"RDozFxEQEDI4Q0M9NzMuKiYjIB4bGhgXFhUVFiAKAAA=","xerneas":"GgAACBchKDM8Y20qJxoaHyQlLUxLSkZEQkFBQEBBkpc=","xurkitree":"Y2JERExIODhSSh0KCgAAEQ4OUDIyNklISEdHRzIyKyo=","yamask":"aWlraltSTkpIRkZGR0hOEQQBAAABBAxSUVFSU1VYXF0=","yamper":"mpqam5yeKicoLjQ6AQABAgQIDCAcGhkZGRseJScoMoA=","yanma":"eHY2AQAAAQUMEhwmKCYlJSUlJScpLi4vKSUlJSVWVlY=","yanmega":"g4OGIR4BAAABBAgNExgfJjE7PzsyLioiIiIjJScpSW0=","yungoos":"FwoEAQAAAAABBAgICQoMEBMZHR4gIiQmJygqKy0oKCg=","yveltal":"ziwsLhEKBAAACggICBN2hH9/gEdHLCwvNDAyOUJNUFY=","zacian-crowned":"HB8kKjM1OkJDQxscISQoJx8YEAoFAQAAAQMHDC41NUI=","zacian":"2tXSzseOh0Y+MSwnHxkTDgoGBAIBAAAAAQMHDDAxMTI=","zamazenta-crowned":"TkxIMysaEhANCwsLDQ8QCwcDAQAADTs4NTU1NS0qKoI=","zamazenta":"MCgkIiIfEQYEBAAAAQIEEBMYHSIQDAoKCg0TExQYXVw=","zangoose":"U05KR0RCPTo5NjY4MScnKCIcFxELBAAABwcJDh0VFRc=","zapdos-galar":"gIA+PjExCwsPGwAAAAYGBQUIAwMREQsKCgsZIZaWlpY=","zapdos":"PAAAAwoREhIWIBcUGCk7R0I8OTg9OTk5VlZXX2RjYmI=","zarude":"CgEAAAMCAgICBAgNEBgfVmNhYF4fGxQRERETGCAZGUY=","zebstrika":"FhMPBgYHBw8NCwMAAAAkJSUkHA8GBAQIEBggKDhIQ0E=","zekrom":"2L+snpJFMCwrLTEjHB0qNioTCAAACRwYGBwbFxeGhIQ=","zeraora":"JyIeHBkZGRQUGCojGhMMBwIAAAEQM0VbW1tbXZqYmJk=","zigzagoon":"xL25WRUSBwcHBwcHCAkIBgUFBAAAAAECCxIYGBkdNjY=","zoroark-hisui":"2Il0b29ANxoUFAoJChEmJigqHBgYAAYILDFlVUM7O94=","zoroark":"UExFKiooJSIfHh4eHRw7MiARBgAABTw8Qk5BOztDsLA=","zorua-hisui":"XVZSUlNYaWZPMSEYEQICAgQJDhYAAAsQICAhJjBUVmM=","zorua":"eXUJBwUFBQUGBwgLDhEUAAAFCQkSIyguR0tTWWN4eHk=","zubat":"TDwxJh4VDwkFAQAALltmaWlnYl5bVlJNSUQ/Ozt+fXw=","zweilous":"ISEiJR8SDAgFBQcLERkEBAAEHTExLCQjJh8aFhILCCQ=","zygarde-10-forme":"RCIhISM1OTMwMFRWVlNRUExIQz86KBwUDQcDAAACjY4=","zygarde-50-forme":"FldWJSIiJSYFBQcODxMVBgcSExkWAAAsNDEvLi4wNj8=","zygarde-complete-forme":"Ny0qKCUiIR4dGxoYFxEGAQAFBRYWExMUFBUHAgECBXQ="});
+  const contourProfileCache=new Map();
+  function contourLeftProfile(b) {
+    if(!b?.slug || !CONTOUR_LEFT_PROFILES[b.slug])return null;
+    if(contourProfileCache.has(b.slug))return contourProfileCache.get(b.slug);
+    let values=null;
+    try {
+      const binary=atob(CONTOUR_LEFT_PROFILES[b.slug]);
+      if(binary.length===32)values=Array.from(binary,c=>c.charCodeAt(0)/255);
+    } catch(_){/* Unknown art: rectangular float remains authoritative. */}
+    if(contourProfileCache.size>=72)
+      contourProfileCache.delete(contourProfileCache.keys().next().value);
+    contourProfileCache.set(b.slug,values);
+    return values;
+  }
+  // Outline the RIGHT floated content exclusion, conservatively hugging
+  // the subject's leftmost pixel in each band. No image is recropped or moved.
+  // Floated element remains the native section and keeps QoL's sparkle control.
+  function contourShapeFor(article,hero,layout) {
+    if(!layout?.flow || !layout.contourWrap || article.getBoundingClientRect().width>=550)return null;
+    const image=hero.querySelector('.yofi-hero-art-lane .square-image img');
+    const b=subjectBBoxFor(article,image);
+    const profile=contourLeftProfile(b);
+    if(!profile)return null;
+    const offset=Math.max(0,(layout.laneWidth-layout.imageWidth)*(layout.artAlign??.5));
+    const inset=6; // text-to-alpha gap, independent of the column gap
+    const points=[];
+    // Use 32 conservative strips (min across each original 1/32-height band)
+    // rather than a giant polygon for every raw contour pixel.
+    for(let i=0;i<32;i++){
+      const x=Math.max(0,offset+profile[i]*layout.imageWidth-inset);
+      const start=layout.artTopGap+i*layout.imageHeight/32;
+      const end=layout.artTopGap+(i+1)*layout.imageHeight/32;
+      points.push(`${x.toFixed(2)}px ${start.toFixed(2)}px`,
+        `${x.toFixed(2)}px ${end.toFixed(2)}px`);
+    }
+    const right=Math.max(0,layout.laneWidth);
+    return `polygon(${points[0]}, ${points.slice(1).join(', ')}, `+
+      `${right.toFixed(2)}px ${(layout.artTopGap+layout.imageHeight).toFixed(2)}px, `+
+      `${right.toFixed(2)}px 0px)`;
+  }
+  function updateContourShape(article,hero,layout) {
+    const shape=contourShapeFor(article,hero,layout);
+    hero.style.removeProperty('--lab3-contour-shape');
+    if(shape)hero.style.setProperty('--lab3-contour-shape',shape);
+    article.classList.toggle('lab3-contour-flow',!!shape);
+  }
+
+  // v0.2.14 Working diagnostic: outline actual subject pixels, NOT expanded icon frame.
+  let bboxOutlineEnabled = true;
+  window.__yofiSubjectBoundsDebug = enabled => {
+    bboxOutlineEnabled = enabled === undefined ? !bboxOutlineEnabled : !!enabled;
+    document.querySelectorAll('.page > main article:not([data-yofi-layout-probe])').forEach(article =>
+      article.classList.toggle('yofi-subject-outline-debug',
+        bboxOutlineEnabled && article.classList.contains('yofi-subject-bounds-active')));
+    return bboxOutlineEnabled;
+  };
+  // Subject framing is the ONLY integration surface for QoL's existing
+  // four-corner draggable control. Do not change the control's selected
+  // corner, inline positioning, event handlers, or persistence here.
   const SUBJECT_STYLE_VARS = ['--bbox-canvas-w','--bbox-canvas-h','--bbox-canvas-x',
-    '--bbox-canvas-y','--bbox-clip-top','--bbox-clip-right','--bbox-clip-bottom','--bbox-clip-left'];
+    '--bbox-canvas-y','--bbox-clip-top','--bbox-clip-right','--bbox-clip-bottom','--bbox-clip-left',
+    '--bbox-subject-width','--bbox-subject-height',
+    '--bbox-figure-x','--bbox-figure-y','--bbox-subject-offset-x','--bbox-subject-offset-y'];
   function subjectBBoxFor(article,image) {
     if (!bboxTestEnabled || !currentSpeciesRouteKey().startsWith('pokemon:')) return null;
     const source = image?.getAttribute('src') || image?.currentSrc || '';
@@ -199,63 +268,145 @@
       width:right-left,height:bottom-top,ratio:(right-left)/(bottom-top)};
   }
   function clearBBoxRendering(article,hero) {
-    article?.classList.remove('yofi-subject-bounds-active');
+    article?.classList.remove('yofi-subject-bounds-active','yofi-subject-outline-debug');
+    hero?.classList.remove('lab3-sparkle-expanded','lab3-sparkle-infeasible');
     if (hero) for (const prop of SUBJECT_STYLE_VARS) hero.style.removeProperty(prop);
   }
-  function nativeSubjectLayout(article,hero,layout) {
-    const lane=hero.querySelector('.yofi-hero-art-lane .square-image');
-    const image=lane?.querySelector('img');
-    const b=subjectBBoxFor(article,image);
-    if(!b||!lane)return null;
-    const width=lane.getBoundingClientRect().width;
-    if(!(width>0))return null;
-    const usable=usablePanelHeight(article);
-    const limits=artLimits(usable,hero.getBoundingClientRect().width,b.ratio);
-    // Native-like placement uses the same subject ratio and preferred size
-    // policy as other candidates. Its existing description/metadata DOM stays
-    // in place; only the art transform is changed.
-    const imageHeight=Math.min(limits.max,width/b.ratio,limits.preferred);
-    return imageHeight>0?{imageHeight,imageWidth:imageHeight*b.ratio,laneWidth:width}:null;
+  // QoL owns the sparkle element, its click/drag handlers and remembered corner.
+  // Species Card ONLY sets the permitted figure rectangle. A free-track extension
+  // cannot steal the gap between this image and a neighboring content column.
+  const sparkleSilhouettes = new Map();
+  const sparkleLoadWatch = new WeakMap();
+  function sparkleSilhouette(image,b) {
+    if(!image?.complete||!(image.naturalWidth>0)||!b)return null;
+    const source=image.currentSrc||image.getAttribute('src')||'';
+    if(!/\/main\.png(?:[?#]|$)/i.test(source))return sparkleSilhouettes.get(b.slug)||null;
+    if(sparkleSilhouettes.has(b.slug))return sparkleSilhouettes.get(b.slug);
+    try {
+      const canvas=document.createElement('canvas');
+      canvas.width=96;canvas.height=96;
+      const context=canvas.getContext('2d',{willReadFrequently:true});
+      if(!context)return null;
+      context.drawImage(image,0,0,96,96);
+      const raw=context.getImageData(0,0,96,96).data;
+      const alpha=new Uint8Array(96*96);
+      for(let i=0;i<alpha.length;i++)alpha[i]=raw[i*4+3];
+      const record={alpha};
+      if(sparkleSilhouettes.size>=24)
+        sparkleSilhouettes.delete(sparkleSilhouettes.keys().next().value);
+      sparkleSilhouettes.set(b.slug,record);
+      return record;
+    }catch(_){return null;}
+  }
+  function sparkleOccupancy(record,b,subjectW,subjectH,iconW,iconH,corner) {
+    if(!record)return null;
+    // The current *image subject* corner, with no hidden QoL 4px inset.
+    const localX=corner.endsWith('r')?subjectW-iconW:0;
+    const localY=corner.startsWith('b')?subjectH-iconH:0;
+    const scaleX=b.width/subjectW,scaleY=b.height/subjectH;
+    const x1=b.left+localX*scaleX,y1=b.top+localY*scaleY;
+    const x2=x1+iconW*scaleX,y2=y1+iconH*scaleY;
+    const xStart=Math.max(0,Math.floor(x1*96/b.canvasWidth));
+    const xEnd=Math.min(96,Math.ceil(x2*96/b.canvasWidth));
+    const yStart=Math.max(0,Math.floor(y1*96/b.canvasHeight));
+    const yEnd=Math.min(96,Math.ceil(y2*96/b.canvasHeight));
+    let filled=0,total=0;
+    for(let y=yStart;y<yEnd;y++)for(let x=xStart;x<xEnd;x++){
+      if(record.alpha[y*96+x]>=90)filled++;
+      total++;
+    }
+    return total?filled/total:0;
+  }
+  function subjectFrame(hero,image,b,layout) {
+    const lane=hero.querySelector('.yofi-hero-art-lane');
+    const figure=lane?.querySelector('.square-image > figure');
+    const button=figure?.querySelector(':scope > .yofi-portrait-sparkle');
+    const iconWidth=button?.offsetWidth||30;
+    const iconHeight=button?.offsetHeight||iconWidth;
+    const record=button?sparkleSilhouette(image,b):null;
+    const blocked=!!record&&['tr','tl','br','bl'].every(corner=>{
+      const occupancy=sparkleOccupancy(record,b,layout.imageWidth,layout.imageHeight,
+        iconWidth,iconHeight,corner);
+      return occupancy!==null&&occupancy>.04;
+    });
+    // Artwork is aligned inside *its own track*. Neither the inter-column gap
+    // nor any biology/statistics row is available to sparkle placement.
+    const availableLeft=Math.max(0,(layout.laneWidth-layout.imageWidth)*(layout.artAlign??.5));
+    const availableRight=Math.max(0,layout.laneWidth-layout.imageWidth-availableLeft);
+    const left=availableLeft>=.5?availableLeft:0;
+    const right=availableRight>=.5?availableRight:0;
+    // Only the actual artwork-lane bottom, after the subject, may be used.
+    // Three-column artwork is normally bottom-aligned, leaving no such space.
+    const laneHeight=Math.max(0,lane?.getBoundingClientRect().height||0);
+    const artBottom=(layout.artTopGap||0)+layout.imageHeight;
+    const freeBottom=Math.max(0,laneHeight-artBottom);
+    const bottom=freeBottom>=.5?freeBottom:0;
+    // If every original corner intersects the subject, grow the allowed
+    // frame by one icon width; keep the expansion inside the artwork track.
+    const hasClearTrack=availableLeft>=iconWidth-.5||
+      availableRight>=iconWidth-.5||freeBottom>=iconHeight-.5;
+    // No corner can be housed within this track without covering artwork:
+    // veto the proposed composition instead of stealing column spacing.
+    return {left,right,bottom,expanded:blocked,
+      infeasible:blocked&&!hasClearTrack,iconWidth,iconHeight};
   }
   function renderSubjectBBox(article,hero,layout) {
-
-    const image = hero.querySelector('.yofi-hero-art-lane .square-image img');
-    const b = subjectBBoxFor(article,image);
-    if (!b || !layout) {clearBBoxRendering(article,hero);return;}
+    const image=hero.querySelector('.yofi-hero-art-lane .square-image img');
+    const b=subjectBBoxFor(article,image);
+    if(!b||!layout){clearBBoxRendering(article,hero);return;}
     const scale=layout.imageHeight/b.height;
-    if (!(scale>0 && Number.isFinite(scale))) {clearBBoxRendering(article,hero);return;}
-    // Preserve the complete original source image: align its visible rectangle
-    // with the geometry chosen by the unchanged layout selector. The native
-    // zoom element is relocated, not replaced or reparented.
+    const topGap=layout.artTopGap??0;
+    if(!(scale>0&&Number.isFinite(scale))){clearBBoxRendering(article,hero);return;}
+    const frame=subjectFrame(hero,image,b,layout);
     const px=n=>n.toFixed(3)+'px';
+    const leftInTrack=(layout.laneWidth-layout.imageWidth)*(layout.artAlign??.5);
     const vars={
       '--bbox-canvas-w':px(b.canvasWidth*scale),
-      '--yofi-subject-art-height':px(layout.imageHeight),
       '--bbox-canvas-h':px(b.canvasHeight*scale),
-      '--bbox-canvas-x':px((layout.laneWidth-layout.imageWidth)/2-b.left*scale),
+      '--bbox-canvas-x':px(frame.left-b.left*scale),
       '--bbox-canvas-y':px(-b.top*scale),
+      '--bbox-figure-x':px(leftInTrack-frame.left),
+      '--bbox-figure-y':px(topGap),
+      '--bbox-subject-width':px(layout.imageWidth+frame.left+frame.right),
+      '--bbox-subject-height':px(layout.imageHeight+frame.bottom),
+      '--bbox-subject-offset-x':px(frame.left),
+      '--bbox-subject-offset-y':'0px',
       '--bbox-clip-top':(100*b.top/b.canvasHeight).toFixed(4)+'%',
       '--bbox-clip-right':(100*(b.canvasWidth-b.right)/b.canvasWidth).toFixed(4)+'%',
       '--bbox-clip-bottom':(100*(b.canvasHeight-b.bottom)/b.canvasHeight).toFixed(4)+'%',
       '--bbox-clip-left':(100*b.left/b.canvasWidth).toFixed(4)+'%'
     };
-    for(const [prop,value] of Object.entries(vars))
-      if(hero.style.getPropertyValue(prop)!==value) hero.style.setProperty(prop,value);
+    for(const [k,v] of Object.entries(vars))
+      if(hero.style.getPropertyValue(k)!==v)hero.style.setProperty(k,v);
+    hero.classList.toggle('lab3-sparkle-expanded',frame.expanded);
+    hero.classList.toggle('lab3-sparkle-infeasible',frame.infeasible);
     article.classList.add('yofi-subject-bounds-active');
+    article.classList.toggle('yofi-subject-outline-debug',
+      bboxOutlineEnabled&&!article.hasAttribute('data-yofi-layout-probe'));
+    if(image&&!image.complete&&!sparkleLoadWatch.has(image)&&
+       !article.hasAttribute('data-yofi-layout-probe')){
+      const onLoad=()=>{sparkleLoadWatch.delete(image);requestHeroTick();};
+      sparkleLoadWatch.set(image,onLoad);
+      image.addEventListener('load',onLoad,{once:true});
+    }
   }
   function bboxTestStatus() {
-    const article=document.querySelector('.page > main article.lab3-active')||
-      document.querySelector('.page > main article');
+    const article=document.querySelector('.page > main article.lab3-active:not([data-yofi-layout-probe])')||
+      document.querySelector('.page > main article:not([data-yofi-layout-probe])');
     const hero=article?.querySelector('.yofi-species-hero');
     const image=hero?.querySelector('.yofi-hero-art-lane .square-image img');
     const b=subjectBBoxFor(article,image);
-    return {version:'0.1.28',enabled:bboxTestEnabled,route:currentSpeciesRouteKey(),
+    return {version:'0.2.22',enabled:bboxTestEnabled,route:currentSpeciesRouteKey(),
       source:image?.getAttribute('src')||null,matched:b?.slug||null,
       bounds:b?[b.left,b.top,b.right,b.bottom]:null,
       subjectRatio:b?.ratio||null,canvasRatio:image?.naturalWidth&&image?.naturalHeight?
         image.naturalWidth/image.naturalHeight:null,
       promoted:!!article?.classList.contains('lab3-active'),
       applied:!!article?.classList.contains('yofi-subject-bounds-active'),
+      debugOutline:bboxOutlineEnabled,
+      frameExpansion:{left:hero?.style.getPropertyValue('--bbox-subject-offset-x')||null,
+        width:hero?.style.getPropertyValue('--bbox-subject-width')||null,
+        height:hero?.style.getPropertyValue('--bbox-subject-height')||null},
       stage:hero?.dataset.lab3Stage||'native',
       artWidth:hero?.style.getPropertyValue('--lab3-art-width')||null,
       artHeight:hero?.style.getPropertyValue('--lab3-art-height')||null,
@@ -662,31 +813,37 @@ article.yofi-scores-layout .yofi12-value .inline-type-name .name.yofi-ice-letter
 
 article.yofi-scores-layout .yofi12-narrow-badges .yofi12-stage .inline-type-name {zoom:.96}
 
-/* Preserve the original Tag.svelte node AND its original paragraph.
-       The paragraph floats only for its own first line; the next line of
-       the native .ability text returns to the full available width. */
+/* AbilityPoolInfo owns <p class="no-margin"><Tag>Hidden</Tag></p>
+       followed by <div class="ability">text</div>. Preserve these exact
+       Svelte-owned siblings and make BOTH true inline content so the tag
+       shares the text line/baseline and text wraps naturally after it.
+       Each ordinary Ability remains its own block with regular item spacing.
+       No wrappers, floats, positioning, translation or offset compensation. */
 
-article section.abilities > .yofi-native-hidden-pair {
-      display:flow-root!important;
-      min-width:0;
+article section.abilities > .ability {
+      display:block!important;
+      margin:0 0 var(--yofi-card-text-gap,.42em)!important;
     }
+article section.abilities > .ability:last-child { margin-bottom:0!important; }
 
-article section.abilities > .yofi-native-hidden-pair > p.no-margin {
-      float:left!important;
-      /* Its float exclusion ends after the FIRST line. The native badge
-         itself remains its original size and can paint outside this box. */
-      height:1em!important;
-      overflow:visible!important;
-      margin:0 .4em 0 0!important;
+article section.abilities > p.no-margin {
+      display:inline!important;
+      float:none!important;
+      margin:0!important;
       padding:0!important;
     }
-
-article section.abilities > .yofi-native-hidden-pair > .ability {
-      display:block!important;
-      overflow:visible!important;
-      min-width:0;
+article section.abilities > p.no-margin + .ability {
+      display:inline!important;
       margin:0!important;
+      padding:0!important;
     }
+/* When native data contains consecutive Hidden abilities, terminate the
+       previous inline entry before the next badge without adding a wrapper. */
+article section.abilities > p.no-margin + .ability:has(+ p.no-margin)::after {
+      content:"\A";
+      white-space:pre;
+    }
+
 
 /* Description lead is a QOL content decoration. Does not rely on the hero adapter. */
 
@@ -825,30 +982,16 @@ article.yofi-scores-layout > .scrollable > section:is(.abilities,.evolution,.evo
       margin-block:var(--yofi-card-heading-gap)!important;
     }
 
-article.yofi-scores-layout > .scrollable > section:is(.abilities,.evolution,.evolutions,.moves,.tms,.tm) > :not(h2) {
+article.yofi-scores-layout > .scrollable > section:is(.evolution,.evolutions,.moves,.tms,.tm) > :not(h2) {
       margin-block:0!important;
     }
 
-article.yofi-scores-layout > .scrollable > section:is(.abilities,.evolution,.evolutions,.moves,.tms,.tm) > :not(h2) + :not(h2) {
+article.yofi-scores-layout > .scrollable > section:is(.evolution,.evolutions,.moves,.tms,.tm) > :not(h2) + :not(h2) {
       margin-block-start:var(--yofi-card-text-gap)!important;
     }
 
-/* AbilityPoolInfo: original .ability blocks are separate text items.
-       The native Hidden paragraph and its .ability form ONE item. */
-
-article.yofi-scores-layout section.abilities > .ability {
-      margin-block:0!important;
-    }
-
-article.yofi-scores-layout section.abilities > .yofi-native-hidden-pair > .ability {
-      margin-block:0!important;
-    }
-
-article.yofi-scores-layout section.abilities > .yofi-native-hidden-pair + .ability,
-    article.yofi-scores-layout section.abilities > .ability + .ability,
-    article.yofi-scores-layout section.abilities > .ability + .yofi-native-hidden-pair {
-      margin-block-start:var(--yofi-card-text-gap)!important;
-    }
+/* Abilities spacing is owned by the ordinary block entries above. Hidden
+       badges are part of the following inline Ability, not separate rows. */
 
 /* EvolutionInfo puts the content *inside* .evolution-section. Reset
        its native 1.5em h3 top margin and 1.25em paragraph bottom margin. */
@@ -916,13 +1059,10 @@ article.yofi-scores-layout section.moves > dl + dl {
   }
 
   const BASE_HERO_CSS = `
-    /* v0.8.5: a fresh hero. Native metadata remains the live, read-only
-       source; description and Art stay native nodes with their handlers. */
+    /* Native metadata and Art remain the live read-only sources. Layout
+       decisions are made by one solver for compact and promoted cards. */
     article .yofi-species-hero {
       --yofi-hero-gap: clamp(10px, 2.5%, 18px);
-      /* One real gap: artwork/facts to vitals in either layout, and
-         artwork/description to the separate facts row in long mode. */
-      --yofi-hero-data-gap: .3rem;
       box-sizing: border-box;
       display: block;
       position: relative;
@@ -937,12 +1077,6 @@ article.yofi-scores-layout section.moves > dl + dl {
       width: 100%;
       margin: 0;
       padding: 0;
-    }
-    /* The long-mode float can retain blank block height after its artwork
-       shrinks. Exclude only that measured surplus from normal document flow;
-       the remaining gap is the same as below the facts, before vitals. */
-    .yofi-species-hero[data-yofi-facts-mode="long"] > .yofi-hero-flow {
-      margin-block-end: var(--yofi-hero-long-flow-adjust, 0px) !important;
     }
     /* Fixed 50% image lane, top-right anchored. A small left margin
        separates it from the description; long copy flows below the lane. */
@@ -1060,7 +1194,9 @@ article.yofi-scores-layout section.moves > dl + dl {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       align-items: center;
-      column-gap: 0;
+      /* A real gutter is required even when both biology fields consume
+         their entire assigned half; zero gap made Mawile's bars touch. */
+      column-gap: var(--yofi-compact-bio-gap, 8px);
       min-width: 0;
       width: 100%;
       margin: .85em 0 0;
@@ -1101,9 +1237,6 @@ article.yofi-scores-layout section.moves > dl + dl {
     .yofi-hero-facts > dl.yofi-hero-facts-right {
       container-type: inline-size;
     }
-    article:not(.lab3-active) .yofi-hero-facts-right .yofi-hero-field-egg {
-      width: 100% !important;
-    }
     .yofi-hero-facts .yofi-hero-field-egg {
       display: grid !important;
       grid-template-columns: 1.4em minmax(0, 1fr);
@@ -1113,18 +1246,6 @@ article.yofi-scores-layout section.moves > dl + dl {
       width: 100%; min-width: 0;
       box-sizing: border-box;
       padding-inline: 6px !important;
-    }
-    /* The compact hero exposes this field directly rather than through a
-       .lab3-egg tile. Give only that visible field the same rounded surface;
-       the promoted tile already owns its surface and must not be doubled. */
-    article:not(.lab3-active) .yofi-species-hero
-      .yofi-hero-facts:not(.lab3-copy-facts) .yofi-hero-field-egg {
-      height:var(--yofi-compact-bio-height, 36px);
-      min-height: 36px;
-      border-radius: 13px;
-      background: rgba(255,255,255,.49);
-      padding: 5px 9px !important;
-      box-sizing: border-box;
     }
     .yofi-hero-field-egg > dt { display: none !important; }
     .yofi-hero-field-egg > .lab3-egg-icon {
@@ -1148,7 +1269,7 @@ article.yofi-scores-layout section.moves > dl + dl {
        three-track toolbar places its center at the same x-coordinate as the
        type pill. Each colored segment uses the native --percent flex basis. */
     .yofi-hero-facts > .yofi-hero-gender {
-      min-height: var(--yofi-compact-bio-height, 36px);
+      min-height: var(--yofi-compact-bio-height, 22px);
       width:100% !important;
       display: inline-flex !important;
       align-items: center;
@@ -1156,7 +1277,7 @@ article.yofi-scores-layout section.moves > dl + dl {
       min-width: 0;
     }
     .yofi-hero-facts .yofi-hero-gender .gender-ratio-display {
-      height:var(--yofi-compact-bio-height, 36px) !important;
+      height:var(--yofi-compact-bio-height, 22px) !important;
       box-sizing:border-box !important;
       display: inline-flex !important;
       /* Between the previous 6.8em compact badge and native 10em badge.
@@ -1164,8 +1285,10 @@ article.yofi-scores-layout section.moves > dl + dl {
       width: 100% !important;
       max-width: 100% !important;
       flex-shrink: 1;
-      height: var(--yofi-compact-bio-height, 36px) !important;
-      border-radius: .25em;
+      height: var(--yofi-compact-bio-height, 22px) !important;
+      /* Same radius as the shared promoted biology bar: presentation must
+         not depend on whether the native-like layout wins. */
+      border-radius: clamp(4px, calc(var(--yofi-compact-bio-height, 22px) * .22), 8px) !important;
       overflow: hidden;
       background: gray;
       vertical-align: middle;
@@ -1196,9 +1319,6 @@ article.yofi-scores-layout section.moves > dl + dl {
       font-size: .9em !important;
       line-height: 1;
     }
-    .yofi-species-hero[data-yofi-facts-mode="long"] > .yofi-hero-facts > .yofi-hero-gender {
-      flex: 0 1 auto; /* Allow tight split panels to yield to long Egg names. */
-    }
     .yofi-hero-facts .yofi-hero-gender .female { background: var(--skin-female-bg, #d00025); }
     .yofi-hero-facts .yofi-hero-gender .male { background: var(--skin-male-bg, #1846db); }
     .yofi-hero-facts .yofi-hero-gender .genderless { background: var(--skin-agender-bg, #777); }
@@ -1222,75 +1342,6 @@ article.yofi-scores-layout section.moves > dl + dl {
       vertical-align: -.105em;
       flex: 0 0 auto;
     }
-
-    /* Short description: Gender and Egg are left-aligned and stacked beneath
-       the copy within its left column; the artwork stays in its right lane. */
-    .yofi-species-hero[data-yofi-facts-mode="short"] > .yofi-hero-flow {
-      display: grid !important;
-      grid-template-columns: minmax(0, calc(50% - var(--yofi-hero-gap))) 50% !important;
-      column-gap: var(--yofi-hero-gap) !important;
-      row-gap: 0 !important;
-      align-items: stretch !important;
-    }
-    article .yofi-species-hero[data-yofi-facts-mode="short"] .yofi-hero-flow > section.info.yofi-hero-art-lane {
-      float: none !important;
-      grid-column: 2;
-      grid-row: 1;
-      width: 100% !important;
-      margin: 0 !important;
-    }
-    .yofi-species-hero[data-yofi-facts-mode="short"] .yofi-hero-flow > .yofi-hero-short-column {
-      grid-column: 1;
-      grid-row: 1;
-      display: flex;
-      flex-direction: column;
-      align-self: stretch;
-      min-width: 0;
-    }
-    article .yofi-species-hero[data-yofi-facts-mode="short"] .yofi-hero-short-column > section.yofi-hero-copy {
-      min-width: 0;
-      width: 100% !important;
-      margin: 0 !important;
-      padding: 0 !important;
-    }
-    .yofi-species-hero[data-yofi-facts-mode="short"] .yofi-hero-short-column > .yofi-hero-facts {
-      display: flex !important;
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: flex-start;
-      width: 100% !important;
-      min-width: 0;
-      /* Free height in the artwork column belongs ABOVE Gender/Egg.
-         The metadata ends at the image or credit bottom naturally. */
-      margin: auto 0 0 !important;
-      gap: .25em;
-    }
-    /* Compare the natural stacked description+metadata height against the
-       full-size image BEFORE aligning the final short layout. */
-    .yofi-species-hero[data-yofi-facts-pending="true"][data-yofi-facts-mode="short"]
-      .yofi-hero-short-column > .yofi-hero-facts {
-      margin-top: .25em !important;
-    }
-    .yofi-species-hero[data-yofi-facts-mode="short"] .yofi-hero-facts > .yofi-hero-gender {
-      align-self: flex-start;
-      margin: 0;
-    }
-    .yofi-species-hero[data-yofi-facts-mode="short"] .yofi-hero-gender .gender-ratio-display {
-      width: 100% !important;
-      max-width: 100% !important;
-    }
-    .yofi-species-hero[data-yofi-facts-mode="short"] .yofi-hero-gender .bar {
-      flex: 1 1 var(--percent) !important;
-      min-width: max-content !important;
-      padding-inline: .08em !important;
-    }
-    .yofi-species-hero[data-yofi-facts-mode="short"] .yofi-hero-facts > .yofi-hero-facts-right {
-      align-self: flex-start;
-      justify-content: flex-start !important;
-      width: 100%;
-      margin: 0;
-    }
-
 
     /* Gender: slightly deeper baby pink / blue, white foreground, and SVG
        symbols with no icon backgrounds. Three fixed overlay slots are
@@ -1374,8 +1425,10 @@ article.yofi-scores-layout section.moves > dl + dl {
       top: 0 !important;
       vertical-align: middle !important;
       flex: none;
-      width: .92em;
-      height: .92em;
+      /* The All-sex SVG is nested in a .9em ratio label. Compensate
+         for the inherited scale so it matches the 1.12em fixed icon slots. */
+      width: 1.2444em;
+      height: 1.2444em;
       color: #fff !important;
     }
     article .yofi-species-hero .yofi-hero-gender .yofi-gender-all-combined .yofi-sex-svg {
@@ -1456,7 +1509,7 @@ article.yofi-scores-layout section.moves > dl + dl {
     return { title, imageSource, recordId, typeSignature };
   }
   function visibleSpeciesArticles() {
-    return [...document.querySelectorAll(LIVE_CARD_SELECTOR)].filter(article =>
+    return [...document.querySelectorAll(LIVE_CARD_SELECTOR+':not([data-yofi-layout-probe])')].filter(article =>
       article.querySelector('section.stats') && article.getClientRects().length > 0);
   }
   function visibleSpeciesArticle() {
@@ -1575,16 +1628,6 @@ article.yofi-scores-layout section.moves > dl + dl {
     return node?.textContent?.replace(/\s+/g, " ").trim() || "";
   }
 
-  // Match the existing 37%-of-CARD artwork floor while waiting for image
-  // decode. The art lane itself is about half the card, less hero gutters.
-  function sizePendingHeroArt(info, hero) {
-    const lane = info.getBoundingClientRect().width;
-    const card = hero.getBoundingClientRect().width;
-    const percent = lane > 0 && card > 0
-      ? Math.min(100, 100 * card * .37 / lane) : 74;
-    setHeroStyle(info, "--yofi-hero-art-width", `${percent.toFixed(3)}%`);
-  }
-
   function copyHeroValue(source, target) {
     if (!source || !target) return;
     const signature = source.innerHTML;
@@ -1653,16 +1696,12 @@ article.yofi-scores-layout section.moves > dl + dl {
     description.classList.add("yofi-hero-copy");
     flow.append(info, description);
     hero.append(flow, facts);
-    // The initial native image can still be loading when the hero mounts.
-    // Do not allow a 50%-wide unmeasured portrait to flash in that interval.
     const initialImage = info.querySelector(".square-image img");
-    if (initialImage instanceof HTMLImageElement && !initialImage.complete) {
-      sizePendingHeroArt(info, hero);
+    if (initialImage instanceof HTMLImageElement && !initialImage.complete)
       info.classList.add("yofi-hero-art-pending");
-    }
-    state = { hero, article, info, metadata, description, flow, shortColumn: null,
+    state = { hero, article, info, metadata, description, flow,
       facts, right, gender, values, geometryKey: "", factsKey: "",
-      observer: null, resizeObserver: null, width: -1, factsMode: "long" };
+      observer: null, resizeObserver: null, width: -1 };
     speciesHeroStates.set(hero, state);
     activeSpeciesHeroState = state;
 
@@ -1863,132 +1902,6 @@ article.yofi-scores-layout section.moves > dl + dl {
     renderHeroGender(gender, state.gender, forcedSex);
   }
 
-  function selectHeroFactsMode(state) {
-    const image = state.info.querySelector(".square-image img");
-    const artwork = state.info.querySelector(".square-image img-zoom")
-      || state.info.querySelector(".square-image");
-    const copy = state.description.querySelector(".small-text");
-    if (!(copy instanceof HTMLElement)) return;
-
-    // Choose the composition from native content and the reserved image box.
-    // Native route changes and warmed artwork supply the current card data;
-    // geometry is computed independently of the navigation action.
-    const hasImage = image instanceof HTMLImageElement;
-    const ready = hasImage && image.complete && image.naturalWidth > 0 && image.naturalHeight > 0;
-    const pending = hasImage && !ready && !image.complete;
-    state.info.classList.toggle("yofi-hero-art-pending", pending);
-    delete state.hero.dataset.yofiFactsPending;
-
-    const credit = state.info.querySelector(".square-image figure figcaption");
-    const hasCredit = credit instanceof HTMLElement && !!credit.textContent.trim();
-    const copyStyle = getComputedStyle(copy);
-    const signature = [state.flow.getBoundingClientRect().width.toFixed(1),
-      currentSpeciesRouteKey(),
-      hasCredit ? credit.textContent.trim() : "", copy.innerHTML,
-      copyStyle.fontFamily, copyStyle.fontSize, copyStyle.lineHeight,
-      state.facts.textContent].join("|");
-    if (state.modeSignature === signature && state.hero.dataset.yofiFactsMode === state.factsMode) return;
-
-    // Measure the original short-mode eligibility before resizing or aligning
-    // either column. Previous render measurements must not bias this decision.
-    setHeroStyle(state.flow, "--yofi-hero-long-flow-adjust", "0px");
-    if (!pending) setHeroStyle(state.info, "--yofi-hero-art-width", "100%");
-
-    // Perform the neutral float-layout measurement in the same synchronous
-    // pass as the final placement. The facts are concealed only DURING that
-    // measurement, so neither placement flashes onscreen between frames.
-    state.hero.dataset.yofiFactsPending = "true";
-    if (state.description.parentElement !== state.flow) state.flow.appendChild(state.description);
-    if (state.facts.parentElement !== state.hero) state.hero.appendChild(state.facts);
-    state.shortColumn?.remove();
-    state.hero.dataset.yofiFactsMode = "long";
-
-    // One eligibility test: stack description and facts next to FULL-SIZE
-    // artwork; raise them only if their complete natural block fits above
-    // the image bottom. No independent description-only threshold.
-    const artBottom = artwork?.getBoundingClientRect().bottom || 0;
-    let next = "short";
-    state.hero.dataset.yofiFactsMode = next;
-    if (next === "short") {
-      if (!state.shortColumn) {
-        state.shortColumn = document.createElement("div");
-        state.shortColumn.className = "yofi-hero-short-column";
-      }
-      state.flow.appendChild(state.shortColumn);
-      state.shortColumn.append(state.description, state.facts);
-      // The left column must fit IN ITS ENTIRETY alongside the artwork.
-      // Descriptions alone can fit while the gender bar and egg group run
-      // below the portrait. Measure their actual final position before
-      // committing the layout; no delayed reveal or repeated animation.
-      const factsBottom = state.facts.getBoundingClientRect().bottom;
-      if (factsBottom > artBottom - 2) {
-        next = "long";
-        state.flow.appendChild(state.description);
-        state.hero.appendChild(state.facts);
-        state.shortColumn.remove();
-        state.hero.dataset.yofiFactsMode = next;
-      }
-    }
-    // Resize in BOTH hero modes. In short mode the right-hand portrait (and
-    // its optional credit) approaches the bottom of Gender/Egg. In long mode
-    // it approaches the description's bottom, without moving Gender/Egg.
-    // The minimum and maximum refer to the DETAIL CARD, not the outer
-    // Safari window: a 37vw floor can exceed the entire 50%-width art lane
-    // when the Pokemon sidebar is open on a wide iPad/desktop viewport.
-    // The fit decision above is based on full-size art.
-    const zoom = state.info.querySelector(".square-image img-zoom");
-    const lane = state.info.getBoundingClientRect();
-    const portrait = zoom?.getBoundingClientRect();
-    if (hasImage && portrait?.width > 0 && portrait.height > 0 && lane.width > 0) {
-      const artEnd = () => hasCredit
-        ? credit.getBoundingClientRect().bottom
-        : zoom.getBoundingClientRect().bottom;
-      const desiredEnd = () => next === "short"
-        ? state.facts.getBoundingClientRect().bottom
-        : copy.getBoundingClientRect().bottom;
-      // Use the actual hero/card width, not the outer browser viewport.
-      // The native section may have inner padding, so its measured lane is
-      // not always exactly half the hero's outer width.
-      const floor = Math.min(portrait.width, state.hero.getBoundingClientRect().width * .37);
-      const ratio = portraitRatio(state.article, image);
-      // A long-mode description may reflow as the floated portrait shortens.
-      // Resolve that reflow synchronously with a bounded, monotonic adjustment.
-      for (let pass = 0; pass < 4; pass++) {
-        const excess = artEnd() - desiredEnd();
-        const currentWidth = zoom.getBoundingClientRect().width;
-        if (excess <= .5 || currentWidth <= floor + .25) break;
-        const adjusted = Math.max(floor, currentWidth - excess * ratio);
-        if (adjusted >= currentWidth - .25) break;
-        setHeroStyle(state.info, "--yofi-hero-art-width", `${(100 * adjusted / lane.width).toFixed(3)}%`);
-      }
-
-    }
-    // In long mode the floated, resized image can leave unused space in its
-    // original section box. The facts should follow the last VISIBLE content:
-    // the description or the portrait INCLUDING its optional artist credit.
-    // Determine the empty tail from actual DOM geometry, not a guessed offset.
-    // This is intentionally after artwork resizing and never affects short
-    // mode eligibility, image dimensions, or the original 37vw size floor.
-    if (next === "long") {
-      const contentBottom = Math.max(
-        copy.getBoundingClientRect().bottom,
-        hasCredit ? credit.getBoundingClientRect().bottom
-          : (zoom?.getBoundingClientRect().bottom || 0)
-      );
-      const flowBottom = state.flow.getBoundingClientRect().bottom;
-      const unusedTail = Math.max(0, flowBottom - contentBottom);
-      setHeroStyle(state.flow, "--yofi-hero-long-flow-adjust",
-        unusedTail > .25 ? `${(-unusedTail).toFixed(2)}px` : "0px");
-    }
-    state.factsMode = next;
-    state.modeSignature = signature;
-    state.factsKey = "";
-    // The ResizeObserver should not interpret our own deliberate art-size
-    // adjustment as an unrelated image change and repeatedly recompute it.
-    state.artHeight = state.info.getBoundingClientRect().height;
-    delete state.hero.dataset.yofiFactsPending;
-  }
-
   function fitHeroFacts(state) {
     // v0.9.5: SR/MinLvl/Size moved into the vitals row, so there is no
     // longer any reason to shrink the remaining Gender and Egg controls.
@@ -2009,8 +1922,8 @@ article.yofi-scores-layout section.moves > dl + dl {
     // Record the native image ratio for the route's measured layout. The
     // native image source determines the current ratio.
     setHeroStyle(info, "--yofi-hero-art-ratio", String(portraitRatio(article, img)));
-    // selectHeroFactsMode owns artwork width. Resetting it here would undo
-    // the fitted short-mode size on every unrelated installation pass.
+    // The single geometry solver selects actual occupied-subject dimensions.
+    // Do not independently resize the portrait here.
   }
 
   function updateNativeHero(article) {
@@ -2020,14 +1933,9 @@ article.yofi-scores-layout section.moves > dl + dl {
     if (!state) return;
     syncHeroFacts(state);
     sizeHeroArt(state);
-    // Use final fact typography when measuring whether its complete block
-    // fits next to full-size artwork; never decide based on a temporary font.
-    if (!article.classList.contains('lab3-active')) fitHeroFacts(state);
-    // Recompute original mobile/compact mode on first mount and whenever no
-    // promoted layout is active. Avoid measuring the baseline float while a
-    // promoted 3-column grid overrides its geometry.
-    if (!article.classList.contains('lab3-active') || !state.hero.dataset.yofiFactsMode)
-      selectHeroFactsMode(state);
+    // Compact and promoted candidates use the same reusable biology nodes,
+    // typography, artwork transform, and geometry selector.
+    fitHeroFacts(state);
   }
 
 
@@ -2039,15 +1947,17 @@ article.yofi-scores-layout section.moves > dl + dl {
       --lab3-art-width: 210px;
       --lab3-art-height: 210px;
       --lab3-hero-height: 210px;
+      --lab3-row-height: 210px;
       --lab3-lane-width: 210px;
       --lab3-score-row-height: 58px;
+      --lab3-score-font-size: 16px;
       --lab3-tile-size: 88px;
       --lab3-side-width: 184px;
       --lab3-copy-width: 240px;
       display: grid !important;
       box-sizing: border-box !important;
       grid-template-columns: var(--lab3-copy-width) minmax(0, var(--lab3-lane-width)) var(--lab3-side-width) !important;
-      grid-template-rows: auto !important;
+      grid-template-rows: var(--lab3-row-height) !important;
       column-gap: var(--lab3-gap) !important;
       row-gap: 0 !important;
       align-items: start !important;
@@ -2056,12 +1966,30 @@ article.yofi-scores-layout section.moves > dl + dl {
       margin: 0 !important;
       position: relative;
     }
-    /* Scores can promote without creating a right-hand tile column. Keep the
-       two-column compact topology until tiles make a third column useful. */
-    article.lab3-active:not(.lab3-tiles) .yofi-species-hero {
+    article.lab3-active.lab3-bio-full-inline .yofi-species-hero {
+      grid-template-rows: var(--lab3-row-height) auto !important;
+      row-gap: var(--lab3-tile-gap) !important;
+    }
+    article.lab3-active.lab3-bio-full-inline .yofi-species-hero > .lab3-biologies {
+      grid-column: 1 / -1 !important;
+      grid-row: 2 !important;
+      display: grid !important;
+      grid-template-columns: var(--lab3-bio-gender-width) var(--lab3-bio-egg-width) !important;
+      align-items: stretch !important;
+      column-gap: var(--lab3-tile-gap) !important;
+      width: var(--lab3-bio-total-width) !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      height: var(--lab3-bio-height) !important;
+    }
+    article.lab3-active.lab3-bio-full-inline .yofi-species-hero > .lab3-biologies > .lab3-biology {
+      width: 100% !important;
+    }
+    /* Two-column candidates still use the same measured grid solver. */
+    article.lab3-active:not(.lab3-has-right) .yofi-species-hero {
       grid-template-columns: var(--lab3-copy-width) minmax(0, var(--lab3-lane-width)) !important;
     }
-    article.lab3-active:not(.lab3-tiles) .yofi-species-hero > .lab3-right {
+    article.lab3-active:not(.lab3-has-right) .yofi-species-hero > .lab3-right {
       display: none !important;
     }
     article.lab3-active .yofi-species-hero > .yofi-hero-flow,
@@ -2070,14 +1998,18 @@ article.yofi-scores-layout section.moves > dl + dl {
     }
     article.lab3-active .yofi-species-hero .yofi-hero-copy {
       display: block !important;
-      grid-column: 1 !important;
-      grid-row: 1 !important;
       align-self: start !important;
       float: none !important;
       min-width: 0 !important;
       width: 100% !important;
       margin: 0 !important;
       padding: 0 !important;
+    }
+    article.lab3-active .yofi-species-hero .yofi-hero-copy p {
+      margin: 0 !important;
+    }
+    article.lab3-active .yofi-species-hero .yofi-hero-copy p + p {
+      margin-top: .48em !important;
     }
     article.lab3-active .yofi-species-hero .yofi-hero-copy > .small-text {
       font-size: var(--lab3-copy-font, var(--font-sz-venus, .9rem)) !important;
@@ -2093,7 +2025,8 @@ article.yofi-scores-layout section.moves > dl + dl {
       width: var(--lab3-lane-width) !important;
       max-width: none !important;
       height: auto !important;
-      padding: 0 !important; margin: 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
     }
     article.lab3-active .yofi-species-hero .yofi-hero-art-lane > .column:last-child,
     article.lab3-active .yofi-species-hero .yofi-hero-art-lane .square-image,
@@ -2139,58 +2072,53 @@ article.yofi-scores-layout section.moves > dl + dl {
       container-type: inline-size;
       display: flex !important; flex-direction: column;
       align-self: start !important;
-      gap: 8px;
-      /* Match the art's physical bottom, without moving the copy itself.
-         The description occupies the top; metadata can occupy the bottom. */
+      gap: 8px !important;
+      /* Exactly one owner for intercomponent spacing: this stack. */
       box-sizing: border-box !important;
-      height: var(--lab3-hero-height, var(--lab3-art-height)) !important;
-      padding: var(--lab3-left-offset, 0px) 0 0 !important;
+      height: var(--lab3-row-height, var(--lab3-art-height)) !important;
+      padding: 0 !important;
       margin: 0 !important;
+      justify-content: flex-start !important;
+    }
+    /* Every child's physical bottom is validated; no flex shrink or distributed gaps. */
+    article.lab3-active.lab3-distribute-left .yofi-species-hero > .lab3-left-extra {
       justify-content: space-between !important;
     }
-    article.lab3-stage1 .yofi-species-hero > .lab3-left-extra {
-      /* A compact metadata stack anchored to the BOTTOM of the image-height row.
-         Native gender and egg each occupy the ENTIRE left column width. */
-      padding-top: 0 !important;
-      justify-content: flex-end !important;
-    }
-    /* Vital tiles stay top anchored by the shared .lab3-right rule, never
-       pushed down solely to align with the image or another column. */
-    /* The left block may contain scores, biology, or both. Neither is
-       obligated to bottom-align independently of the artwork. */
-    article.lab3-scores .yofi-species-hero > .lab3-left-extra {
+    article.lab3-active.lab3-distribute-right .yofi-species-hero > .lab3-right {
       justify-content: space-between !important;
+    }
+    article.lab3-active .yofi-species-hero > .lab3-left-extra > *,
+    article.lab3-active .yofi-species-hero > .lab3-right > * {
+      flex-shrink: 0 !important;
+      min-height: max-content;
     }
     /* Biology placement is selected with scores, artwork and column slack:
        inline/stacked left, stacked right, or one native bar on each side. */
     article.lab3-active .lab3-biologies.lab3-bio-inline {
-      flex-direction: row !important;
-      height: var(--lab3-bio-height, 46px);
-      align-items: stretch;
+      display: grid !important;
+      grid-template-columns: var(--lab3-bio-gender-width) var(--lab3-bio-egg-width) !important;
+      width: var(--lab3-bio-total-width) !important;
+      height: var(--lab3-bio-height) !important;
+      align-items: stretch !important;
+      gap: var(--lab3-tile-gap) !important;
     }
     article.lab3-active .lab3-biologies.lab3-bio-inline > .lab3-biology {
-      flex: 1 1 50% !important;
-      width: 0;
-      height: var(--lab3-bio-height, 46px) !important;
-      min-height: var(--lab3-bio-height, 46px) !important;
+      width: 100% !important;
+      height: var(--lab3-bio-height) !important;
+      min-height: var(--lab3-bio-height) !important;
     }
     /* Inline and stacked biology share the SAME scalable icon/text system.
        No compact-specific downscaling can make a truncated inline Egg valid. */
     article.lab3-active .lab3-biologies.lab3-bio-inline .lab3-copy-facts {
       font-size: var(--yofi-hero-facts-font, .75rem) !important;
     }
-    article.lab3-stage3 .yofi-species-hero > .lab3-right > section.abilities {
-      width: 100%;
-      /* Optical adjustment: the native ability line-box reserves descender
-         space, making its last visible line end slightly before the Egg tile. */
-      padding-top: 5px !important;
-    }
+
     article.lab3-active .yofi-species-hero > .lab3-right {
       grid-column: 3 !important; grid-row: 1 !important;
       align-self: start; justify-self: stretch;
       display: flex; flex-direction: column;
       width: var(--lab3-side-width) !important;
-      height: var(--lab3-hero-height, var(--lab3-art-height)) !important;
+      height: var(--lab3-row-height, var(--lab3-art-height)) !important;
       box-sizing: border-box !important;
       min-width: 0; max-width: none;
       gap: var(--lab3-tile-gap);
@@ -2204,9 +2132,10 @@ article.yofi-scores-layout section.moves > dl + dl {
       overflow: hidden !important; pointer-events: none !important;
       margin: 0 !important; padding: 0 !important;
     }
-    /* Breathing room between the final hero tile and Speed/Skills/Types.
-       Preserve the native lower stats organization and headings. */
-    article.lab3-active section.stats { margin-top: 14px !important; }
+    /* One owner for the separation BELOW the entire hero. No hero child
+       carries trailing space into Speed/Senses/Skills/Effectiveness. */
+    article.lab3-active .yofi-species-hero { margin-bottom: 14px !important; }
+    article.lab3-active section.stats { margin-top: 0 !important; }
     article.lab3-active section.stats > .yofi-scores-banner { margin-top: .65em !important; }
     article.lab3-scores section.stats > .yofi-scores-banner { display: none !important; }
     /* The underlying stats below the hero (Speed/Senses/Skills/Type) stay intact. */
@@ -2270,7 +2199,7 @@ article.yofi-scores-layout section.moves > dl + dl {
       white-space: nowrap; font-variant-numeric: tabular-nums;
       font-size: inherit;
     }
-    .lab3-biologies { display: flex; flex-direction: column; gap: var(--lab3-tile-gap); min-width: 0; width:100%; }
+    .lab3-biologies { display:flex; flex-direction:column; gap:var(--lab3-tile-gap); min-width:0; width:var(--lab3-bio-total-width); max-width:var(--lab3-bio-total-width); margin:0!important; }
     /* No stage-dependent biology sizing: the chosen bar height is shared by
        the measurement path and the final inline, stacked, or split bars. */
     article.lab3-active .lab3-biologies:not(.lab3-bio-inline) > .lab3-biology {
@@ -2282,9 +2211,21 @@ article.yofi-scores-layout section.moves > dl + dl {
       min-height: var(--lab3-bio-height, 50px);
       width: 100%; min-width: 0;
       overflow: hidden;
-      border-radius: 13px;
+      border-radius: clamp(4px, calc(var(--lab3-bio-height, 22px) * .22), 8px);
       background: rgba(255,255,255,.49);
       padding: 0 9px;
+    }
+    /* One resolved physical height for BOTH biology bars, in every host.
+       Split Egg lives directly in .lab3-right, outside .lab3-biologies,
+       so the old group-only no-shrink rule was insufficient. */
+    article.lab3-active .yofi-species-hero .lab3-biology {
+      max-width:var(--lab3-bio-bar-max, 212px) !important;
+      box-sizing: border-box !important;
+      height: var(--lab3-bio-height, 50px) !important;
+      min-height: var(--lab3-bio-height, 50px) !important;
+      max-height: var(--lab3-bio-height, 50px) !important;
+      flex-grow: 0 !important;
+      flex-shrink: 0 !important;
     }
     .lab3-biology.lab3-gender { padding: 0 !important; background: transparent !important; }
     /* The promoted bar alone is a width-query container. Keep native SVG
@@ -2295,7 +2236,7 @@ article.yofi-scores-layout section.moves > dl + dl {
       container-type: inline-size;
     }
     article.lab3-active .yofi-species-hero .lab3-gender .gender-ratio-display {
-      font-size: clamp(13px, min(6.2cqi, calc(var(--lab3-bio-height, 50px) * .42)), 18px) !important;
+      font-size: clamp(12px, min(6.2cqi, calc(var(--lab3-bio-height, 22px) * .46)), 18px) !important;
     }
     /* Mirror the COMPLETE native gender node under the original .yofi-hero-facts
        ancestor. Do not rewrite its native segments, ratio, slots, glyphs or colors.
@@ -2321,12 +2262,11 @@ article.yofi-scores-layout section.moves > dl + dl {
       display: inline-flex !important;
       width: 100% !important; max-width: 100% !important;
       height: 100% !important; min-height: 100% !important;
-      border-radius: 13px !important;
+      border-radius: clamp(4px, calc(var(--lab3-bio-height, 22px) * .22), 8px) !important;
       overflow: hidden !important;
     }
-    /* QOL's SHORT facts-mode switches segment flex to 1 1 var(--percent)
-       and min-width:max-content. That is only intended for its compact original
-       bar; the enlarged copy must preserve the fixed original proportions. */
+    /* Keep the actual gender-segment probability proportions in every
+       placement. The compact short-mode fork has been retired. */
     article.lab3-active .yofi-species-hero .lab3-gender .yofi-hero-gender
       .gender-ratio-display > .bar.yofi-gender-segment {
       flex: 0 0 var(--percent) !important;
@@ -2350,23 +2290,24 @@ article.yofi-scores-layout section.moves > dl + dl {
        same bar width; narrow, overfull modes are rejected by eggFit(). */
     .lab3-egg .yofi-hero-field-egg {
       display: grid !important;
-      font-size: clamp(13px, 6.2cqi, 18px) !important;
-      grid-template-columns: 1.4em minmax(0, 1fr) !important;
-      column-gap: .42em !important;
+      font-size: clamp(12px, min(6.2cqi, calc(var(--lab3-bio-height, 22px) * .46)), 18px) !important;
+      grid-template-columns: 1.12em minmax(0, 1fr) !important;
+      column-gap: .30em !important;
       width: 100%; min-width: 0 !important;
       align-items: center !important; margin: 0 !important;
       padding: 0 !important;
     }
     .lab3-egg .yofi-hero-field-egg > .lab3-egg-icon {
-      width: 1.4em !important; height: 1.4em !important;
+      width: 1.12em !important; height: 1.12em !important;
     }
     .lab3-egg .yofi-hero-egg-value {
       display: block !important; min-width: 0 !important;
       margin: 0 !important;
       overflow-wrap: normal !important; word-break: normal !important;
       white-space: nowrap !important;
-      font-size: inherit !important;
-      line-height: 1.16 !important;
+      font-size: .9em !important;
+      font-weight: 400 !important;
+      line-height: 1.0 !important;
       text-align: center !important; text-transform: capitalize !important;
     }
     article.lab3-stage3 .yofi-species-hero > .lab3-right > section.abilities,
@@ -2409,17 +2350,11 @@ article.yofi-scores-layout section.moves > dl + dl {
       inset:0 0 0 -4em !important;
       transform-origin:right top !important;
     }
-    article.lab3-stage3 .lab3-right > section.abilities > :not(h2),
-    article .yofi-species-hero section.abilities.lab3-measure-abilities > :not(h2) {
-      margin:0 !important;padding-inline:0 !important;
-    }
-    article.lab3-stage3 .lab3-right > section.abilities > :not(h2) + :not(h2),
-    article .yofi-species-hero section.abilities.lab3-measure-abilities > :not(h2)+:not(h2) {
-      margin-top:.5em !important;
-    }
+    /* The same native inline Hidden + Ability flow is used when the entire
+       section is promoted. No separate first-line or badge spacing rules. */
     /* Keep the actual QOL definition list and all DT/DD children. Arrange it
        as two three-score bands by placement only; no new score tags exist. */
-    article.lab3-scores .yofi-species-hero > .lab3-left-extra > dl.yofi-scores-strip {
+    article.lab3-scores .yofi-species-hero > :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip {
       display: grid !important;
       position: relative !important;
       isolation: isolate !important;
@@ -2433,9 +2368,9 @@ article.yofi-scores-layout section.moves > dl + dl {
       min-height: calc(2*var(--lab3-score-row-height,58px) + var(--lab3-tile-gap,8px)) !important;
       margin: 0 !important; padding: 0 !important;
       justify-self: stretch !important;
-      align-self: end !important;
+      align-self: start !important;
       text-align: center !important;
-      font-size: clamp(13px,4.8cqi,19px) !important;
+      font-size: var(--lab3-score-font-size, clamp(13px,4.8cqi,19px)) !important;
       line-height: 1.2 !important;
       color:var(--skin-bg-text) !important;
       background: linear-gradient(to bottom,
@@ -2446,7 +2381,7 @@ article.yofi-scores-layout section.moves > dl + dl {
         var(--lab3-score-bg,var(--skin-bg,#71A9D5)) calc(var(--lab3-score-row-height,58px) + var(--lab3-tile-gap,8px)),
         var(--lab3-score-bg,var(--skin-bg,#71A9D5)) 100%) !important;
     }
-    article.lab3-scores .lab3-left-extra > dl.yofi-scores-strip > :is(dt,dd) {
+    article.lab3-scores :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :is(dt,dd) {
       display: block !important;
       position:relative !important;z-index:1 !important;
       grid-area: auto !important;
@@ -2459,39 +2394,199 @@ article.yofi-scores-layout section.moves > dl + dl {
       color:var(--skin-bg-text) !important;
       background:none !important;
     }
-    article.lab3-scores .lab3-left-extra > dl.yofi-scores-strip > dt {
+    article.lab3-scores :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > dt {
       font-weight:700 !important; text-transform:uppercase !important;
       text-decoration:underline dotted;
       text-underline-offset:.12em;
     }
-    article.lab3-scores .lab3-left-extra > dl.yofi-scores-strip > :nth-child(1) {grid-row:1 !important;grid-column:1 !important;}
-    article.lab3-scores .lab3-left-extra > dl.yofi-scores-strip > :nth-child(2) {grid-row:2 !important;grid-column:1 !important;}
-    article.lab3-scores .lab3-left-extra > dl.yofi-scores-strip > :nth-child(3) {grid-row:1 !important;grid-column:2 !important;}
-    article.lab3-scores .lab3-left-extra > dl.yofi-scores-strip > :nth-child(4) {grid-row:2 !important;grid-column:2 !important;}
-    article.lab3-scores .lab3-left-extra > dl.yofi-scores-strip > :nth-child(5) {grid-row:1 !important;grid-column:3 !important;}
-    article.lab3-scores .lab3-left-extra > dl.yofi-scores-strip > :nth-child(6) {grid-row:2 !important;grid-column:3 !important;}
-    article.lab3-scores .lab3-left-extra > dl.yofi-scores-strip > :nth-child(7) {grid-row:4 !important;grid-column:1 !important;}
-    article.lab3-scores .lab3-left-extra > dl.yofi-scores-strip > :nth-child(8) {grid-row:5 !important;grid-column:1 !important;}
-    article.lab3-scores .lab3-left-extra > dl.yofi-scores-strip > :nth-child(9) {grid-row:4 !important;grid-column:2 !important;}
-    article.lab3-scores .lab3-left-extra > dl.yofi-scores-strip > :nth-child(10){grid-row:5 !important;grid-column:2 !important;}
-    article.lab3-scores .lab3-left-extra > dl.yofi-scores-strip > :nth-child(11){grid-row:4 !important;grid-column:3 !important;}
-    article.lab3-scores .lab3-left-extra > dl.yofi-scores-strip > :nth-child(12){grid-row:5 !important;grid-column:3 !important;}
+    article.lab3-scores :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(1) {grid-row:1 !important;grid-column:1 !important;}
+    article.lab3-scores :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(2) {grid-row:2 !important;grid-column:1 !important;}
+    article.lab3-scores :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(3) {grid-row:1 !important;grid-column:2 !important;}
+    article.lab3-scores :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(4) {grid-row:2 !important;grid-column:2 !important;}
+    article.lab3-scores :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(5) {grid-row:1 !important;grid-column:3 !important;}
+    article.lab3-scores :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(6) {grid-row:2 !important;grid-column:3 !important;}
+    article.lab3-scores :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(7) {grid-row:4 !important;grid-column:1 !important;}
+    article.lab3-scores :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(8) {grid-row:5 !important;grid-column:1 !important;}
+    article.lab3-scores :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(9) {grid-row:4 !important;grid-column:2 !important;}
+    article.lab3-scores :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(10){grid-row:5 !important;grid-column:2 !important;}
+    article.lab3-scores :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(11){grid-row:4 !important;grid-column:3 !important;}
+    article.lab3-scores :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(12){grid-row:5 !important;grid-column:3 !important;}
+
+    /* One-row scores reuse the SAME six DT/DD pairs as the native strip.
+       This is an intrinsic measured geometry, not a species exception. */
+    article.lab3-scores.lab3-score-single .yofi-species-hero > :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip {
+      grid-template-columns: repeat(6,minmax(0,1fr)) !important;
+      grid-template-rows: repeat(2,calc(var(--lab3-score-row-height,58px)/2)) !important;
+      min-height: var(--lab3-score-row-height,58px) !important;
+      background: var(--lab3-score-bg,var(--skin-bg,#71A9D5)) !important;
+    }
+    article.lab3-scores.lab3-score-single :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(1) { grid-row:1 !important;grid-column:1 !important;}
+    article.lab3-scores.lab3-score-single :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(2) { grid-row:2 !important;grid-column:1 !important;}
+    article.lab3-scores.lab3-score-single :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(3) { grid-row:1 !important;grid-column:2 !important;}
+    article.lab3-scores.lab3-score-single :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(4) { grid-row:2 !important;grid-column:2 !important;}
+    article.lab3-scores.lab3-score-single :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(5) { grid-row:1 !important;grid-column:3 !important;}
+    article.lab3-scores.lab3-score-single :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(6) { grid-row:2 !important;grid-column:3 !important;}
+    article.lab3-scores.lab3-score-single :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(7) { grid-row:1 !important;grid-column:4 !important;}
+    article.lab3-scores.lab3-score-single :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(8) { grid-row:2 !important;grid-column:4 !important;}
+    article.lab3-scores.lab3-score-single :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(9) { grid-row:1 !important;grid-column:5 !important;}
+    article.lab3-scores.lab3-score-single :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(10) { grid-row:2 !important;grid-column:5 !important;}
+    article.lab3-scores.lab3-score-single :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(11) { grid-row:1 !important;grid-column:6 !important;}
+    article.lab3-scores.lab3-score-single :is(.lab3-left-extra,.lab3-right) > dl.yofi-scores-strip > :nth-child(12) { grid-row:2 !important;grid-column:6 !important;}
+
+    /* The native-like and expanded arrangements move the SAME two complete
+       lab3-biology components; the root facts grid merely hosts them. */
+    article:not(.lab3-active) .yofi-species-hero {
+      --lab3-bio-height: var(--yofi-compact-bio-height, 22px);
+    }
+    article .yofi-species-hero .yofi-hero-facts:not(.lab3-copy-facts) > .lab3-biology {
+      box-sizing:border-box !important;
+      width:100% !important;
+      min-width:0 !important;
+      height:var(--lab3-bio-height) !important;
+      min-height:var(--lab3-bio-height) !important;
+      margin:0 !important;
+      align-self:stretch !important;
+    }
+    article .yofi-species-hero .lab3-biology.lab3-gender {
+      container-type:inline-size;
+    }
+    article .yofi-species-hero .lab3-biology > .lab3-copy-facts {
+      display:flex !important;
+      align-items:stretch !important;
+      justify-content:stretch !important;
+      box-sizing:border-box !important;
+      width:100% !important;
+      height:100% !important;
+      margin:0 !important;
+      padding:0 !important;
+    }
+    article .yofi-species-hero .lab3-biology .lab3-copy-facts > .yofi-hero-gender {
+      width:100% !important;
+      height:100% !important;
+      min-height:0 !important;
+      margin:0 !important;
+      padding:0 !important;
+      display:flex !important;
+      align-items:stretch !important;
+    }
+    article .yofi-species-hero .lab3-biology.lab3-gender .gender-ratio-display {
+      display:flex !important;
+      width:100% !important;
+      max-width:none !important;
+      height:100% !important;
+      min-height:0 !important;
+      font-size:clamp(12px, min(6.2cqi, calc(var(--lab3-bio-height) * .46)), 18px) !important;
+      border-radius:clamp(4px, calc(var(--lab3-bio-height, 22px) * .22), 8px) !important;
+      box-sizing:border-box !important;
+    }
+    /* Readable 1:1 proportions must remain fixed in both hosts. */
+    article .yofi-species-hero .lab3-gender .gender-ratio-display > .bar.yofi-gender-segment {
+      flex:0 0 var(--percent) !important;
+      min-width:0 !important;
+      padding:0 !important;
+    }
   `;
 
   const SUBJECT_BOUNDS_CSS = `
+    article.lab3-scores.lab3-flow-score .yofi-species-hero > .yofi-hero-flow > dl.yofi-scores-strip {
+      display: grid !important;
+      position: relative !important;
+      isolation: isolate !important;
+      grid-template-columns: repeat(3,minmax(0,1fr)) !important;
+      grid-template-rows: repeat(2,calc(var(--lab3-score-row-height,58px)/2))
+        var(--lab3-tile-gap,8px) repeat(2,calc(var(--lab3-score-row-height,58px)/2)) !important;
+      grid-auto-flow: row !important;
+      column-gap: 0 !important;
+      row-gap: 0 !important;
+      width: 100% !important; max-width:none !important;
+      min-height: calc(2*var(--lab3-score-row-height,58px) + var(--lab3-tile-gap,8px)) !important;
+      margin: 0 !important; padding: 0 !important;
+      justify-self: stretch !important;
+      align-self: start !important;
+      text-align: center !important;
+      font-size: var(--lab3-score-font-size, clamp(13px,4.8cqi,19px)) !important;
+      line-height: 1.2 !important;
+      color:var(--skin-bg-text) !important;
+      background: linear-gradient(to bottom,
+        var(--lab3-score-bg,var(--skin-bg,#71A9D5)) 0,
+        var(--lab3-score-bg,var(--skin-bg,#71A9D5)) var(--lab3-score-row-height,58px),
+        transparent var(--lab3-score-row-height,58px),
+        transparent calc(var(--lab3-score-row-height,58px) + var(--lab3-tile-gap,8px)),
+        var(--lab3-score-bg,var(--skin-bg,#71A9D5)) calc(var(--lab3-score-row-height,58px) + var(--lab3-tile-gap,8px)),
+        var(--lab3-score-bg,var(--skin-bg,#71A9D5)) 100%) !important;
+    }
+    article.lab3-scores.lab3-flow-score .yofi-hero-flow > dl.yofi-scores-strip > :is(dt,dd) {
+      display: block !important;
+      position:relative !important;z-index:1 !important;
+      grid-area: auto !important;
+      min-width:0; margin:0 !important; padding:0 !important;
+      width: 100%; align-self:center !important;
+      font-size:inherit !important;
+      line-height: 1.15 !important;
+      white-space:nowrap !important;
+      text-align:center !important;
+      color:var(--skin-bg-text) !important;
+      background:none !important;
+    }
+    article.lab3-scores.lab3-flow-score .yofi-hero-flow > dl.yofi-scores-strip > dt {
+      font-weight:700 !important; text-transform:uppercase !important;
+      text-decoration:underline dotted;
+      text-underline-offset:.12em;
+    }
+    article.lab3-scores.lab3-flow-score .yofi-hero-flow > dl.yofi-scores-strip > :nth-child(1) {grid-row:1 !important;grid-column:1 !important;}
+    article.lab3-scores.lab3-flow-score .yofi-hero-flow > dl.yofi-scores-strip > :nth-child(2) {grid-row:2 !important;grid-column:1 !important;}
+    article.lab3-scores.lab3-flow-score .yofi-hero-flow > dl.yofi-scores-strip > :nth-child(3) {grid-row:1 !important;grid-column:2 !important;}
+    article.lab3-scores.lab3-flow-score .yofi-hero-flow > dl.yofi-scores-strip > :nth-child(4) {grid-row:2 !important;grid-column:2 !important;}
+    article.lab3-scores.lab3-flow-score .yofi-hero-flow > dl.yofi-scores-strip > :nth-child(5) {grid-row:1 !important;grid-column:3 !important;}
+    article.lab3-scores.lab3-flow-score .yofi-hero-flow > dl.yofi-scores-strip > :nth-child(6) {grid-row:2 !important;grid-column:3 !important;}
+    article.lab3-scores.lab3-flow-score .yofi-hero-flow > dl.yofi-scores-strip > :nth-child(7) {grid-row:4 !important;grid-column:1 !important;}
+    article.lab3-scores.lab3-flow-score .yofi-hero-flow > dl.yofi-scores-strip > :nth-child(8) {grid-row:5 !important;grid-column:1 !important;}
+    article.lab3-scores.lab3-flow-score .yofi-hero-flow > dl.yofi-scores-strip > :nth-child(9) {grid-row:4 !important;grid-column:2 !important;}
+    article.lab3-scores.lab3-flow-score .yofi-hero-flow > dl.yofi-scores-strip > :nth-child(10){grid-row:5 !important;grid-column:2 !important;}
+    article.lab3-scores.lab3-flow-score .yofi-hero-flow > dl.yofi-scores-strip > :nth-child(11){grid-row:4 !important;grid-column:3 !important;}
+    article.lab3-scores.lab3-flow-score .yofi-hero-flow > dl.yofi-scores-strip > :nth-child(12){grid-row:5 !important;grid-column:3 !important;}
+
+    /* The native right float can optionally exclude its opaque contour,
+       rather than its rectangular lane. The art remains top-aligned and
+       the sparkle button keeps its own position and collision checks. */
+    article.lab3-active.lab3-flow.lab3-contour-flow
+      .yofi-hero-flow > section.info.yofi-hero-art-lane {
+      shape-outside: var(--lab3-contour-shape, none) !important;
+      -webkit-shape-outside: var(--lab3-contour-shape, none) !important;
+      shape-margin: 0 !important;
+    }
     /* Place the *full, unchanged source image* so its visible alpha
        bounds occupy the candidate's image box in compact and expanded cards.
+       These selectors must tie or outrank the !important lab3 image sizes
+       above. A weaker selector makes the full-canvas crop run on the already
+       subject-sized image, shrinking the artwork a second time.
        No contour collision yet. */
-    article.yofi-subject-bounds-active .yofi-hero-art-lane .square-image > figure {
+    /* The figure itself IS the visible subject frame. QoL already anchors
+       its draggable button at the four figure corners, so do not style or
+       move that button from Species Card. The bounding frame may grow by
+       one icon width per side only when every corner intersects the subject. */
+    article.yofi-subject-bounds-active .yofi-species-hero .yofi-hero-art-lane .square-image > figure {
       position:relative!important;
       box-sizing:border-box!important;
       display:block!important;
-      padding:var(--yofi-subject-art-height) 0 0!important;
-      min-height:var(--yofi-subject-art-height)!important;
-      height:auto!important;
+      width:var(--bbox-subject-width)!important;
+      max-width:none!important;
+      height:var(--bbox-subject-height)!important;
+      min-height:var(--bbox-subject-height)!important;
+      padding:0!important;
+      margin:var(--bbox-figure-y) 0 0 var(--bbox-figure-x)!important;
       overflow:visible!important;
     }
-    article.yofi-subject-bounds-active .yofi-hero-art-lane .square-image img-zoom {
+    article.yofi-subject-bounds-active .yofi-species-hero .yofi-hero-art-lane .square-image {
+      overflow:visible!important;
+    }
+    article.yofi-subject-bounds-active .yofi-species-hero .yofi-hero-art-lane figcaption {
+      position:absolute!important;
+      top:calc(100% + 4px)!important;
+      left:0!important;
+      width:100%!important;
+    }
+    article.yofi-subject-bounds-active .yofi-species-hero .yofi-hero-art-lane .square-image img-zoom {
       position:absolute!important;
       top:var(--bbox-canvas-y)!important;
       left:var(--bbox-canvas-x)!important;
@@ -2504,11 +2599,286 @@ article.yofi-scores-layout section.moves > dl + dl {
       aspect-ratio:auto!important;
       clip-path:inset(var(--bbox-clip-top) var(--bbox-clip-right) var(--bbox-clip-bottom) var(--bbox-clip-left));
     }
-    article.yofi-subject-bounds-active .yofi-hero-art-lane .square-image img-zoom > img {
+    article.yofi-subject-bounds-active .yofi-species-hero .yofi-hero-art-lane .square-image img-zoom > img {
       width:100%!important;height:100%!important;
       max-width:none!important;max-height:none!important;
       aspect-ratio:auto!important;object-fit:fill!important;
+      -webkit-user-drag:none!important;user-select:none!important;
       margin:0!important;padding:0!important;
+    }
+    /* Working diagnostic: subject rectangle, not the expanded icon frame. */
+    article.yofi-subject-bounds-active.yofi-subject-outline-debug
+      .yofi-species-hero .yofi-hero-art-lane .square-image > figure::after {
+      content:'' !important;
+      position:absolute !important;
+      z-index:45 !important;
+      pointer-events:none !important;
+      box-sizing:border-box !important;
+      left:var(--bbox-subject-offset-x) !important;
+      top:var(--bbox-subject-offset-y) !important;
+      width:var(--lab3-art-width) !important;
+      height:var(--lab3-art-height) !important;
+      border:1px solid #f00 !important;
+      background:transparent !important;
+    }
+    /* Clip the image itself, never its containing figure: the QoL drag
+       control must remain visible at any of the four bounding-box corners. */
+    article.yofi-subject-bounds-active .yofi-species-hero
+      .yofi-hero-art-lane .square-image > figure {
+      overflow: visible !important;
+    }
+    /* Keep the full source PNG inside its visible subject frame instead of
+       leaving a clipped but scrollable full-canvas box outside the card.
+       The figure and its separate QoL sparkle control remain untouched. */
+    article.yofi-subject-bounds-active .yofi-species-hero .yofi-hero-art-lane .square-image img-zoom {
+      top:0!important;left:0!important;
+      width:var(--bbox-subject-width)!important;
+      height:var(--bbox-subject-height)!important;
+      max-width:none!important;max-height:none!important;
+      clip-path:none!important;
+      overflow:clip!important;
+    }
+    article.yofi-subject-bounds-active .yofi-species-hero .yofi-hero-art-lane .square-image img-zoom > img {
+      position:absolute!important;
+      top:var(--bbox-canvas-y)!important;
+      left:var(--bbox-canvas-x)!important;
+      width:var(--bbox-canvas-w)!important;
+      height:var(--bbox-canvas-h)!important;
+      max-width:none!important;max-height:none!important;
+      clip-path:inset(var(--bbox-clip-top) var(--bbox-clip-right) var(--bbox-clip-bottom) var(--bbox-clip-left))!important;
+    }
+    /* No Species Card icon positioning selectors. QoL's original four-corner
+       CSS, pointer handling and saved data-yofi-corner remain authoritative. */
+
+    article.lab3-active.lab3-flow .yofi-species-hero {
+      display: block !important;
+      grid-template-columns: none !important;
+      grid-template-rows: none !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      padding: 0 1em !important;
+      margin-bottom: 14px !important;
+    }
+    article.lab3-active.lab3-flow .yofi-species-hero > .yofi-hero-flow {
+      display: flow-root !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      height: auto !important;
+    }
+    article.lab3-active.lab3-flow .yofi-species-hero .yofi-hero-flow > section.info.yofi-hero-art-lane {
+      display: block !important;
+      float: right !important;
+      clear: none !important;
+      position: static !important;
+      width: var(--lab3-lane-width) !important;
+      margin: 0 0 0 var(--lab3-gap) !important;
+      padding: 0 !important;
+    }
+    article.lab3-active.lab3-flow .yofi-species-hero .yofi-hero-copy {
+      display: block !important;
+      float: none !important;
+      width: auto !important;
+      min-width: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow-wrap: anywhere;
+    }
+    article.lab3-active.lab3-flow .yofi-species-hero > :is(.lab3-left-extra,.lab3-right) {
+      display: none !important;
+    }
+    /* Compact flow may host both native bars as a real-height stack next
+       to the portrait, below the copy. No duplicate biology DOM is created. */
+    article.lab3-active.lab3-flow.lab3-bio-flow-stack .yofi-species-hero .yofi-hero-flow > .lab3-biologies {
+      display: flex !important;
+      flex-direction: column !important;
+      width: var(--lab3-bio-total-width) !important;
+      max-width: var(--lab3-bio-total-width) !important;
+      height: calc(2*var(--lab3-bio-height) + var(--lab3-tile-gap)) !important;
+      gap: var(--lab3-tile-gap) !important;
+      margin: var(--lab3-tile-gap) 0 0 !important;
+      padding: 0 !important;
+      clear: none !important;
+    }
+    article.lab3-active.lab3-flow.lab3-bio-flow-stack .yofi-hero-flow > .lab3-biologies > .lab3-biology {
+      width: 100% !important;
+      height: var(--lab3-bio-height) !important;
+    }
+    article.lab3-active.lab3-flow.lab3-flow-score.lab3-bio-flow-inline
+      .yofi-species-hero > .yofi-hero-flow {
+      grid-template-rows: max-content max-content max-content !important;
+    }
+    article.lab3-active.lab3-flow.lab3-flow-score.lab3-bio-flow-inline
+      .yofi-hero-flow > dl.yofi-scores-strip {
+      grid-column: 1 !important;
+      grid-row: 2 !important;
+      width: var(--lab3-copy-width) !important;
+      min-width: 0 !important;
+      margin: 0 !important;
+    }
+    article.lab3-active.lab3-flow.lab3-flow-score.lab3-bio-flow-inline
+      .yofi-hero-flow > .lab3-biologies {
+      grid-row: 3 !important;
+    }
+    article.lab3-active.lab3-flow.lab3-flow-score.lab3-bio-flow-inline
+      .yofi-hero-flow > section.info.yofi-hero-art-lane {
+      grid-row: 1 / 4 !important;
+    }
+    article.lab3-active.lab3-flow.lab3-bio-flow-inline
+      .yofi-species-hero > .yofi-hero-flow {
+      display: grid !important;
+      grid-template-columns: var(--lab3-copy-width) minmax(0, var(--lab3-lane-width)) !important;
+      grid-template-rows: max-content max-content !important;
+      column-gap: var(--lab3-gap) !important;
+      row-gap: var(--lab3-tile-gap) !important;
+      width: 100% !important;
+      height: auto !important;
+      min-height: var(--lab3-row-height) !important;
+      min-width: 0 !important;
+      align-items: start !important;
+      align-content: start !important;
+    }
+    article.lab3-active.lab3-flow.lab3-bio-flow-inline
+      .yofi-hero-flow > .yofi-hero-copy {
+      float: none !important;
+      grid-column: 1 !important;
+      grid-row: 1 !important;
+      width: var(--lab3-copy-width) !important;
+      min-width: 0 !important;
+    }
+    article.lab3-active.lab3-flow.lab3-bio-flow-inline
+      .yofi-hero-flow > section.info.yofi-hero-art-lane {
+      float: none !important;
+      grid-column: 2 !important;
+      grid-row: 1 / 3 !important;
+      width: var(--lab3-lane-width) !important;
+      margin: 0 !important;
+    }
+    article.lab3-active.lab3-flow.lab3-bio-flow-inline
+      .yofi-hero-flow > .lab3-biologies {
+      grid-column: 1 !important;
+      grid-row: 2 !important;
+      margin: 0 !important;
+    }
+    /* Wide subjects and long descriptions: house a compact native biology
+       stack directly BELOW the artwork track, without a wasted card-wide
+       biology row. The description remains beside the art. */
+    article.lab3-active.lab3-flow.lab3-bio-flow-right-stack
+      .yofi-species-hero > .yofi-hero-flow {
+      display: grid !important;
+      grid-template-columns: var(--lab3-copy-width) minmax(0, var(--lab3-lane-width)) !important;
+      grid-template-rows: max-content max-content !important;
+      column-gap: var(--lab3-gap) !important;
+      row-gap: var(--lab3-tile-gap) !important;
+      width: 100% !important;
+      height: auto !important;
+      min-height: var(--lab3-row-height) !important;
+      min-width: 0 !important;
+      align-content: start !important;
+    }
+    article.lab3-active.lab3-flow.lab3-bio-flow-right-stack
+      .yofi-hero-flow > .yofi-hero-copy {
+      grid-column: 1 !important;
+      grid-row: 1 / 3 !important;
+      float: none !important;
+      width: var(--lab3-copy-width) !important;
+      min-width: 0 !important;
+    }
+    article.lab3-active.lab3-flow.lab3-bio-flow-right-stack
+      .yofi-hero-flow > section.info.yofi-hero-art-lane {
+      grid-column: 2 !important;
+      grid-row: 1 !important;
+      float: none !important;
+      width: var(--lab3-lane-width) !important;
+      min-height: calc(var(--lab3-art-height) + var(--lab3-art-top-gap, 8px)) !important;
+      margin: 0 !important;
+    }
+    article.lab3-active.lab3-flow.lab3-bio-flow-right-stack
+      .yofi-hero-flow > .lab3-biologies {
+      display: flex !important;
+      flex-direction: column !important;
+      grid-column: 2 !important;
+      grid-row: 2 !important;
+      width: var(--lab3-bio-total-width) !important;
+      max-width: var(--lab3-bio-total-width) !important;
+      height: calc(2 * var(--lab3-bio-height) + var(--lab3-tile-gap)) !important;
+      gap: var(--lab3-tile-gap) !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    article.lab3-active.lab3-flow.lab3-bio-flow-right-stack
+      .yofi-hero-flow > .lab3-biologies > .lab3-biology {
+      width: 100% !important;
+      height: var(--lab3-bio-height) !important;
+    }
+    /* Compact Scores + stacked biology in the shorter COPY column.
+       It is a grid composition, not contour text flow; source nodes remain
+       unchanged and the subject stays in its separate right lane. */
+    article.lab3-active.lab3-flow.lab3-flow-score.lab3-bio-flow-stack
+      .yofi-species-hero > .yofi-hero-flow {
+      display:grid !important;
+      grid-template-columns:var(--lab3-copy-width) minmax(0,var(--lab3-lane-width)) !important;
+      grid-template-rows:max-content max-content max-content !important;
+      column-gap:var(--lab3-gap) !important;
+      row-gap:var(--lab3-tile-gap) !important;
+      align-content:start !important;
+      align-items:start !important;
+      min-height:var(--lab3-row-height) !important;
+    }
+    article.lab3-active.lab3-flow.lab3-flow-score.lab3-bio-flow-stack
+      .yofi-hero-flow > .yofi-hero-copy {
+      grid-column:1 !important;grid-row:1 !important;
+      float:none !important;width:var(--lab3-copy-width) !important;
+    }
+    article.lab3-active.lab3-flow.lab3-flow-score.lab3-bio-flow-stack
+      .yofi-hero-flow > dl.yofi-scores-strip {
+      grid-column:1 !important;grid-row:2 !important;
+      width:var(--lab3-copy-width) !important;
+    }
+    article.lab3-active.lab3-flow.lab3-flow-score.lab3-bio-flow-stack
+      .yofi-hero-flow > .lab3-biologies {
+      grid-column:1 !important;grid-row:3 !important;
+      margin:0 !important;
+    }
+    article.lab3-active.lab3-flow.lab3-flow-score.lab3-bio-flow-stack
+      .yofi-hero-flow > section.info.yofi-hero-art-lane {
+      float:none !important;grid-column:2 !important;
+      grid-row:1 / 4 !important;width:var(--lab3-lane-width) !important;
+      margin:0 !important;
+    }
+    /* Narrow layout: when real Egg ink fits, the two short biology bars
+       share a single row immediately BELOW the description, next to artwork.
+       The native elements are moved, not recreated. */
+    article.lab3-active.lab3-flow.lab3-bio-flow-inline
+      .yofi-species-hero .yofi-hero-flow > .lab3-biologies {
+      display: grid !important;
+      grid-template-columns: var(--lab3-bio-gender-width) var(--lab3-bio-egg-width) !important;
+      width: var(--lab3-bio-total-width) !important;
+      max-width: var(--lab3-bio-total-width) !important;
+      height: var(--lab3-bio-height) !important;
+      gap: var(--lab3-tile-gap) !important;
+      margin: var(--lab3-tile-gap) 0 0 !important;
+      padding: 0 !important;
+      clear: none !important;
+    }
+    article.lab3-active.lab3-flow.lab3-bio-flow-inline
+      .yofi-hero-flow > .lab3-biologies > .lab3-biology {
+      height: var(--lab3-bio-height) !important;
+      width: 100% !important;
+    }
+    article.lab3-active.lab3-flow .yofi-species-hero > .lab3-biologies {
+      display: grid !important;
+      grid-template-columns: var(--lab3-bio-gender-width) var(--lab3-bio-egg-width) !important;
+      align-items: stretch !important;
+      column-gap: var(--lab3-tile-gap) !important;
+      width: var(--lab3-bio-total-width) !important;
+      height: var(--lab3-bio-height) !important;
+      margin: var(--lab3-tile-gap) 0 0 !important;
+      padding: 0 !important;
+    }
+    article.lab3-active.lab3-flow .yofi-species-hero > .lab3-biologies > .lab3-biology {
+      width: 100% !important;
+      height: var(--lab3-bio-height) !important;
+      min-height: var(--lab3-bio-height) !important;
     }
   `;
 
@@ -2647,26 +3017,112 @@ article.yofi-scores-layout section.moves > dl + dl {
      and artwork occupancy; the original nodes and styles remain authoritative. */
   const TILE_GAP = 8;
   const SCORE_ROW = 58;
+  const MIN_SCORE_ROW = 40;
   const MIN_TILE = 82;
   const MAX_TILE = 112;
+  // Preserve the 2x2 Vitals comparison as a preference for wide heroes,
+  // not as a 172px minimum imposed on every compact subject.
+  const ALIGN_TOLERANCE = 3;
+  const MAX_SCORE_ROW = 68;
   const ART_WIDTH_PROGRESS = Object.freeze({
     ceiling: 435, shrinkTolerance: .045
   });
-  // Preferred heights are panel-relative guides; content can exceed the soft
-  // band, but a tall, narrow subject must not dictate the entire document.
-  function artLimits(panelHeight, available, ratio) {
-    const usable = Math.max(360,panelHeight || 750);
-    const min = Math.max(112,Math.min(182,usable*.215,available*.45/Math.max(ratio,.65)));
-    const preferred = Math.max(min,Math.min(340,usable*.35));
-    const max = Math.max(min,Math.min(465,usable*.48,ART_WIDTH_PROGRESS.ceiling/ratio));
-    return {min:Math.min(min,max),preferred:Math.min(preferred,max),max};
+  // Exterior alpha-contour enclosure within the existing subject bounding box.
+  // All 1,139 native NORMAL main.png images. Threshold alpha>=90/255;
+  // external contours are filled, including holes, without bridging gaps.
+  // Computed offline only; no canvas sampling or per-navigation pixel work.
+  const SUBJECT_CONTOUR_COVERAGE_10000 = Object.freeze({"abomasnow":6050,"abra":4562,"absol":4305,"accelgor":4101,"aegislash":4401,"aerodactyl":3202,"aggron":6268,"aipom":3839,"alakazam":4239,"alcremie":6556,"alolan-diglett":5777,"alolan-dugtrio":6499,"alolan-exeggutor":2467,"alolan-geodude":5720,"alolan-golem":6694,"alolan-graveler":4542,"alolan-grimer":5138,"alolan-marowak":4313,"alolan-meowth":4686,"alolan-muk":5319,"alolan-ninetales":4399,"alolan-persian":4469,"alolan-raichu":5045,"alolan-raticate":5520,"alolan-rattata":4417,"alolan-sandshrew":5770,"alolan-sandslash":4770,"alolan-vulpix":5666,"alomomola":5879,"altaria":4647,"amaura":3551,"ambipom":3840,"amoonguss":6648,"ampharos":3665,"annihilape":4629,"anorith":4170,"appletun":5918,"applin":6202,"araquanid":5109,"arbok":6112,"arboliva":2818,"arcanine":5835,"arcanine-hisui":5594,"arceus":3283,"archaludon":5335,"archen":4367,"archeops":4153,"arctibax":4548,"arctovish":6075,"arctozolt":4497,"ariados":4080,"armaldo":4696,"armarouge":4909,"aromatisse":6504,"aron":6740,"arrokuda":3625,"articuno":4456,"articuno-galar":3899,"audino":6090,"aurorus":4521,"avalugg":5891,"avalugg-hisui":6230,"axew":4486,"azelf":5377,"azumarill":4645,"azurill":6085,"bagon":5525,"baltoy":4114,"banette":4579,"barbaracle":3526,"barboach":4325,"barraskewda":3877,"basculegion-f":4478,"basculegion-m":4665,"basculin":3908,"basculin-blue-striped":5272,"basculin-white-striped":5472,"bastiodon":6037,"baxcalibur":4908,"bayleef":4377,"beartic":4519,"beautifly":4560,"beedrill":4273,"beheeyem":5008,"beldum":6450,"bellibolt":7081,"bellossom":5789,"bellsprout":3632,"bergmite":5294,"bewear":5375,"bibarel":6284,"bidoof":6866,"binacle":4971,"bisharp":4958,"blacephalon":3171,"black-kyurem":4149,"blastoise":6436,"blaziken":4225,"blipbug":4751,"blissey":6474,"blitzle":4510,"boldore":5587,"boltund":3312,"bombirdier":3046,"bonsly":5115,"bouffalant":5239,"bounsweet":5535,"braixen":4527,"brambleghast":5812,"bramblin":5191,"braviary":4227,"braviary-hisui":3841,"breloom":4137,"brionne":5113,"bronzong":4215,"bronzor":6621,"brute-bonnet":7124,"bruxish":5014,"budew":6863,"buizel":3888,"bulbasaur":7157,"buneary":4985,"bunnelby":4382,"burmy":5583,"butterfree":6153,"buzzwole":4655,"cacnea":4975,"cacturne":3794,"calyrex":4644,"calyrex-ice":4653,"calyrex-shadow":4510,"camerupt":6553,"capsakid":6224,"carbink":5647,"carkol":6061,"carnivine":3923,"carracosta":6294,"carvanha":4324,"cascoon":3601,"castform":6042,"caterpie":5443,"celebi":4275,"celesteela":3815,"centiskorch":3482,"ceruledge":2726,"cetitan":4882,"cetoddle":4536,"chandelure":4039,"chansey":6473,"charcadet":4973,"charizard":5263,"charjabug":7585,"charmander":4755,"charmeleon":4255,"chatot":4348,"cherrim":6180,"cherubi":5855,"chesnaught":4255,"chespin":4832,"chewtle":5821,"chi-yu":3529,"chien-pao":4270,"chikorita":4253,"chimchar":5247,"chimecho":3796,"chinchou":3360,"chingling":4034,"cinccino":6560,"cinderace":3485,"clamperl":7793,"clauncher":4004,"clawitzer":3574,"claydol":6043,"clefable":6191,"clefairy":7247,"cleffa":6483,"clobbopus":6611,"clodsire":7559,"cloyster":5172,"coalossal":5522,"cobalion":4523,"cofagrigus":3720,"combee":4579,"combusken":3378,"comfey":7371,"conkeldurr":6583,"copperajah":6037,"corphish":5786,"corsola":4575,"corviknight":4690,"corvisquire":4455,"cosmoem":5983,"cosmog":3997,"cottonee":6143,"crabominable":4524,"crabrawler":4464,"cradily":4891,"cramorant":3964,"cranidos":4732,"crawdaunt":5244,"cresselia":4212,"croagunk":5900,"crobat":2695,"crocalor":5795,"croconaw":4479,"crustle":6741,"cryogonal":6587,"cubchoo":6922,"cubone":6067,"cufant":5265,"cursola":3307,"cutiefly":3613,"cyclizar":3911,"cyndaquil":4687,"dachsbun":6119,"darkrai":4264,"darmanitan":4364,"dartrix":5349,"darumaka":5624,"dawn-wings-necrozma":4342,"decidueye":4942,"decidueye-hisui":5009,"dedenne":6030,"deerling":4466,"deino":4482,"delcatty":4674,"delibird":5617,"delphox":3813,"deoxys":2744,"dewgong":5296,"dewott":4510,"dewpider":6290,"dhelmise":5329,"dialga":3722,"dialga-origin":4327,"diancie":4480,"diggersby":5092,"diglett":6536,"dipplin":3809,"ditto":7058,"dodrio":3094,"doduo":2701,"dolliv":4900,"dondozo":6037,"donphan":6141,"dottler":6952,"doublade":4932,"dracovish":6066,"dracozolt":3740,"dragalge":2296,"dragapult":4238,"dragonair":3034,"dragonite":4567,"drakloak":3851,"drampa":5442,"drapion":4506,"dratini":3025,"drednaw":5822,"dreepy":3289,"drifblim":4203,"drifloon":3117,"drilbur":5490,"drizzile":3435,"drowzee":6562,"druddigon":4896,"dubwool":6205,"ducklett":5529,"dudunsparce":5750,"dugtrio":6314,"dunsparce":4252,"duosion":7673,"duraludon":4994,"durant":5285,"dusclops":3905,"dusk-mane-necrozma":3949,"dusknoir":4760,"duskull":5978,"dustox":5502,"dwebble":6668,"eelektrik":4613,"eelektross":5627,"eevee":5205,"eiscue":5914,"ekans":6248,"eldegoss":7094,"electabuzz":3433,"electivire":4838,"electrike":6290,"electrode":7778,"electrode-hisui":7859,"elekid":3504,"elgyem":5911,"emboar":5967,"emolga":5019,"empoleon":4151,"enamorus":5365,"enamorus-therian":4094,"entei":5281,"escavalier":4532,"espathra":4115,"espeon":3256,"espurr":6033,"eternatus":2852,"eternatus-eternamax":3577,"excadrill":5401,"exeggcute":6365,"exeggutor":4034,"exploud":5724,"falinks":5753,"farfetchd":5168,"farigiraf":3154,"fearow":3746,"feebas":5492,"fennekin":5390,"feraligatr":4632,"ferroseed":5520,"ferrothorn":3475,"fezandipiti":3647,"fidough":7263,"finizen":5188,"finneon":5207,"flaaffy":5043,"flabebe":4669,"flamigo":2851,"flapple":4621,"flareon":5402,"fletchinder":3720,"fletchling":3856,"flittle":6248,"floatzel":4247,"floette":4087,"floette-eternal":2796,"floragato":4629,"florges":4294,"flutter-mane":3974,"flygon":3825,"fomantis":6595,"foongus":6199,"forretress":6218,"fraxure":4870,"frigibax":5487,"frillish":3815,"froakie":6149,"frogadier":3723,"froslass":6516,"frosmoth":3791,"fuecoco":5121,"furfrou":5715,"furret":5367,"gabite":4095,"galarian-corsola":4160,"galarian-darmanitan":6397,"galarian-darumaka":6380,"galarian-farfetchd":3229,"galarian-linoone":3715,"galarian-meowth":4780,"galarian-mr-mime":3583,"galarian-ponyta":6316,"galarian-rapidash":5810,"galarian-slowbro":5527,"galarian-slowking":5785,"galarian-slowpoke":5849,"galarian-stunfisk":5246,"galarian-weezing":3402,"galarian-yamask":3279,"galarian-zigzagoon":5439,"gallade":2673,"galvantula":4934,"garbodor":6299,"garchomp":4366,"gardevoir":3272,"garganacl":6374,"gastly":6100,"gastrodon":5181,"genesect":4780,"gengar":5366,"geodude":4948,"gholdengo":4009,"gible":5812,"gigalith":4508,"gimmighoul":6203,"gimmighoul-roaming":3845,"girafarig":3987,"giratina-altered-forme":4705,"giratina-origin-forme":6438,"glaceon":2772,"glalie":6428,"glameow":4764,"glastrier":4608,"gligar":5474,"glimmet":5145,"glimmora":6217,"gliscor":4808,"gloom":5501,"gogoat":5474,"golbat":3795,"goldeen":5146,"golduck":3552,"golem":5918,"golett":5849,"golisopod":4515,"golurk":6104,"goodra":3656,"goodra-hisui":5796,"goomy":5055,"gorebyss":2910,"gossifleur":6117,"gothita":5765,"gothitelle":4686,"gothorita":4585,"gouging-fire":4625,"gourgeist":4197,"grafaiai":5319,"granbull":5014,"grapploct":5446,"graveler":5307,"great-tusk":6002,"greavard":5039,"greedent":7143,"greninja":2854,"grimer":5426,"grimmsnarl":3829,"grookey":5526,"grotle":6174,"groudon":5257,"groudon-primal":4936,"grovyle":3706,"growlithe":6155,"growlithe-hisui":5322,"grubbin":6274,"grumpig":5121,"gulpin":5549,"gumshoos":3890,"gurdurr":4848,"guzzlord":5556,"gyarados":3968,"hakamo-o":4018,"happiny":5869,"hariyama":6267,"hatenna":3548,"hatterene":4323,"hattrem":5282,"haunter":3841,"hawlucha":4507,"haxorus":4362,"heatmor":5034,"heatran":5051,"heliolisk":2361,"helioptile":4189,"heracross":3495,"herdier":4951,"hippopotas":6059,"hippowdon":5309,"hitmonchan":3436,"hitmonlee":2920,"hitmontop":4316,"ho-oh":3467,"honchkrow":4661,"honedge":4630,"hoopa-confined":4429,"hoopa-unbound":3650,"hoothoot":4106,"hoppip":3486,"horsea":5091,"houndoom":3508,"houndour":5451,"houndstone":5559,"huntail":4769,"hydrapple":4549,"hydreigon":3656,"hypno":4718,"igglybuff":6125,"illumise":6286,"impidimp":4187,"incineroar":4441,"indeedee-f":5267,"indeedee-m":5587,"infernape":4412,"inkay":5452,"inteleon":3616,"iron-boulder":5715,"iron-bundle":5665,"iron-crown":4745,"iron-hands":5175,"iron-jugulis":3582,"iron-leaves":4215,"iron-moth":3903,"iron-thorns":4790,"iron-treads":5931,"iron-valiant":2760,"ivysaur":6323,"jangmo-o":4075,"jellicent":6025,"jigglypuff":5841,"jirachi":5080,"jolteon":4633,"joltik":5747,"jumpluff":5846,"jynx":5465,"kabuto":7657,"kabutops":4135,"kadabra":4475,"kakuna":7037,"kangaskhan":5986,"karrablast":5786,"kartana":2157,"kecleon":4661,"keldeo":4214,"kilowattrel":2665,"kingambit":3276,"kingdra":3463,"kingler":4607,"kirlia":5390,"klang":6064,"klawf":5123,"kleavor":3404,"klefki":3612,"klink":4906,"klinklang":5346,"koffing":5186,"komala":6016,"kommo-o":4532,"koraidon":3991,"krabby":5121,"kricketot":6751,"kricketune":5257,"krokorok":3927,"krookodile":6055,"kubfu":5599,"kyogre":4817,"kyogre-primal":3676,"kyurem":4162,"lairon":6579,"lampent":3660,"landorus":6825,"landorus-therian":5369,"lanturn":4829,"lapras":3907,"larvesta":5260,"larvitar":5302,"latias":2839,"latios":2874,"leafeon":4478,"leavanny":3770,"lechonk":6652,"ledian":4835,"ledyba":5434,"lickilicky":5230,"lickitung":7207,"liepard":3449,"lileep":4863,"lilligant":6196,"lilligant-hisui":2993,"lillipup":6125,"linoone":4663,"litleo":6015,"litten":3800,"litwick":6341,"lokix":3895,"lombre":5173,"lopunny":5053,"lotad":6642,"loudred":5729,"lucario":4132,"ludicolo":5982,"lugia":3756,"lumineon":4347,"lunala":4644,"lunatone":6919,"lurantis":5310,"luvdisc":6781,"luxio":4282,"luxray":4326,"lycanroc-dusk-form":4035,"lycanroc-midday-form":5259,"lycanroc-midnight-form":5109,"mabosstiff":5887,"machamp":4372,"machoke":5491,"machop":4373,"magby":4730,"magcargo":6246,"magearna":4666,"magikarp":4412,"magmar":4013,"magmortar":5555,"magnemite":4921,"magneton":4682,"magnezone":4581,"makuhita":6425,"malamar":4343,"mamoswine":6320,"manaphy":3571,"mandibuzz":6487,"manectric":4575,"mankey":3711,"mantine":3978,"mantyke":4560,"maractus":4392,"mareanie":6112,"mareep":7062,"marill":5580,"marowak":4690,"marshadow":5756,"marshtomp":4879,"maschiff":6370,"masquerain":3684,"maushold":6970,"mawile":4831,"medicham":4273,"meditite":5334,"meganium":5138,"melmetal":6411,"meloetta---aria":5011,"meloetta---pirouette":4266,"meltan":7257,"meowscarada":3641,"meowstic-f":5225,"meowstic-m":5773,"meowth":3996,"mesprit":4827,"metagross":4885,"metang":5709,"metapod":4539,"mew":3819,"mewtwo":3599,"mienfoo":4592,"mienshao":2489,"mightyena":4502,"milcery":5295,"milotic":4751,"miltank":5201,"mime-jr":4134,"mimikyu":3876,"minccino":5649,"minior-core-form":6790,"minior-meteor-form":6790,"minun":3946,"miraidon":2907,"misdreavus":5854,"mismagius":4494,"moltres":3665,"moltres-galar":4653,"monferno":4624,"morelull":5459,"morgrem":3890,"morpeko":6381,"mothim":4343,"mr-mime":4723,"mr-rime":4902,"mudbray":4416,"mudkip":4508,"mudsdale":5355,"muk":5400,"munchlax":5898,"munkidori":5825,"munna":7671,"murkrow":4003,"musharna":5586,"nacli":7376,"naclstack":6824,"naganadel":3805,"natu":5249,"necrozma":3708,"nickit":4297,"nidoking":5357,"nidoqueen":5724,"nidoran-f":6198,"nidoran-m":6509,"nidorina":4991,"nidorino":5360,"nihilego":5849,"nincada":4477,"ninetales":6410,"ninjask":4915,"noctowl":5385,"noibat":4268,"noivern":4855,"nosepass":6498,"numel":5897,"nuzleaf":4866,"nymble":5520,"obstagoon":5427,"octillery":5036,"oddish":5016,"ogerpon":4684,"ogerpon-cornerstone-mask":4987,"ogerpon-heartflame-mask":4712,"ogerpon-wellspring-mask":4956,"oinkologne-female":5628,"oinkologne-male":5628,"okidogi":5181,"omanyte":7070,"omastar":5571,"onix":4764,"oranguru":6360,"orbeetle":5529,"oricorio-baile-style":3212,"oricorio-pau-style":4333,"oricorio-pom-pom-style":4268,"oricorio-sensu-style":4126,"orthworm":4260,"oshawott":6271,"overqwil":2488,"pachirisu":5020,"palafin":5188,"palkia":5305,"palkia-origin":3602,"palossand":5233,"palpitoad":6862,"pancham":6355,"pangoro":4856,"panpour":5574,"pansage":6097,"pansear":5764,"paras":5092,"parasect":5340,"passimian":3281,"patrat":5532,"pawmi":7513,"pawmo":5173,"pawmot":5023,"pawniard":3231,"pecharunt":5131,"pelipper":5501,"perrserker":5422,"persian":3683,"petilil":5595,"phanpy":6908,"phantump":3667,"pheromosa":3892,"phione":4178,"pichu":4629,"pidgeot":3996,"pidgeotto":4258,"pidgey":4648,"pidove":4947,"pignite":5810,"pikachu":4468,"pikipek":4304,"piloswine":6926,"pincurchin":4111,"pineco":6536,"pinsir":4102,"piplup":6592,"plusle":4973,"poipole":4267,"politoed":4954,"poliwag":5173,"poliwhirl":5132,"poliwrath":4811,"poltchageist":4071,"polteageist":4848,"ponyta":4346,"poochyena":4741,"popplio":5220,"porygon":5401,"porygon-z":3382,"porygon2":5220,"primarina":3894,"primeape":5265,"prinplup":4118,"probopass":6634,"psyduck":6381,"pumpkaboo":5273,"pupitar":6246,"purrloin":3916,"purugly":5669,"pyroar":4956,"pyukumuku":6277,"quagsire":6098,"quaquaval":4162,"quaxly":6699,"quaxwell":5214,"quilava":5129,"quilladin":4553,"qwilfish":4852,"qwilfish-hisui":5731,"raboot":4671,"rabsca":5273,"raging-bolt":3615,"raichu":3222,"raikou":4881,"rainy-castform":4361,"ralts":5746,"rampardos":4873,"rapidash":4628,"raticate":4876,"rattata":4371,"rayquaza":3657,"regice":5594,"regidrago":4834,"regieleki":4350,"regigigas":5469,"regirock":5876,"registeel":4999,"relicanth":6222,"rellor":6554,"remoraid":4195,"reshiram":4752,"reuniclus":4834,"revavroom":5698,"rhydon":4510,"rhyhorn":6573,"rhyperior":5737,"ribombee":4571,"rillaboom":5774,"riolu":3887,"roaring-moon":4322,"rockruff":5822,"roggenrola":6159,"rolycoly":6571,"rookidee":4546,"roselia":3727,"roserade":4859,"rotom":2049,"rotom-fan":4209,"rotom-frost":4814,"rotom-heat":4736,"rotom-mow":4662,"rotom-wash":4605,"rowlet":7544,"rufflet":6969,"runerigus":5145,"sableye":3390,"salamence":6028,"salandit":2875,"salazzle":3395,"samurott":4263,"samurott-hisui":3924,"sandaconda":6696,"sandile":5317,"sandshrew":5783,"sandslash":4692,"sandy-shocks":3867,"sandygast":3943,"sawk":5306,"sawsbuck":3196,"scatterbug":4454,"sceptile":3769,"scizor":3960,"scolipede":3337,"scorbunny":4299,"scovillain":5173,"scrafty":5241,"scraggy":4765,"scream-tail":6119,"scyther":3489,"seadra":4139,"seaking":5886,"sealeo":4813,"seedot":6614,"seel":4837,"seismitoad":6411,"sentret":4862,"serperior":3738,"servine":2840,"seviper":6104,"sewaddle":6315,"sharpedo":3772,"shaymin-land":6764,"shaymin-sky":3948,"shedinja":5225,"shelgon":7162,"shellder":6340,"shellos":5467,"shelmet":6448,"shieldon":5997,"shiftry":4369,"shiinotic":4285,"shinx":4459,"shroodle":5485,"shroomish":5551,"shuckle":3605,"shuppet":5412,"sigilyph":2702,"silcoon":3650,"silicobra":5625,"silvally":3399,"simipour":5303,"simisage":4868,"simisear":5735,"sinistcha":5847,"sinistea":6994,"sirfetchd":3330,"sizzlipede":4120,"skarmory":4220,"skeledirge":6073,"skiddo":5019,"skiploom":6502,"skitty":4345,"skorupi":4518,"skrelp":4292,"skuntank":5226,"skwovet":5397,"slaking":6976,"slakoth":6180,"sliggoo":4207,"sliggoo-hisui":3692,"slither-wing":4690,"slowbro":6510,"slowking":6002,"slowpoke":5937,"slugma":5545,"slurpuff":6367,"smeargle":4419,"smoliv":6081,"smoochum":6304,"sneasel":3238,"sneasel-hisui":3991,"sneasler":4191,"snivy":5069,"snom":6748,"snorlax":6720,"snorunt":5900,"snover":4686,"snowy-castform":5974,"snubbull":5554,"sobble":5211,"solgaleo":5081,"solosis":7840,"solrock":3205,"spearow":4400,"spectrier":3488,"spewpa":6483,"spheal":6778,"spidops":4694,"spinarak":5580,"spinda":5266,"spiritomb":6618,"spoink":5310,"sprigatito":6171,"spritzee":5819,"squawkabilly":3674,"squirtle":5275,"stakataka":4983,"stantler":3561,"staraptor":4425,"staravia":4844,"starly":5871,"starmie":6056,"staryu":5126,"steelix":3878,"steenee":4680,"stonjourner":6328,"stoutland":5370,"stufful":5982,"stunfisk":4974,"stunky":4259,"sudowoodo":3193,"suicune":5111,"sunflora":4372,"sunkern":6415,"sunny-castform":6649,"surskit":1563,"swablu":4649,"swadloon":4509,"swalot":7050,"swampert":4979,"swanna":3857,"swellow":4241,"swinub":7158,"swirlix":6280,"swoobat":3586,"sylveon":5017,"tadbulb":5867,"taillow":5246,"talonflame":2489,"tandemaus":6224,"tangela":7369,"tangrowth":4603,"tapu-bulu":3612,"tapu-fini":4841,"tapu-koko":5147,"tapu-lele":6516,"tarountula":4571,"tatsugiri":5174,"tauros":3583,"tauros-paldea-aqua-breed":4779,"tauros-paldea-blaze-breed":3947,"tauros-paldea-combat-breed":3936,"teddiursa":6165,"tentacool":3998,"tentacruel":4792,"tepig":5215,"terapagos":3522,"terapagos-stellar-form":4922,"terapagos-terastal-form":5541,"terrakion":5888,"thievul":4556,"throh":4871,"thundurus":5282,"thundurus-therian":3669,"thwackey":5802,"timburr":5250,"ting-lu":3965,"tinkatink":4717,"tinkaton":5299,"tinkatuff":5616,"tirtouga":4921,"toedscool":3234,"toedscruel":3721,"togedemaru":6655,"togekiss":4448,"togepi":6964,"togetic":5155,"torchic":4803,"torkoal":6606,"tornadus":6042,"tornadus-therian":4885,"torracat":4286,"torterra":6050,"totodile":5569,"toucannon":4106,"toxapex":4499,"toxel":4821,"toxicroak":3500,"toxtricity-amped":4780,"toxtricity-low-key":4900,"tranquill":3898,"trapinch":6365,"treecko":3979,"trevenant":3895,"tropius":5759,"trubbish":4085,"trumbeak":4142,"tsareena":5364,"turtonator":5077,"turtwig":5293,"tympole":5733,"tynamo":5213,"type-null":4468,"typhlosion":5633,"typhlosion-hisui":3719,"tyranitar":4595,"tyrantrum":4294,"tyrogue":4293,"tyrunt":6277,"ultra-necrozma":3088,"umbreon":3998,"unfezant":4379,"unown":4248,"ursaluna":5909,"ursaluna-bloodmoon":5867,"ursaring":6167,"urshifu-rapid":4694,"urshifu-single":4959,"uxie":5002,"vanillish":5176,"vanillite":5290,"vanilluxe":5085,"vaporeon":4898,"varoom":5516,"veluza":3190,"venipede":6272,"venomoth":4790,"venonat":4722,"venusaur":6239,"vespiquen":5415,"vibrava":3861,"victini":3570,"victreebel":5676,"vigoroth":4623,"vikavolt":3260,"vileplume":5896,"virizion":3581,"vivillon":5109,"volbeat":5776,"volcanion":5687,"volcarona":5101,"voltorb":7566,"voltorb-hisui":7596,"vullaby":3984,"vulpix":5982,"wailmer":6376,"wailord":5815,"walking-wake":3860,"walrein":5244,"wartortle":5579,"watchog":5379,"wattrel":4139,"weavile":4279,"weedle":4221,"weepinbell":5247,"weezing":4818,"whimsicott":7482,"whirlipede":5553,"whiscash":4712,"whismur":6197,"white-kyurem":4178,"wigglytuff":5554,"wiglett":4408,"wimpod":4461,"wingull":2176,"wishiwashi-school-form":3755,"wishiwashi-solo-form":6199,"wo-chien":5325,"wobbuffet":7008,"woobat":3917,"wooloo":6650,"wooper":4658,"wooper-paldea":4668,"wormadam-plant-cloak":3405,"wormadam-sand-cloak":4098,"wormadam-trash-cloak":3690,"wugtrio":5179,"wurmple":5299,"wynaut":4361,"wyrdeer":3541,"xatu":5042,"xerneas":2275,"xurkitree":2929,"yamask":3385,"yamper":5831,"yanma":3609,"yanmega":3991,"yungoos":4407,"yveltal":3669,"zacian":4595,"zacian-crowned":5110,"zamazenta":5029,"zamazenta-crowned":5454,"zangoose":4037,"zapdos":3666,"zapdos-galar":4914,"zarude":3996,"zebstrika":3798,"zekrom":4687,"zeraora":3547,"zigzagoon":5844,"zoroark":4571,"zoroark-hisui":4243,"zorua":5883,"zorua-hisui":3809,"zubat":3166,"zweilous":4845,"zygarde-10-forme":3067,"zygarde-50-forme":3977,"zygarde-complete-forme":5503});
+  const COMBINED_AREA_MIN_FRACTION = .095;
+  const COMBINED_AREA_TARGET_FRACTION = .10;
+  const COMBINED_AREA_MAX_FRACTION = .105;
+  const BBOX_AREA_MAX_FRACTION = .185;
+  function contourCoverage(slug) {
+    const tenThousand = SUBJECT_CONTOUR_COVERAGE_10000[slug];
+    return tenThousand > 0 ? tenThousand / 10000 : null;
+  }
+
+  // Determine one subject scale from the geometric mean of bbox and exterior
+  // contour area. Intersect its 9.5-10.5% band with the 18.5% bbox cap,
+  // 40% panel-height cap and physical available width. No density multiplier.
+  function artLimits(panelHeight, available, ratio, slug = null, panelWidth = available) {
+    const usable=Math.max(1,panelHeight || 750);
+    const r=Math.max(.05,ratio);
+    const compact=panelWidth<550;
+    if(compact){
+      const ceiling=usable*.40;
+      const panelArea=Math.max(1,panelWidth)*usable;
+      const physicalMax=Math.min(520,ceiling,available/r);
+      const fill=contourCoverage(slug);
+      if(fill!==null){
+        // The combined-area percentage at subject height h equals
+        // r*h*h*sqrt(fill)/panelArea. Width/height are always scaled together.
+        const weight=Math.sqrt(fill);
+        const combinedMin=Math.sqrt(panelArea*COMBINED_AREA_MIN_FRACTION/(r*weight));
+        const combinedMax=Math.sqrt(panelArea*COMBINED_AREA_MAX_FRACTION/(r*weight));
+        const combinedTarget=Math.sqrt(panelArea*COMBINED_AREA_TARGET_FRACTION/(r*weight));
+        const bboxMax=Math.sqrt(panelArea*BBOX_AREA_MAX_FRACTION/r);
+        const max=Math.min(physicalMax,bboxMax,combinedMax);
+        // If the area floor cannot be reached, use the nearest feasible size;
+        // constraint checks and the test harness—not production debug code—
+        // identify the conflict.
+        const min=Math.min(combinedMin,max);
+        return {min,preferred:clampGeometry(combinedTarget,min,max),max,
+          ceiling,requestedFloor:combinedMin,anchor:combinedTarget,compact,
+          widthCap:available,areaWeight:0,contourCoverage:fill};
+      }
+      // Unindexed/Fakemon imagery retains dimensional guidance, with no
+      // fabricated contour or bbox area measurements.
+      const requestedFloor=Math.max(usable*.20,available*.30/r);
+      const min=Math.min(physicalMax,requestedFloor);
+      return {min,preferred:clampGeometry(Math.min(usable*.25,available*.50/r),min,physicalMax),
+        max:physicalMax,ceiling,requestedFloor,anchor:min,compact,
+        widthCap:available,areaWeight:0,contourCoverage:null};
+    }
+    // Preserve the existing >=550px artwork guidance in this isolated trial.
+    const ceiling=usable*.37;
+    const referenceSide=Math.min(available*.50,usable*.25);
+    const targetArea=referenceSide*referenceSide;
+    const areaHeight=Math.sqrt(targetArea/r);
+    const formerWidthFraction=Math.min(.65,.55+.10*Math.max(0,available-550)/650);
+    const widthBlend=clampGeometry((available-550)/230,0,1);
+    const widthFraction=.68*(1-widthBlend)+formerWidthFraction*widthBlend;
+    const widthCap=Math.min(650,available*widthFraction);
+    const max=Math.min(ceiling,520,widthCap/r);
+    const largeTarget=Math.max(Math.min(usable*.25,max),Math.min(max,usable*.35));
+    const blend=clampGeometry((available-550)/230,0,1);
+    const preferred=Math.min(max,areaHeight*(1-blend)+largeTarget*blend);
+    const floorBlend=clampGeometry((available-520)/280,0,1);
+    const min=Math.min(max,preferred*.80*(1-floorBlend)+usable*.25*floorBlend);
+    const areaWeight=1-clampGeometry((available-525)/125,0,1);
+    return {min,preferred,max,ceiling,requestedFloor:usable*.25,
+      anchor:areaHeight,compact,widthCap,targetArea,areaWeight};
+  }
+  function artAreaDeviation(subjectArea, guide) {
+    // Compact contour bounds are enforced in geometry and final eligibility.
+    // No soft area/density preference inside or outside the feasible band.
+    if(guide.compact)return 0;
+    return Math.abs(Math.log(Math.max(1,subjectArea)/Math.max(1,guide.targetArea)));
+  }
+
+  // This is part of the measured artwork footprint, not an after-paint
+  // offset: the visible subject must not touch/underlap the header.
+  function artworkTopClearance(available) {
+    // The artwork subject is top-aligned with the description; don't create
+    // a blanket 8-16px internal gap. Sparkle clearance is validated against
+    // the actual subject and frame separately.
+    return 0;
   }
   function artFloor(available, ratio, panelHeight) {
     return artLimits(panelHeight,available,ratio).min;
   }
   function usablePanelHeight(article) {
-    const scroller=article.querySelector('.scrollable');
-    return scroller?.clientHeight || article.clientHeight || window.innerHeight || 750;
+    // Compact sizing is relative to the actual PANEL height (including header).
+    // Leave the >=550px viewport guide untouched in this isolated experiment.
+    const bounds=article?.getBoundingClientRect();
+    if(bounds?.width>0&&bounds.width<550)
+      return Math.round(Math.max(1,bounds.height||article.clientHeight||750));
+    const viewport=window.visualViewport?.height||window.innerHeight||750;
+    return Math.round(Math.max(1,Math.min(1300,viewport)));
   }
 
   // This is a compact tuple of independent promotion decisions, not a list
@@ -2739,8 +3195,8 @@ article.yofi-scores-layout section.moves > dl + dl {
         return h;
       },
       eggFit(view, width, inline) {
-        if (width < 82) return null;
-        const w = Math.round(width * 2) / 2;
+        if (width < BIO_MIN_BAR_WIDTH) return null;
+        const w = Math.round(width / 2) * 2;
         // Final Egg typography is independent of promotion stage; reuse the
         // SAME rendered fit across every eligible component arrangement.
         const key = `egg:${inline ? 'inline' : 'stack'}:${w}`;
@@ -2782,6 +3238,7 @@ article.yofi-scores-layout section.moves > dl + dl {
         probe.bar.style.setProperty('width',`${w}px`,'important');
         probe.bar.style.setProperty('height','auto','important');
         probe.bar.style.setProperty('min-height','0','important');
+        probe.bar.style.setProperty('max-height','none','important');
         probe.bar.style.setProperty('overflow','visible','important');
         const rect = probe.value.getBoundingClientRect();
         const css = getComputedStyle(probe.value);
@@ -2803,7 +3260,7 @@ article.yofi-scores-layout section.moves > dl + dl {
           probe.value.scrollWidth <= textWidth + .5 &&
           probe.field.scrollWidth <= probe.field.clientWidth + .5;
         const result = fits ? {height: Math.ceil(Math.max(rect.height,
-          probe.icon.getBoundingClientRect().height) + 12),lines:1,
+          probe.icon.getBoundingClientRect().height) + 8),lines:1,
           fontSize,inkWidth,textWidth} : null;
         cache.set(key,result);
         return result;
@@ -2860,185 +3317,537 @@ article.yofi-scores-layout section.moves > dl + dl {
       close() { for (const {outer} of probes.values()) outer.remove(); }
     };
   }
-  function geometryFor(p, bioMode, tile, cols, copyWidth, hero, view, ratio,
-                       available, minImageHeight, measurer, art) {
-    const gap = Math.max(12,Math.min(20,Math.round(available*.014)));
-    const rightWidth = p.tiles ? cols*tile+(cols-1)*TILE_GAP : 0;
-    const laneWidth = available-copyWidth-rightWidth-gap*(p.tiles?2:1);
-    if (!(laneWidth>0) || laneWidth<ratio*minImageHeight-1) return null;
-    const nativeDesc=hero.querySelector('.yofi-hero-copy');
-    if (!nativeDesc) return null;
-    const inline=bioMode==='left-inline';
-    const split=bioMode==='split';
-    const leftBio=!split && bioMode!=='right-stack';
-    const bioWidth=inline?(copyWidth-TILE_GAP)/2:
-      bioMode==='right-stack'?rightWidth:split?rightWidth:copyWidth;
-    if(bioWidth<82) return null;
-    const eggFit=measurer.eggFit(view,bioWidth,inline);
-    if(!eggFit) return null;
-    const bioH=inline?Math.max(35,eggFit.height):
-      p.tiles&&!p.scores&&!p.abilities&&!split?
-        Math.max(36,(tile-TILE_GAP)/2):Math.max(42,eggFit.height);
-    if(eggFit.height>bioH+.5||bioH>100) return null;
-    const bioTotal=inline?bioH:2*bioH+TILE_GAP;
-    const bioLeftHeight=split?bioH:leftBio?bioTotal:0;
-    const bioRightHeight=split?bioH:!leftBio?bioTotal:0;
-    const scoreRowHeight=p.scores?Math.max(46,Math.min(SCORE_ROW,Math.round(copyWidth*.16))):0;
-    const scoresHeight=p.scores?2*scoreRowHeight+TILE_GAP:0;
-    const vitalH=p.tiles?(cols===4?tile:2*tile+TILE_GAP):0;
-    const credit=hero.querySelector('.yofi-hero-art-lane figure figcaption');
-    let creditH=0;
-    if(credit?.textContent?.trim()) {
-      creditH=measurer.height(credit,laneWidth,'credit');
-      creditH+=Math.max(0,parseFloat(getComputedStyle(credit).marginTop)||0);
+  /* v0.2.14 layout grammar: independently measured placements, bounded
+     distribution, and coordinated scaling. Populated
+     columns approach one physically measured bottom with top-aligned artwork.
+     Component order, score side, and biology host are independent choices. */
+  const HERO_STACK_GAP = 8;
+  const BOTTOM_EPSILON = 9;
+  // The native gender bar is a short, single-line component, not a tile.
+  // Egg adopts the same icon and text scale and stays regular weight.
+  const BIO_DEFAULT_HEIGHT = 22;
+  // The requested 22px floor is for compact bars, not a compulsory 22px
+  // height on a 1100px card. Grow continuously toward the previous 29px
+  // preferred size when useful column space is available.
+  function biologyHeightFloor(available) {
+    return BIO_DEFAULT_HEIGHT+7*clampGeometry((available-520)/400,0,1);
+  }
+  // Panel bands are readability bounds, not layout breakpoints: a width
+  // transition changes only the available score scale, never its host/order.
+  function scoreScaleBounds(panelWidth,scoreWidth) {
+    const compact=panelWidth<680,medium=panelWidth<920,large=panelWidth<1160;
+    const fontMin=compact?13:medium?13.5:large?14:14.5;
+    const fontMax=compact?18:medium?19.5:large?21:22;
+    const rowMin=compact?39:medium?40:large?42:44;
+    const rowCap=compact?61:medium?66:large?72:76;
+    // Do not grow a score cell without growing its type. Intrinsic content
+    // width determines the tallest useful cell in this column.
+    const usableFont=Math.max(fontMin,Math.min(fontMax,scoreWidth*.088));
+    return {fontMin,fontMax,rowMin,rowMax:Math.max(rowMin,
+      Math.min(rowCap,Math.floor(usableFont*3.15+5)))};
+  }
+  function clampGeometry(x,lo,hi) { return Math.min(hi,Math.max(lo,x)); }
+  function scoreDimensions(width,rowHeight,panelWidth=width,bands=2) {
+    const bounds=scoreScaleBounds(panelWidth,width);
+    const h=clampGeometry(rowHeight,bounds.rowMin,bounds.rowMax);
+    const font=clampGeometry(Math.min(width*.09,h*.31),
+      bounds.fontMin,bounds.fontMax);
+    return {rowHeight:h,fontSize:font,height:h*bands+(bands===2?TILE_GAP:0)};
+  }
+  function candidateIdentity(x) {
+    return [x.promotion,x.bioMode,x.scoreSide,x.cols,x.tile,
+      Math.round(x.copyWidth/4),Math.round(x.imageHeight/5),
+      x.scoreBands||2,Math.round(x.scoreRowHeight/3),Math.round(x.bioGenderWidth/8),
+      Math.round(x.bioEggWidth/8),x.copyHeight,x.abilitiesHeight||0,
+      x.artAlign??.5,x.contourWrap?1:0].join(':');
+  }
+  function orderedGeometry(candidates) {
+    return candidates.sort((a,b)=>
+      a.totalFootprint-b.totalFootprint || a.internalUnusedArea-b.internalUnusedArea ||
+      a.visualCost-b.visualCost || b.imageHeight-a.imageHeight ||
+      a.copyWidth-b.copyWidth || a.bioMode.localeCompare(b.bioMode) ||
+      a.scoreSide.localeCompare(b.scoreSide) || a.promotion.localeCompare(b.promotion));
+  }
+  // Bar width is a content constraint. A Gender/Egg pair cannot fill an
+  // arbitrarily wide track merely because that track has spare pixels.
+  const BIO_MAX_BAR_WIDTH=212;
+  const BIO_MIN_BAR_WIDTH=72;
+  function biologyGeometry(mode,copyWidth,rightWidth,available,measurer,view) {
+    const full=mode==='full-inline';
+    const right=mode==='right-inline'||mode==='right-stack';
+    const inline=full||mode==='left-inline'||mode==='right-inline';
+    const region=full?available:(right?rightWidth:copyWidth);
+    const candidateWidth=inline?Math.min(BIO_MAX_BAR_WIDTH,(region-TILE_GAP)/2):
+      Math.min(BIO_MAX_BAR_WIDTH,region);
+    if(candidateWidth<BIO_MIN_BAR_WIDTH)return null;
+    // One shared height and equal widths wherever physically possible.
+    // Disallow a wider Egg bar unless equal-width text fit truly fails.
+    let genderWidth=candidateWidth,eggWidth=candidateWidth;
+    let eggFit=measurer.eggFit(view,eggWidth,inline);
+    if(!eggFit&&inline){
+      for(const extra of [12,24,36]){
+        const rightCandidate=Math.min(BIO_MAX_BAR_WIDTH,candidateWidth+extra);
+        if(candidateWidth+rightCandidate+TILE_GAP>region+.1)break;
+        const fit=measurer.eggFit(view,rightCandidate,true);
+        if(fit){eggWidth=rightCandidate;eggFit=fit;break;}
+      }
     }
-    const copyH=measurer.height(nativeDesc,copyWidth,'copy',p.scores||p.tiles||p.abilities);
-    const hasAbilities=!!view.abilities?.querySelector('.ability,.yofi-native-hidden-pair');
-    const abilitiesH=p.abilities&&hasAbilities?
-      measurer.height(view.abilities,rightWidth,'abilities')+5:0;
-    const leftH=copyH+(p.scores?11+scoresHeight:0)+
-      (bioLeftHeight?(p.scores?TILE_GAP:9)+bioLeftHeight:0);
-    const rightH=vitalH+(bioRightHeight?TILE_GAP+bioRightHeight:0)+
-      (abilitiesH?TILE_GAP+abilitiesH:0);
-    const maxArt = Math.min(laneWidth/ratio,art.max);
-    if(maxArt < minImageHeight-.5) return null;
-    const leftRight = Math.max(leftH,rightH);
-    const ideal = Math.max(minImageHeight,Math.min(maxArt,leftRight-creditH));
-    const heights=[minImageHeight,ideal,art.preferred,maxArt]
-      .map(h=>Math.min(maxArt,Math.max(minImageHeight,h)));
-    const distinct=[...new Set(heights.map(h=>Math.round(h*2)/2))];
-    const copyPreferred=p.abilities?Math.max(280,Math.min(415,available*.29)):
-      p.tiles?Math.max(245,Math.min(385,available*.31)):
-      Math.max(225,Math.min(430,available*.43));
-    const copyPenalty=Math.abs(copyPreferred-copyWidth)*.10+
-      Math.max(0,copyWidth-420)*.04;
-    const tilePenalty=p.tiles?Math.max(0,tile-98)*.25:0;
-    const genderWidth=inline?bioWidth:split?copyWidth:bioWidth;
-    const genderFont=Math.min(18,Math.max(13,Math.min(genderWidth*.062,bioH*.42)));
-    const bioPenalty=(18-eggFit.fontSize)*2+(18-genderFont);
-    let best=null;
-    for(const imageHeight of distinct){
-      const imageWidth=imageHeight*ratio;
-      const heroHeight=Math.max(imageHeight+creditH,leftH,rightH);
-      const leftSlack=Math.max(0,heroHeight-leftH);
-      const rightSlack=p.tiles?Math.max(0,heroHeight-rightH):0;
-      const artUnderfill=Math.max(0,heroHeight-creditH-imageHeight);
-      // Height and below-hero footprint are measured independently of image
-      // prominence. Above the preferred subject size, extra art earns no
-      // bonus and pays for the empty columns it creates.
-      const scaleShortfall=Math.max(0,art.preferred-imageHeight);
-      const scaleExcess=Math.max(0,imageHeight-art.preferred);
-      const balancedSlack=(leftSlack+rightSlack)*.15;
-      const visualCost=copyPenalty+tilePenalty+bioPenalty+balancedSlack+
-        artUnderfill*.22+scaleShortfall*.18+scaleExcess*.22;
-      const c={stage:promotionStage(p),scores:p.scores,tiles:p.tiles,
-        abilities:p.abilities,promotion:promotionKey(p),bioMode,
-        cols,tile,gap,tileGap:TILE_GAP,rightWidth,copyWidth,laneWidth,
-        imageWidth,imageHeight,heroHeight,creditHeight:creditH,
-        bioHeight:bioH,scoreRowHeight,leftHeight:leftH,rightHeight:rightH,
-        leftSlack,rightSlack,artUnderfill,visualCost};
-      if(!best || c.heroHeight+c.visualCost<best.heroHeight+best.visualCost-.25)
-        best=c;
+    if(!eggFit)return null;
+    const height=Math.max(biologyHeightFloor(available),eggFit.height);
+    if(height>49)return null;
+    const pairHeight=inline?height:2*height+TILE_GAP;
+    return {genderWidth,eggWidth,totalWidth:inline?
+      genderWidth+eggWidth+TILE_GAP:Math.max(genderWidth,eggWidth),
+      height,pairHeight,inline,full,right,eggFit};
+  }
+  function proposalFor(p,mode,scoreSide,cols,tile,sideWidth,copyWidth,hero,view,ratio,
+                       available,minArt,measurer,art,displaced) {
+    const hasRight=p.tiles||p.abilities;
+    const gap=Math.max(14,Math.min(22,Math.round(available*.015)+3));
+    const rightWidth=hasRight?(p.tiles?cols*tile+(cols-1)*TILE_GAP:sideWidth):0;
+    const laneWidth=available-copyWidth-rightWidth-gap*(hasRight?2:1);
+    if(laneWidth<Math.max(100,minArt*ratio)-.01)return [];
+    const maxArt=Math.min(art.max,laneWidth/ratio);
+    if(maxArt<minArt-.2)return [];
+    const copy=hero.querySelector('.yofi-hero-copy');
+    const copyHeight=measurer.height(copy,copyWidth,'copy',true);
+    const bio=biologyGeometry(mode,copyWidth,rightWidth,available,measurer,view);
+    if(!bio)return [];
+    // Right-column biology may lead Abilities only under a 1x4 Vitals row.
+    // All alternatives use exactly one logical biology pair.
+    const bioLeft=bio.full||bio.right?0:bio.pairHeight;
+    const bioRightHeight=bio.right?bio.pairHeight:0;
+    const hasAbilities=!!view.abilities?.querySelector('.ability');
+    if(p.abilities&&hasAbilities&&rightWidth<174)return [];
+    const abilitiesHeight=p.abilities&&hasAbilities?
+      measurer.height(view.abilities,rightWidth,'abilities'):0;
+    const caption=hero.querySelector('.yofi-hero-art-lane figure figcaption');
+    const creditHeight=caption?.textContent?.trim()?
+      measurer.height(caption,laneWidth,'credit')+
+      Math.max(0,parseFloat(getComputedStyle(caption).marginTop)||0):0;
+    const topGap=artworkTopClearance(available);
+    const tileHeight=p.tiles?(cols===4?tile:2*tile+TILE_GAP):0;
+    const scoreWidth=scoreSide==='right'?rightWidth:copyWidth;
+    const bounds=scoreScaleBounds(available,scoreWidth);
+    const baseScore=p.scores?clampGeometry(scoreWidth*.165,bounds.rowMin,bounds.rowMax):0;
+    const result=[];
+    const bandsOptions=p.scores?(scoreWidth>=344?[1,2]:[2]):[2];
+    for(const bands of bandsOptions){
+      const rows=p.scores?[Math.round(baseScore),bounds.rowMin,bounds.rowMax]:[0];
+      for(const startingRow of [...new Set(rows)]){
+        let score=p.scores?scoreDimensions(scoreWidth,startingRow,available,bands):
+          {rowHeight:0,fontSize:0,height:0};
+        const leftN=1+(p.scores&&scoreSide==='left'?1:0)+(bioLeft?1:0);
+        const rightN=(p.tiles?1:0)+(p.scores&&scoreSide==='right'?1:0)+
+          (bioRightHeight?1:0)+(abilitiesHeight?1:0);
+        let leftH=copyHeight+bioLeft+(p.scores&&scoreSide==='left'?score.height:0)+
+          (leftN-1)*HERO_STACK_GAP;
+        let rightH=tileHeight+bioRightHeight+abilitiesHeight+
+          (p.scores&&scoreSide==='right'?score.height:0)+
+          Math.max(0,rightN-1)*HERO_STACK_GAP;
+        // Adjust a score row toward a shared bottom; unlike v0.2.9 this
+        // is not a hard 3px feasibility gate before final measurement.
+        if(hasRight&&Math.abs(leftH-rightH)>BOTTOM_EPSILON&&p.scores){
+          const change=(scoreSide==='left'?rightH-leftH:leftH-rightH)/bands;
+          const corrected=clampGeometry(score.rowHeight+change,bounds.rowMin,bounds.rowMax);
+          const revised=scoreDimensions(scoreWidth,corrected,available,bands);
+          const diff=revised.height-score.height;
+          score=revised;
+          if(scoreSide==='left')leftH+=diff;
+          else rightH+=diff;
+        }
+        // Determine one shared target, then scale the subject and/or distribute
+        // stacked native elements. Short columns are not mistaken for empty
+        // if they can anchor their last element at that shared target.
+        const rowHeight=Math.max(leftH,hasRight?rightH:0,minArt+topGap+creditHeight);
+        const imageHeight=Math.min(maxArt,Math.max(0,rowHeight-topGap-creditHeight));
+        if(imageHeight<Math.min(minArt,maxArt)-.6)continue;
+        const imageWidth=ratio*imageHeight;
+        const artUnderfill=Math.max(0,rowHeight-topGap-creditHeight-imageHeight);
+        const leftSlack=Math.max(0,rowHeight-leftH);
+        const rightSlack=hasRight?Math.max(0,rowHeight-rightH):0;
+        const distributeLeft=leftN>1&&leftSlack>.5;
+        const distributeRight=hasRight&&rightN>1&&rightSlack>.5;
+        const leftTail=distributeLeft?0:leftSlack;
+        const rightTail=distributeRight?0:rightSlack;
+        const bottomError=Math.max(leftTail,rightTail,artUnderfill);
+        const internalUnusedArea=(leftSlack*copyWidth+
+          (hasRight?rightSlack*rightWidth:0)+artUnderfill*laneWidth)/Math.max(1,available);
+        const heroHeight=rowHeight+(bio.full?TILE_GAP+bio.height:0);
+        const genderFont=Math.max(12,Math.min(18,bio.genderWidth*.062));
+        const readability=Math.max(0,15-bio.eggFit.fontSize)*1.1+
+          Math.max(0,15-genderFont)*.45;
+        const preferredPenalty=Math.max(0,art.preferred-imageHeight)*.14;
+        const excessBiologyWidth=Math.max(0,bio.totalWidth-(bio.inline?320:194))*.1;
+        const freeArtworkWidth=Math.max(0,laneWidth-imageWidth);
+        const cornerReserve=Math.min(58,Math.max(38,available*.046));
+        const excessArtworkWidth=Math.max(0,freeArtworkWidth-cornerReserve);
+        const trackWasteCost=excessArtworkWidth*(ratio<.8?.34:ratio<1.22?.25:.17);
+        const visualCost=readability+preferredPenalty+excessBiologyWidth+
+          internalUnusedArea*.58+trackWasteCost+bottomError*3.1+
+          (leftSlack+rightSlack)*.09;
+        const totalFootprint=heroHeight+
+          (p.scores?0:displaced.scores)+
+          (p.tiles?0:displaced.vitals)+
+          (p.abilities?0:displaced.abilities);
+        result.push({stage:promotionStage(p),scores:p.scores,tiles:p.tiles,
+          abilities:p.abilities,promotion:promotionKey(p),bioMode:mode,
+          scoreSide,scoreBands:bands,cols,tile,gap,tileGap:TILE_GAP,rightWidth,
+          copyWidth,laneWidth,imageWidth,imageHeight,rowHeight,heroHeight,
+          artTopGap:topGap,creditHeight,copyHeight,abilitiesHeight,
+          bioHeight:bio.height,bioGenderWidth:bio.genderWidth,
+          bioEggWidth:bio.eggWidth,bioTotalWidth:bio.totalWidth,
+          bioEggInk:bio.eggFit.inkWidth||0,
+          scoreRowHeight:score.rowHeight,scoreFontSize:score.fontSize,
+          scoreTopGap:HERO_STACK_GAP,leftHeight:leftH,rightHeight:rightH,
+          leftBottom:distributeLeft?rowHeight:leftH,
+          rightBottom:hasRight?(distributeRight?rowHeight:rightH):null,
+          subjectBottom:topGap+creditHeight+imageHeight,
+          bottomError,internalUnusedArea,visualCost,totalFootprint,
+          freeArtworkWidth,excessArtworkWidth,trackWasteCost,
+          leftSlack,rightSlack,artUnderfill,
+          distributeLeft,distributeRight});
+      }
     }
-    return best;
+    return result;
   }
 
-  function selectGeometry(p,hero,view,ratio,available,imageFloor,measurer,art) {
-    const desc=hero.querySelector('.yofi-hero-copy');
-    if(!desc)return null;
-    const font=parseFloat(getComputedStyle(desc.querySelector('.small-text')||desc).fontSize)||16;
-    const hpText=cleanText(view.vitals.querySelector('[data-key="hp"] .lab3-number'));
-    const vitalFont=parseFloat(getComputedStyle(view.vitals.querySelector('.lab3-number')).fontSize)||16;
-    const tileMin=p.tiles?Math.max(MIN_TILE,Math.ceil(hpText.length*vitalFont*.55+12)):0;
-    if(tileMin>MAX_TILE)return null;
-    const minCopy=Math.max(p.scores?218:202,font*(p.scores?12.25:11.25));
-    // Compact fallback stays on its native two-column proportions; other
-    // compositions vary continuously inside analytically feasible bounds.
-    const baseline=!p.tiles&&!p.scores;
-    const modes=baseline?['left-stack']:
-      p.tiles?['left-inline','left-stack','right-stack','split']:
-      ['left-inline','left-stack'];
+  // Adaptive *content* breakpoints, not preset column patterns. Candidate
+  // geometries on the same text-wrap plateau are equivalent unless the art,
+  // score scale or biology fit changes at a meaningful boundary.
+  function contentWidths(node,lower,upper,kind,measurer,referenceRatio=1) {
+    if(upper<=lower+1)return [lower];
+    const values=new Set([Math.round(lower),Math.round(upper)]);
+    const sampleCount=kind==='abilities'?10:12;
+    if(kind==='copy'&&referenceRatio<1.2){
+      for(const distance of [12,28,48,76]){
+        const x=Math.round(upper-distance);
+        if(x>lower+1)values.add(x);
+      }
+    }
+    const sample=[];
+    for(let i=0;i<=sampleCount;i++){
+      const x=lower+(upper-lower)*i/sampleCount;
+      sample.push([x,measurer.height(node,x,kind,kind==='copy')]);
+    }
+    for(let i=1;i<sample.length;i++){
+      const [x,h]=sample[i], [prev,pH]=sample[i-1];
+      if(h===pH)continue;
+      let lo=prev,hi=x;
+      for(let j=0;j<7&&hi-lo>1;j++){
+        const mid=(hi+lo)/2;
+        if(measurer.height(node,mid,kind,kind==='copy')===pH)lo=mid;
+        else hi=mid;
+      }
+      values.add(Math.round(Math.max(lower,hi-2)));
+      values.add(Math.round(Math.min(upper,hi+2)));
+      values.add(Math.round((prev+x)/2));
+    }
+    // Wide portraits benefit from artwork width; tall portraits benefit
+    // when their text can wrap in a narrower neighboring copy column.
+    const ideal=kind==='copy'?(referenceRatio>1.32?.27:.34):.37;
+    values.add(Math.round(Math.min(upper,Math.max(lower,availableWidthHint(lower,upper,ideal)))));
+    return [...values].filter(x=>x>=lower-1&&x<=upper+1).sort((a,b)=>a-b);
+  }
+  function availableWidthHint(lower,upper,fraction){
+    return lower+(upper-lower)*fraction;
+  }
+  function selectGeometry(p,hero,view,ratio,available,imageFloor,measurer,art,displaced) {
+    const hasRight=p.tiles||p.abilities;
+    const copy=hero.querySelector('.yofi-hero-copy');
+    const font=parseFloat(getComputedStyle(copy.querySelector('.small-text')||copy).fontSize)||16;
+    const tileMin=p.tiles?Math.max(MIN_TILE,Math.ceil(
+      cleanText(view.vitals.querySelector('[data-key="hp"] .lab3-number')).length*8+12)):0;
+    if(tileMin>MAX_TILE)return [];
+    const minCopy=p.scores?Math.max(162,font*8.4):Math.max(124,font*7.3);
+    const modes=hasRight?['left-inline','left-stack','right-inline','right-stack','full-inline']:
+      ['left-inline','left-stack','full-inline'];
+    const scoreSides=p.scores&&hasRight?['left','right']:['left'];
     const tiles=p.tiles?[...new Set([tileMin,94,MAX_TILE]
-      .map(t=>Math.max(tileMin,Math.min(MAX_TILE,t))))]:[0];
-    let best=null;
-    for(const tile of tiles) {
-      // A 4-across vitals row is useful only when there is enough horizontal
-      // space; otherwise keep the 2x2 grid and its more generous art lane.
-      const columns=p.tiles&&p.abilities?[2,4]:[2];
-      for(const cols of columns) {
-        const gap=Math.max(12,Math.min(20,Math.round(available*.014)));
-        const rightWidth=p.tiles?cols*tile+(cols-1)*TILE_GAP:0;
-        const maxCopy=Math.floor(available-rightWidth-gap*(p.tiles?2:1)-ratio*imageFloor);
-        if(maxCopy<minCopy)continue;
-        const preferred=p.abilities?Math.max(280,Math.min(415,available*.29)):
-          p.tiles?Math.max(245,Math.min(385,available*.31)):
-          Math.max(225,Math.min(430,available*.43));
-        // The native compact layout is exactly two columns. This single
-        // projection lets the scorer compare promoting content to leaving it
-        // below, without constructing and measuring a second rendered card.
-        const nativeCopy=(available-gap)/2;
-        const widths=baseline?[Math.max(minCopy,Math.min(maxCopy,nativeCopy))]:
-          [minCopy,preferred,maxCopy,(preferred+maxCopy)/2];
-        const tried=new Set();
-        for(const proposed of widths){
-          const copyWidth=Math.round(Math.max(minCopy,Math.min(maxCopy,proposed))/2)*2;
-          if(tried.has(copyWidth))continue;
-          tried.add(copyWidth);
-          for(const mode of modes){
-            const candidate=geometryFor(p,mode,tile,cols,copyWidth,hero,view,
-              ratio,available,imageFloor,measurer,art);
-            if(candidate&&(!best||candidate.visualCost+candidate.heroHeight<
-                best.visualCost+best.heroHeight-.01||
-              (Math.abs(candidate.visualCost+candidate.heroHeight-
-                best.visualCost-best.heroHeight)<=.01&&
-                candidate.imageHeight>best.imageHeight)))best=candidate;
+      .map(t=>clampGeometry(t,tileMin,MAX_TILE)))]:[0];
+    const results=[];
+    for(const tile of tiles){
+      for(const cols of (p.tiles?[2,4]:[0])){
+        const gap=Math.max(14,Math.min(22,Math.round(available*.015)+3));
+        // Without promoted vitals, right-side widths are chosen by Abilities
+        // wrapping and the minimum usable artwork lane. No 230/310-only fork.
+        const maxRight=Math.min(520,available-minCopy-imageFloor*ratio-2*gap);
+        const minRight=Math.min(maxRight,Math.max(168,font*9.8));
+        const sides=hasRight&&!p.tiles&&maxRight>=minRight?
+          contentWidths(view.abilities,minRight,maxRight,'abilities',measurer,ratio):[0];
+        for(const sideWidth of sides){
+          const rightWidth=hasRight?(p.tiles?cols*tile+(cols-1)*TILE_GAP:sideWidth):0;
+          const maxCopy=available-rightWidth-gap*(hasRight?2:1)-ratio*imageFloor;
+          if(maxCopy<minCopy)continue;
+          const widths=contentWidths(copy,minCopy,maxCopy,'copy',measurer,ratio);
+          const seen=new Set();
+          for(const w of widths){
+            const copyWidth=Math.round(clampGeometry(w,minCopy,maxCopy)*2)/2;
+            if(seen.has(copyWidth))continue;
+            seen.add(copyWidth);
+            for(const scoreSide of scoreSides){
+              for(const mode of modes){
+                // These decisions remain independent. Invalid order is
+                // excluded in apply(), not patched by reordering a paint.
+                results.push(...proposalFor(p,mode,scoreSide,cols,tile,sideWidth,
+                  copyWidth,hero,view,ratio,available,imageFloor,measurer,art,displaced));
+              }
+            }
           }
         }
       }
     }
-    return best;
+    const plateau=new Map();
+    for(const c of results){
+      const key=[c.bioMode,c.scoreSide,c.scoreBands||2,c.cols,c.tile,c.copyHeight,c.abilitiesHeight].join(':');
+      plateau.set(key,Math.min(c.copyWidth,plateau.get(key)??Infinity));
+    }
+    for(const c of results){
+      const key=[c.bioMode,c.scoreSide,c.scoreBands||2,c.cols,c.tile,c.copyHeight,c.abilitiesHeight].join(':');
+      c.copyPlateauWaste=Math.max(0,c.copyWidth-plateau.get(key));
+      // Same-wrap widths are still distinct when they improve artwork-track
+      // occupancy; avoid penalizing that productive reallocation.
+      c.visualCost+=c.copyPlateauWaste*.02;
+    }
+    // Content-aware permutation exemption, in priority order:
+    // 1. subject aspect ratio / useful artwork track;
+    // 2. description wrapping; 3. Abilities wrapping; 4. Egg-group fit.
+    // A candidate survives if it offers a different meaningful result in
+    // any earlier dimension; do not enforce a global N-candidate beam.
+    const families=new Map();
+    for(const c of results){
+      const key=[c.promotion,c.bioMode,c.scoreSide,c.scoreBands||2,c.cols,
+        Math.round(ratio*8)/8].join(':');
+      if(!families.has(key))families.set(key,[]);
+      families.get(key).push(c);
+    }
+    const diverse=[];
+    for(const group of families.values()){
+      const signatures=new Map();
+      for(const c of group){
+        const key=[Math.round(c.imageHeight/18),Math.round(c.laneWidth/22),
+          c.copyHeight,c.abilitiesHeight,Math.round(c.bioEggWidth/16),
+          Math.round(c.scoreFontSize*2),c.scoreBands||2,Math.round(c.tile/12)].join(':');
+        const prior=signatures.get(key);
+        if(!prior||c.totalFootprint<prior.totalFootprint-.5||
+           (Math.abs(c.totalFootprint-prior.totalFootprint)<=.5&&
+            c.visualCost<prior.visualCost))signatures.set(key,c);
+      }
+      const variants=[...signatures.values()];
+      for(const c of variants){
+        const dominated=variants.some(other=>other!==c&&
+          other.copyHeight<=c.copyHeight+.5&&
+          other.abilitiesHeight<=c.abilitiesHeight+.5&&
+          other.totalFootprint<=c.totalFootprint+.5&&
+          other.visualCost<=c.visualCost+.25&&
+          other.imageHeight>=c.imageHeight-1.5&&
+          other.scoreFontSize>=c.scoreFontSize-.5&&
+          other.bioEggWidth>=c.bioEggWidth-.5&&
+          (other.totalFootprint<c.totalFootprint-.5||
+           other.visualCost<c.visualCost-.25||
+           other.imageHeight>c.imageHeight+1.5));
+        if(!dominated)diverse.push(c);
+      }
+    }
+    return orderedGeometry(diverse);
   }
 
-  function chooseFootprintLayout(candidates,displaced,increasing,previous=null,maxFootprint=Infinity) {
-    const all=candidates.filter(Boolean).map(c=>({
-      ...c,totalFootprint:c.heroHeight+
-        (c.scores?0:displaced.scores)+
-        (c.tiles?0:displaced.vitals)+
-        (c.abilities?0:displaced.abilities)
+  function chooseFootprintLayout(candidates,displaced,panelHeight=750,artGuide=null) {
+    if(!candidates.length)return {choice:null,ranked:[],alternatives:[]};
+    const ranked=orderedGeometry(candidates.slice());
+    const floor=ranked[0].totalFootprint;
+    // No global beam. Every useful composition surviving content/geometry
+    // dominance reaches synchronous hidden-DOM verification, including right Scores
+    // or its biology orientation is rare. Equivalent geometries were already
+    // removed using actual measured text and component dimensions.
+    const quality=c=>c.totalFootprint+c.visualCost*.65+
+      c.internalUnusedArea*.33+c.bottomError*1.8;
+    const semantic=new Map();
+    for(const c of ranked){
+      const k=c.promotion+':'+(c.scoreBands||2);
+      if(!semantic.has(k))semantic.set(k,[]);
+      semantic.get(k).push(c);
+    }
+    const alternatives=[];
+    for(const group of semantic.values()){
+      const best=Math.min(...group.map(quality));
+      const threshold=Math.max(22,Math.min(42,panelHeight*.045));
+      const plausible=group.filter(c=>quality(c)<=best+threshold);
+      const shapeBins=new Map();
+      for(const c of plausible){
+        const k=[c.bioMode,c.scoreSide,c.cols,
+          Math.round(c.imageHeight/45),c.copyHeight,c.abilitiesHeight].join(':');
+        const old=shapeBins.get(k);
+        if(!old||quality(c)<quality(old))shapeBins.set(k,c);
+      }
+      alternatives.push(...shapeBins.values());
+    }
+    // Flow widths are sampled at wrapping/scale plateaus. Keep distinct
+    // content measurements and subject-size regimes, but avoid verifying
+    // dozens of geometrically equivalent float variants in the hidden DOM.
+    const flowShapes=new Map();
+    for(const candidate of ranked){
+      if(!candidate.flow)continue;
+      const k=[candidate.promotion,candidate.bioMode,candidate.contourWrap?1:0,
+        candidate.artAlign,Math.round(candidate.imageHeight/22),
+        candidate.copyHeight,Math.round(candidate.bioEggWidth/24),
+        Math.round(candidate.scoreFontSize||0),
+        Math.round(candidate.bottomError/12)].join(':');
+      const previous=flowShapes.get(k);
+      const cost=c=>quality(c)+
+        (artGuide?.areaWeight||0)*artAreaDeviation(c.imageWidth*c.imageHeight,artGuide)*18;
+      if(!previous||cost(candidate)<cost(previous))flowShapes.set(k,candidate);
+    }
+    for(const candidate of flowShapes.values()){
+      if(!alternatives.includes(candidate))alternatives.push(candidate);
+    }
+    orderedGeometry(alternatives);
+    const summary=alternatives.slice(0,36).map(c=>({
+      promotion:c.promotion,bioMode:c.bioMode,scoreSide:c.scoreSide,cols:c.cols,
+      copyWidth:c.copyWidth,copyHeight:c.copyHeight,copyPlateauWaste:c.copyPlateauWaste,
+      rightWidth:c.rightWidth,laneWidth:c.laneWidth,
+      freeArtworkWidth:c.freeArtworkWidth,excessArtworkWidth:c.excessArtworkWidth,
+      scoreBands:c.scoreBands||2,scoreRowHeight:c.scoreRowHeight,scoreFontSize:c.scoreFontSize,
+      imageHeight:c.imageHeight,imageWidth:c.imageWidth,
+      bioHeight:c.bioHeight,bioGenderWidth:c.bioGenderWidth,
+      leftBottom:c.leftBottom,rightBottom:c.rightBottom,
+      subjectBottom:c.subjectBottom,bottomError:c.bottomError,
+      internalUnusedArea:c.internalUnusedArea,rowHeight:c.rowHeight,
+      heroHeight:c.heroHeight,footprint:c.totalFootprint,
+      visualCost:c.visualCost,footprintBudget:floor+15
     }));
-    if(!all.length)return null;
-    const compact=all.find(c=>!c.scores&&!c.tiles&&!c.abilities);
-    // Allow only changes that preserve or improve the original affected page
-    // footprint, including the native below-hero sections they displace.
-    const budget=compact?.totalFootprint??Infinity;
-    const normal=all.filter(c=>c.totalFootprint<=budget+1);
-    const monotonic=normal.filter(c=>c.totalFootprint<=maxFootprint+1);
-    const viable=monotonic.length?monotonic:normal;
-    if(!viable.length)return compact||all[0];
-    const referenceArt=compact?.imageHeight||Math.max(...viable.map(c=>c.imageHeight));
-    for(const c of viable){
-      const imageLoss=Math.max(0,referenceArt-c.imageHeight);
-      c.totalQuality=c.totalFootprint+c.visualCost+imageLoss*.15;
-    }
-    const best=Math.min(...viable.map(c=>c.totalQuality));
-    // Promotion is a tiebreaker only among genuinely comparable arrangements.
-    // No mandatory score-first/tile-first sequence or arbitrary stage jumps.
-    const near=viable.filter(c=>c.totalQuality<=best+6);
-    near.sort((a,b)=>{
-      const promoted=x=>+x.scores+ +x.tiles+ +x.abilities;
-      return promoted(b)-promoted(a)||a.totalQuality-b.totalQuality||
-        b.imageHeight-a.imageHeight;
-    });
-    let choice=near[0];
-    if(increasing&&previous){
-      const held=viable.find(c=>c.promotion===previous.promotion&&
-        c.bioMode===previous.bioMode&&c.cols===previous.cols);
-      if(held&&held.totalQuality<=choice.totalQuality+10)choice=held;
-    }
-    return choice;
+    return {choice:alternatives[0],ranked:summary,alternatives,footprintFloor:floor};
   }
 
-    function restoreAbilities(view) {
+  // A wrapping flow is another topology of this SAME composition grammar.
+  // At widths where side-by-side columns cannot physically align, description
+  // text can flow below the top-aligned artwork instead of leaving an empty
+  // column or invoking an unrelated compact-layout selector.
+  function wrappingGeometry(hero,view,ratio,available,measurer,art,displaced) {
+    const copy=hero.querySelector('.yofi-hero-copy');
+    const gap=Math.max(14,Math.min(22,Math.round(available*.015)+3));
+    const topGap=artworkTopClearance(available);
+    const results=[];
+    const panelWidth=hero.closest('article')?.getBoundingClientRect().width||available;
+    // Scale candidate widths toward the opaque art's actual shape.
+    // Samples straddle meaningful text wrapping and subject width regimes.
+    const anchorFraction=art.preferred*ratio/available;
+    const familiar=ratio>1.4?[.44,.50,.57,.63]:
+      ratio<.84?[.30,.36,.43,.50]:[.35,.41,.47,.54];
+    // Sample useful lane widths around the area anchor, plus prior wrapping
+    // plateaus. This does not encode a layout by species or image identity.
+    const laneFractions=[...new Set([...familiar,
+      anchorFraction*.88,anchorFraction,anchorFraction*1.10]
+      .map(x=>Math.round(clampGeometry(x,.26,.70)*1000)/1000))];
+    for(const frac of laneFractions) {
+      const lane=available*frac;
+      const copyWidth=available-lane-gap;
+      if(copyWidth<112)continue;
+      const expected=measurer.height(copy,copyWidth,'copy',false);
+      const cap=Math.min(art.max,lane/ratio);
+      // 25% is the requested target, not a magic 172px constraint. Very
+      // wide art at a narrow viewport may physically fit only a shorter
+      // visible subject; still evaluate that geometry instead of returning
+      // no layout, which suppresses even the bounding-box renderer.
+      const minUsable=Math.min(96,Math.max(74,art.min*.40));
+      if(cap<minUsable-.5)continue;
+      const target=Math.min(cap,Math.max(art.min,expected-topGap,112));
+      const areaTarget=Math.min(cap,art.preferred);
+      const heights=[target,cap,areaTarget,Math.min(cap,areaTarget*1.07),
+        Math.max(minUsable,areaTarget*.93),Math.max(minUsable,target-14),
+        Math.max(minUsable,cap-18/Math.max(ratio,.4))];
+      for(const height of [...new Set(heights.map(x=>{
+        const rounded=Math.round(x*2)/2;
+        // Preserve a feasible hard contour-area floor when sampling rounds
+        // just below it; no late paint offset or per-species exception.
+        return art.compact && !art.contourConflict &&
+          rounded<art.min && art.min-rounded<=.75 ? art.min : rounded;
+      }))]){
+        if(height<minUsable-.5||height>cap+.5)continue;
+        const width=height*ratio;
+        for(const mode of (panelWidth>=550?['flow-left-inline','flow-right-stack']:
+          ratio>1.18?['flow-right-stack','flow-left-inline','flow-left-stack','full-inline']:
+          ['flow-left-inline','flow-left-stack','full-inline'])){
+          const bio=biologyGeometry(mode==='flow-left-inline'?'left-inline':
+            mode==='flow-left-stack'?'left-stack':
+            mode==='flow-right-stack'?'right-stack':'full-inline',
+            copyWidth,lane,available,measurer,view);
+          if(!bio)continue;
+          const full=mode==='full-inline';
+          const rightBio=mode==='flow-right-stack';
+          // 1.28.5 demonstrates two rows of three scores can use space
+          // under a compact description without making artwork tiny.
+          const scoredDimensions=scoreDimensions(copyWidth,
+            scoreScaleBounds(available,copyWidth).rowMin,available,2);
+          // Scores can independently promote with either compact biology
+          // arrangement underneath the copy. A free-flowing description
+          // followed by FULL-WIDTH biology is deliberately a distinct
+          // topology: there is no 'shorter column' to insert scores into.
+          const scoreOptions=panelWidth<550 &&
+            (mode==='flow-left-inline'||mode==='flow-left-stack') &&
+            copyWidth>=146 && !!view.scoreStrip?[false,true]:[false];
+          for(const promoteScores of scoreOptions){
+          const scoreFootprint=promoteScores?
+            TILE_GAP+scoredDimensions.height:0;
+          const copyEnd=expected+scoreFootprint+
+            (full||rightBio?0:TILE_GAP+bio.pairHeight);
+          const rightEnd=height+topGap+(rightBio?TILE_GAP+bio.pairHeight:0);
+          // Do not reject promotion merely because the artwork cannot grow
+          // to the left column's bottom. Compare the real occupied geometry.
+          const rowHeight=Math.max(copyEnd,rightEnd);
+          const heroHeight=rowHeight+(full?TILE_GAP+bio.height:0);
+          const subject=subjectBBoxFor(hero.closest('article'),hero.querySelector('.yofi-hero-art-lane img'));
+          const profile=contourLeftProfile(subject);
+          // Only introduce contour alternatives when description lines reach
+          // the image vertically, and there is meaningful transparent inset.
+          // Otherwise the rectangular float is faster and geometrically clearer.
+          const contourGain=profile?profile.slice(0,24).reduce((sum,n)=>sum+n,0)/24:0;
+          const touches=expected>Math.min(height*.60,140)&&copyWidth<available*.63;
+          const contourPossible=panelWidth<550 && !!profile && touches &&
+            contourGain>.11 && mode==='full-inline';
+          for(const artAlign of [.5,.25]){
+            const unfilledArt=Math.max(0,(rightBio?rightEnd:copyEnd)-height-topGap-(rightBio?TILE_GAP+bio.pairHeight:0));
+            const shortfall=Math.max(0,art.min-height);
+            const areaCost=art.areaWeight*artAreaDeviation(ratio*height*height,art)*15;
+            const visualCost=Math.max(0,height-expected+topGap)*.12+
+              shortfall*.30+Math.abs(artAlign-.5)*4+
+              unfilledArt*.20+areaCost+
+              Math.max(0,bio.totalWidth-(bio.inline?320:194))*.08;
+            for(const contourWrap of (contourPossible?[false,true]:[false])){
+            results.push({flow:true,artAlign,contourWrap,stage:promoteScores?0:-1,
+              scores:promoteScores,tiles:false,
+              abilities:false,promotion:promoteScores?'100':'000',bioMode:mode,
+              scoreSide:'left',scoreBands:2,cols:0,tile:0,gap,tileGap:TILE_GAP,
+              rightWidth:0,copyWidth,laneWidth:lane,
+              imageWidth:width,imageHeight:height,artTopGap:topGap,
+              rowHeight,heroHeight,
+              copyHeight:expected,bioHeight:bio.height,
+              bioGenderWidth:bio.genderWidth,bioEggWidth:bio.eggWidth,
+              bioTotalWidth:bio.totalWidth,
+              abilitiesHeight:0,
+              scoreRowHeight:promoteScores?scoredDimensions.rowHeight:0,
+              scoreFontSize:promoteScores?scoredDimensions.fontSize:0,
+              scoreTopGap:HERO_STACK_GAP,
+              leftHeight:copyEnd,rightHeight:rightBio?rightEnd:0,
+              leftBottom:copyEnd,rightBottom:rightBio?rightEnd:null,
+              subjectBottom:topGap+height,
+              bottomError:Math.abs(copyEnd-rightEnd),
+              internalUnusedArea:(Math.max(0,rowHeight-copyEnd)*copyWidth+
+                (rightBio?Math.max(0,rowHeight-rightEnd)*lane:0))/available,
+              visualCost,totalFootprint:heroHeight+
+                (promoteScores?0:displaced.scores)+
+                displaced.vitals+displaced.abilities,
+              leftSlack:0,rightSlack:0,artUnderfill:Math.max(0,rowHeight-height-topGap),
+              distributeLeft:false,distributeRight:false});
+            }
+          }
+          }
+        }
+      }
+    }
+    return results;
+  }
+  function restoreAbilities(view) {
     if (!view?.abilitiesHome?.isConnected || !view.abilities) return;
     if(view.abilities.parentNode!==view.abilitiesHome.parentNode ||
        view.abilities.previousSibling!==view.abilitiesHome)
@@ -3048,15 +3857,29 @@ article.yofi-scores-layout section.moves > dl + dl {
   function restoreOriginalDisplays(view){
     if(!view)return;
     restoreAbilities(view);
+    // `apply()` detaches the actual Vitals group for layouts without tiles.
+    // Keep the same live node in its canonical side host before cloning or
+    // measuring; otherwise a visit after a no-Vitals layout has no Vitals to
+    // promote and different widths select different candidates.
+    if(view.vitals && view.side && view.vitals.parentNode!==view.side)
+      view.side.prepend(view.vitals);
     if(view.scoreStrip && view.scoreBanner && view.scoreStrip.parentNode!==view.scoreBanner)
       view.scoreBanner.append(view.scoreStrip);
-    if(view.gender&&view.biologies &&
-       (view.gender.parentNode!==view.biologies || view.egg.parentNode!==view.biologies))
-      view.biologies.append(view.gender,view.egg);
     const foundation=speciesHeroStates.get(view.hero);
-    if(foundation){
-      if(foundation.gender.parentNode!==foundation.facts) foundation.facts.prepend(foundation.gender);
-      if(foundation.right.parentNode!==foundation.facts) foundation.facts.append(foundation.right);
+    if(!foundation)return;
+    // The *complete* native Gender and Egg bars, including the same outer
+    // component boxes, must move between layouts. Do not render a separate
+    // compact bar with stage-specific padding, corners or segment geometry.
+    if(foundation.gender.parentNode!==view.genderBody)
+      view.genderBody.append(foundation.gender);
+    if(foundation.right.parentNode!==view.egg)
+      view.egg.append(foundation.right);
+    if(view.gender.parentNode!==foundation.facts || view.egg.parentNode!==foundation.facts ||
+       foundation.facts.children.length!==2){
+      foundation.facts.replaceChildren(view.gender,view.egg);
+      // Restoring a different *outer* component changes measured facts fit,
+      // even if its text has not changed. Recheck short/long placement once.
+      foundation.modeSignature='';
     }
   }
   function restore(article, view) {
@@ -3064,25 +3887,36 @@ article.yofi-scores-layout section.moves > dl + dl {
     restoreOriginalDisplays(view || (hero && views.get(hero)));
 
     clearBBoxRendering(article,hero);
-    article.classList.remove('lab3-active','lab3-tiles','lab3-abilities','lab3-scores',
-      'lab3-stage0','lab3-stage1','lab3-stage2','lab3-stage3');
+    article.classList.remove('lab3-contour-flow');
+    hero?.removeAttribute('data-lab3-contour-wrap');
+    hero?.style.removeProperty('--lab3-contour-shape');
+    article.classList.remove('lab3-active','lab3-has-right','lab3-tiles','lab3-abilities','lab3-scores','lab3-score-single',
+      'lab3-stage0','lab3-stage1','lab3-stage2','lab3-stage3','lab3-bio-full-inline','lab3-flow','lab3-bio-flow-stack','lab3-bio-flow-inline','lab3-bio-flow-right-stack','lab3-contour-flow','lab3-flow-score','lab3-distribute-left','lab3-distribute-right');
     if (hero) {
+      if(view?.biologies?.parentNode!==hero)hero.append(view.biologies);
+      const foundation = speciesHeroStates.get(hero);
+      if (foundation && foundation.description.parentElement !== foundation.flow)
+        foundation.flow.append(foundation.description);
       delete hero.dataset.lab3Stage;
       delete hero.dataset.lab3Biology;
       delete hero.dataset.lab3Promotion;
+      delete hero.dataset.lab3ScoreHost;
       delete hero.dataset.lab3Priority;
       delete hero.dataset.lab3ImageFloor;
-      for (const prop of ['--lab3-gap','--lab3-tile-gap','--lab3-art-width','--lab3-art-height','--lab3-hero-height','--lab3-lane-width','--lab3-score-row-height','--lab3-tile-size','--lab3-side-width','--lab3-copy-width','--lab3-left-offset','--lab3-bio-height','--lab3-tile-cols','--lab3-bio-inline'])
+      for (const prop of ['--lab3-gap','--lab3-tile-gap','--lab3-art-width','--lab3-art-height','--lab3-hero-height','--lab3-row-height','--lab3-art-top-gap','--lab3-lane-width','--lab3-score-row-height','--lab3-score-font-size','--lab3-tile-size','--lab3-side-width','--lab3-copy-width','--lab3-bio-gender-width','--lab3-bio-egg-width','--lab3-bio-total-width','--lab3-bio-bar-max','--lab3-bio-height','--lab3-tile-cols','--lab3-bio-inline','--lab3-contour-shape'])
         hero.style.removeProperty(prop);
-      // Keep companion nodes mounted but hidden: leaving and re-entering compact
-      // must not rebuild the gender/egg presentation or move native abilities.
-      // The original QOL hero is still the visible layout at compact widths.
+      // A native restoration occurs only when measured geometry is genuinely
+      // infeasible. The same unified solver handles small and large cards.
     }
   }
 
   const geometryMemo = new WeakMap();
-  const resizeMemory = new WeakMap();
+  const MEASUREMENT_CLASSES = Object.freeze([
+    'lab3-active','lab3-has-right','lab3-tiles','lab3-abilities','lab3-scores','lab3-score-single',
+    'lab3-stage0','lab3-stage1','lab3-stage2','lab3-stage3','lab3-bio-full-inline','lab3-flow','lab3-bio-flow-stack','lab3-bio-flow-inline','lab3-bio-flow-right-stack','lab3-contour-flow','lab3-flow-score','lab3-distribute-left','lab3-distribute-right'
+  ]);
   function chooseStage(article,hero,view) {
+    const geometryStart=performance.now();
     const raw=hero.getBoundingClientRect().width;
     const style=getComputedStyle(hero);
     const available=raw-parseFloat(style.paddingLeft||'0')-
@@ -3093,112 +3927,170 @@ article.yofi-scores-layout section.moves > dl + dl {
     const subject=subjectBBoxFor(article,image);
     const ratio=subject?.ratio || portraitRatio(article,image);
     if(!Number.isFinite(ratio)||ratio<=0)return null;
+    const height=usablePanelHeight(article);
     const desc=hero.querySelector('.yofi-hero-copy');
-    const descStyle=getComputedStyle(desc?.querySelector('.small-text')||desc);
-    const identity=[currentSpeciesRouteKey(),subject?.slug||'canvas',
-      subject ? subject.width+':'+subject.height : '',desc?.innerHTML||'',
-      view.abilities?.innerHTML||'',cleanText(view.scoreStrip),
-      cleanText(view.vitals),cleanText(view.egg),descStyle.fontSize,
-      hero.style.getPropertyValue('--lab3-native-ability-font'),panelHeight].join('|');
-    const before=resizeMemory.get(hero);
-    const increasing=before&&before.identity===identity&&available>=before.width-.5;
-    const panelHeight=usablePanelHeight(article);
-    const art=artLimits(panelHeight,raw,ratio);
-    const floor=art.min;
-    const hasAbilities=!!view.abilities?.querySelector('.ability,.yofi-native-hidden-pair');
+    const art=artLimits(height,raw,ratio,subject?.slug,article.getBoundingClientRect().width);
+    const hasAbilities=!!view.abilities?.querySelector('.ability');
     const hasScores=!!view.scoreStrip&&
       view.scoreStrip.querySelectorAll(':scope > dt').length===6&&
       view.scoreStrip.querySelectorAll(':scope > dd').length===6;
-    const availablePromotions=[];
-    // Three independent capability flags generate at most six feasible
-    // combinations. There are no prescribed layouts to render or advance
-    // through; only dimensions and text-fit constraints are evaluated.
-    for(const tiles of [false,true])for(const scores of [false,true]){
-      if(scores&&!hasScores)continue;
-      for(const abilities of tiles&&hasAbilities?[false,true]:[false]){
+    const promotions=[];
+    for(const tiles of [false,true])for(const scores of [false,true])
+      for(const abilities of [false,true]){
+        if(scores&&!hasScores||abilities&&!hasAbilities)continue;
         const p={scores,tiles,abilities};
-        const signature=promotionKey(p);
-        const minimum=art.min*(abilities?.955:tiles?.96:scores?.975:1);
-        availablePromotions.push({p,minimum});
+        // Even the narrowest widths go through this same grammar. The
+        // unpromoted combination can use a smaller artwork where the text
+        // and real available width demand it. There is no compact mode.
+        const gap=Math.max(14,Math.min(22,Math.round(available*.015)+3));
+        const minCopy=Math.max(124,(parseFloat(getComputedStyle(
+          desc?.querySelector('.small-text')||desc).fontSize)||16)*7.3);
+        const maximum=(available-gap-minCopy)/ratio;
+        // Geometric lane eligibility must not assume the eventual portrait
+        // is already at 25% height. A shorter provisional footprint can
+        // grow toward the shared content bottom after real widths are solved.
+        // Final verification/selection still applies the 25% art floor when
+        // there is a physically valid solution satisfying it.
+        const minimum=!tiles&&!scores&&!abilities?
+          Math.min(art.min,Math.max(90,maximum*.75)):
+          Math.min(art.min,2*MIN_TILE+TILE_GAP);
+        promotions.push({p,minimum});
       }
-    }
-    const key=[available.toFixed(2),ratio.toFixed(4),identity,
-      descStyle.fontFamily,descStyle.lineHeight,
-      hero.style.getPropertyValue('--lab3-native-ability-line'),
-      ...availablePromotions.map(x=>promotionKey(x.p)+':'+x.minimum.toFixed(2)),
-      increasing?before.promotion:''].join('|');
-    const prior=geometryMemo.get(hero);
-    if(prior?.key===key)return prior.layout;
-    const measurer=createMeasurer(hero);
-    let choices=[],displaced;
+    const restoreClasses=MEASUREMENT_CLASSES.filter(c=>article.classList.contains(c));
+    if(restoreClasses.length)article.classList.remove(...restoreClasses);
     try {
-      displaced=measurer.nativeFootprints(article,view);
-      for(const {p,minimum} of availablePromotions){
-        const candidate=selectGeometry(p,hero,view,ratio,available,minimum,measurer,art);
-        if(candidate)choices.push(candidate);
-      }
-    } finally {measurer.close();}
-    const widthIncreased=increasing&&available>before.width+.5;
-    const ceiling=widthIncreased&&Number.isFinite(before?.footprint)?before.footprint:Infinity;
-    const layout=chooseFootprintLayout(choices,displaced,increasing,before?.layout,ceiling);
-    // A compact/native-like composition is an actual winner with its own
-    // geometry, never a null that opts out of the shared selection.
-    if(layout)layout.native=!layout.scores&&!layout.tiles&&!layout.abilities;
-    geometryMemo.set(hero,{key,layout,identity,available});
-    return layout;
-  }
-
-    function rememberNativeHero(hero) {
-    const memo=geometryMemo.get(hero);
-    if (!memo?.identity) return;
-    const img=hero.querySelector('.yofi-hero-art-lane .square-image img');
-    const artH=parseFloat(hero.style.getPropertyValue('--yofi-subject-art-height')) || img?.getBoundingClientRect().height || 0;
-    if (!(artH>0)) return;
-    const box=hero.getBoundingClientRect();
-    const css=getComputedStyle(hero);
-    const width=box.width-parseFloat(css.paddingLeft||'0')-parseFloat(css.paddingRight||'0');
-    const old=resizeMemory.get(hero);
-    const same=old && old.identity===memo.identity && width>=old.width-.5;
-    resizeMemory.set(hero,{
-      identity:memo.identity,width,
-      peakImageHeight:same?Math.max(old.peakImageHeight,artH):artH,
-      footprint:memo.layout?.totalFootprint??old?.footprint??Infinity,
-      promotion:memo.layout?.promotion||'native',
-      layout:same?old.layout:null
-    });
+      const descStyle=getComputedStyle(desc?.querySelector('.small-text')||desc);
+      const identity=[currentSpeciesRouteKey(),subject?.slug||'canvas',
+        subject?subject.width+':'+subject.height:'',desc?.innerHTML||'',
+        view.abilities?.innerHTML||'',cleanText(view.scoreStrip),
+        cleanText(view.vitals),cleanText(view.egg),descStyle.fontSize,
+        hero.style.getPropertyValue('--lab3-native-ability-font'),height].join('|');
+      const tm=article.querySelector('section.moves dd ul[data-yofi-species-tm-columns]');
+      const tmFirst=tm?.querySelector(':scope > li > a');
+      const tmState=tm?[tm.dataset.yofiSpeciesTmColumns,
+        tm.style.getPropertyValue('--yofi-species-tm-rows'),
+        Math.round(tm.getBoundingClientRect().width),
+        // Theme Overlay can replace anchor text with a generated label after
+        // the first card pass. The downstream row height changes even if TM
+        // *column count* stays unchanged, so include the actual text geometry.
+        tmFirst?.getAttribute('data-p5ov-display')||'',
+        tmFirst?getComputedStyle(tmFirst).fontSize:'',
+        tmFirst?Math.round(tmFirst.closest('li').getBoundingClientRect().height*10):0
+      ].join(':'):'unfitted';
+      const key=[available.toFixed(2),ratio.toFixed(4),identity,'tm='+tmState,
+        descStyle.fontFamily,descStyle.lineHeight,
+        hero.style.getPropertyValue('--lab3-native-ability-line'),
+        ...promotions.map(x=>promotionKey(x.p)+':'+x.minimum.toFixed(1))].join('|');
+      const prior=geometryMemo.get(hero);
+      if(prior?.key===key && prior.layout)return {cached:true,layout:prior.layout};
+      const measurer=createMeasurer(hero);
+      let proposals=[],displaced;
+      try {
+        displaced=measurer.nativeFootprints(article,view);
+        for(const {p,minimum} of promotions){
+          proposals.push(...selectGeometry(p,hero,view,ratio,available,
+            minimum,measurer,art,displaced));
+        }
+        proposals.push(...wrappingGeometry(hero,view,ratio,available,
+          measurer,art,displaced));
+      } finally {measurer.close();}
+      const chosen=chooseFootprintLayout(proposals,displaced,height,art);
+      geometryMemo.set(hero,{geometryMs:performance.now()-geometryStart,key,identity,available,layout:null,
+        alternatives:chosen.alternatives,candidateCount:proposals.length,
+        ranked:chosen.ranked,footprintFloor:chosen.footprintFloor});
+      return {cached:false,choice:chosen.choice,
+        alternatives:chosen.alternatives,footprintFloor:chosen.footprintFloor};
+    } finally {
+      if(restoreClasses.length)article.classList.add(...restoreClasses);
+    }
   }
 
   function apply(article,view,layout) {
     const {hero,left,biologies,side,vitals,scoreStrip,abilities}=view;
+    const hasRight=layout.tiles||layout.abilities;
     article.classList.add('lab3-active');
+    article.classList.toggle('lab3-flow',!!layout.flow);
+    article.classList.toggle('lab3-has-right',hasRight);
+    article.classList.toggle('lab3-bio-full-inline',layout.bioMode==='full-inline');
+    article.classList.toggle('lab3-distribute-left',!!layout.distributeLeft);
+    article.classList.toggle('lab3-distribute-right',!!layout.distributeRight);
     article.classList.toggle('lab3-tiles',layout.tiles);
     article.classList.toggle('lab3-abilities',layout.abilities);
     article.classList.toggle('lab3-scores',layout.scores);
+    article.classList.toggle('lab3-bio-flow-stack',layout.bioMode==='flow-left-stack');
+    article.classList.toggle('lab3-bio-flow-inline',layout.bioMode==='flow-left-inline');
+    article.classList.toggle('lab3-bio-flow-right-stack',layout.bioMode==='flow-right-stack');
+    article.classList.toggle('lab3-flow-score',!!layout.flow&&!!layout.scores);
+    article.classList.toggle('lab3-score-single',layout.scores&&layout.scoreBands===1);
     for(const n of [0,1,2,3])
       article.classList.toggle(`lab3-stage${n}`,layout.stage===n);
-    const px=v=>`${(+v).toFixed(2)}px`;
+    const px=v=>(+v).toFixed(2)+'px';
     const vars={
       '--lab3-gap':px(layout.gap),'--lab3-tile-gap':px(layout.tileGap),
       '--lab3-art-width':px(layout.imageWidth),'--lab3-art-height':px(layout.imageHeight),
-      '--lab3-hero-height':px(layout.heroHeight),'--lab3-lane-width':px(layout.laneWidth),
+      '--lab3-hero-height':px(layout.heroHeight),'--lab3-row-height':px(layout.rowHeight),
+      '--lab3-art-top-gap':px(layout.artTopGap||0),
+      '--lab3-lane-width':px(layout.laneWidth),
       '--lab3-score-row-height':px(layout.scoreRowHeight),
+      '--lab3-score-font-size':px(layout.scoreFontSize||16),
       '--lab3-tile-size':px(layout.tile),'--lab3-side-width':px(layout.rightWidth),
       '--lab3-copy-width':px(layout.copyWidth),'--lab3-bio-height':px(layout.bioHeight),
+      '--lab3-bio-gender-width':px(layout.bioGenderWidth),
+      '--lab3-bio-egg-width':px(layout.bioEggWidth),
+      '--lab3-bio-total-width':px(layout.bioTotalWidth),
+      '--lab3-bio-bar-max':'212px',
       '--lab3-tile-cols':String(layout.cols)
     };
     for(const [name,value] of Object.entries(vars))
       if(hero.style.getPropertyValue(name)!==value)hero.style.setProperty(name,value);
-    const split=layout.bioMode==='split'&&layout.tiles;
-    if(!split&&(view.gender.parentNode!==biologies||view.egg.parentNode!==biologies))
+    updateContourShape(article,hero,layout);
+    if(layout.flow){
+      // The native copy/art objects remain the same. Their wrapping
+      // relationship, not a second compact selector, is the candidate.
+      const foundation=speciesHeroStates.get(hero);
+      if(foundation){
+        const flow=foundation.flow;
+        if(foundation.info.parentNode!==flow||foundation.description.parentNode!==flow||
+           flow.lastElementChild!==foundation.description)
+          flow.replaceChildren(foundation.info,foundation.description);
+        if(foundation.gender.parentNode!==view.genderBody)
+          view.genderBody.append(foundation.gender);
+        if(foundation.right.parentNode!==view.egg)
+          view.egg.append(foundation.right);
+      }
+      restoreAbilities(view);
+      if(layout.scores){
+        if(scoreStrip?.parentNode!==foundation?.flow)
+          foundation?.flow.append(scoreStrip);
+      }else if(scoreStrip?.parentNode!==view.scoreBanner)
+        view.scoreBanner.append(scoreStrip);
+      if(view.gender.parentNode!==biologies||view.egg.parentNode!==biologies)
+        biologies.append(view.gender,view.egg);
+      biologies.classList.toggle('lab3-bio-inline',!['flow-left-stack','flow-right-stack'].includes(layout.bioMode));
+      const bioParent=['flow-left-stack','flow-left-inline','flow-right-stack'].includes(layout.bioMode)?foundation?.flow:hero;
+      if(bioParent&&biologies.parentNode!==bioParent)bioParent.append(biologies);
+      if(left.children.length)left.replaceChildren();
+      if(side.children.length)side.replaceChildren();
+      hero.dataset.lab3Stage='flow';
+      hero.dataset.lab3Biology=layout.bioMode;
+      hero.dataset.lab3Promotion=layout.promotion;
+      hero.dataset.lab3ScoreHost=layout.scores?'left':'native';
+      hero.dataset.lab3ContourWrap=article.classList.contains('lab3-contour-flow')?'true':'false';
+      hero.dataset.lab3Priority='measured wrapping grammar; native content fit';
+      return;
+    }
+    const full=layout.bioMode==='full-inline';
+    const toRight=layout.bioMode==='right-inline'||layout.bioMode==='right-stack';
+    const inline=layout.bioMode==='left-inline'||
+      layout.bioMode==='right-inline'||full;
+    if(view.gender.parentNode!==biologies||view.egg.parentNode!==biologies)
       biologies.append(view.gender,view.egg);
-    biologies.classList.toggle('lab3-bio-inline',layout.bioMode==='left-inline');
+    biologies.classList.toggle('lab3-bio-inline',inline);
     const foundation=speciesHeroStates.get(hero);
     if(foundation){
       if(foundation.gender.parentNode!==view.genderBody)view.genderBody.append(foundation.gender);
       if(foundation.right.parentNode!==view.egg)view.egg.append(foundation.right);
     }
-    // Reparent only the native canonical section; its heading and handlers
-    // remain intact across all promotions and restoration transitions.
     if(layout.abilities&&abilities&&abilities.parentNode!==side){
       if(!view.abilitiesHome?.isConnected){
         view.abilitiesHome=document.createComment('hero: restore native abilities here');
@@ -3208,44 +4100,443 @@ article.yofi-scores-layout section.moves > dl + dl {
     if(!layout.abilities)restoreAbilities(view);
     if(!layout.scores&&scoreStrip.parentNode!==view.scoreBanner)
       view.scoreBanner.append(scoreStrip);
-    const leftNodes=layout.scores?[scoreStrip]:[];
-    const rightNodes=layout.tiles?[vitals]:[];
-    if(split){leftNodes.push(view.gender);rightNodes.push(view.egg);}
-    else if(layout.bioMode==='right-stack')rightNodes.push(biologies);
-    else leftNodes.push(biologies);
+    const copy=foundation?.description||hero.querySelector('.yofi-hero-copy');
+    const leftNodes=[copy];
+    const rightNodes=[];
+    if(layout.tiles)rightNodes.push(vitals);
+    if(layout.scores&&layout.scoreSide==='left')leftNodes.push(scoreStrip);
+    if(toRight){
+      // Only a preceding 1x4 vital row permits biology before Abilities.
+      if(layout.tiles&&layout.cols===4)rightNodes.push(biologies);
+    }
+    else if(!full)leftNodes.push(biologies);
     if(layout.abilities)rightNodes.push(abilities);
+    // STATS-01 ordering invariant: promoted scores follow Abilities if both
+    // share the right column; they never appear above that section.
+    if(layout.scores&&layout.scoreSide==='right')rightNodes.push(scoreStrip);
+    if(toRight&&!(layout.tiles&&layout.cols===4))rightNodes.push(biologies);
     if(left.children.length!==leftNodes.length||leftNodes.some((n,i)=>left.children[i]!==n))
       left.replaceChildren(...leftNodes);
     if(side.children.length!==rightNodes.length||rightNodes.some((n,i)=>side.children[i]!==n))
       side.replaceChildren(...rightNodes);
-    const nativeCopy=hero.querySelector('.yofi-hero-copy');
-    if(nativeCopy){
-      const offset=layout.scores?rectHeight(nativeCopy)+11:0;
-      if(hero.style.getPropertyValue('--lab3-left-offset')!==px(offset))
-        hero.style.setProperty('--lab3-left-offset',px(offset));
-    }
+    if(full&&biologies.parentNode!==hero)hero.append(biologies);
+    else if(!full&&biologies.parentNode===hero)biologies.remove();
     hero.dataset.lab3Stage=String(layout.stage);
     hero.dataset.lab3Biology=layout.bioMode;
     hero.dataset.lab3Promotion=layout.promotion;
-    hero.dataset.lab3Priority='footprint > artwork occupancy > use of space';
+    hero.dataset.lab3ScoreHost=layout.scoreSide;
+    hero.dataset.lab3Priority='measured grammar; content promotion before bounded distribution';
     hero.dataset.lab3ImageFloor=String(Math.round(artFloor(hero.getBoundingClientRect().width,
       layout.imageWidth/layout.imageHeight,usablePanelHeight(article))));
+  }
+
+  function physicalEndpoints(hero,view,layout) {
+    const root=hero.getBoundingClientRect();
+    const last=container=>{
+      if(!container)return null;
+      const nodes=[...container.children].filter(e=>{
+        const css=getComputedStyle(e);
+        return css.display!=='none'&&css.position!=='absolute';
+      });
+      return nodes.length?nodes[nodes.length-1].getBoundingClientRect().bottom-root.top:null;
+    };
+    const lane=hero.querySelector('.yofi-hero-art-lane');
+    const artTop=lane?.getBoundingClientRect().top-root.top||0;
+    const left=last(view.left),right=(layout.tiles||layout.abilities)?last(view.side):null;
+    const subject=artTop+layout.artTopGap+layout.imageHeight;
+    const boxes=[left,right,subject].filter(Number.isFinite);
+    const spread=boxes.length?Math.max(...boxes)-Math.min(...boxes):Infinity;
+    return {left,right,subject,spread,artTop};
+  }
+  function sparkleExpansionFits(article,hero,layout) {
+    if(hero.classList.contains('lab3-sparkle-infeasible'))return false;
+    if(!hero.classList.contains('lab3-sparkle-expanded'))return true;
+    const figure=hero.querySelector('.yofi-hero-art-lane .square-image > figure');
+    if(!figure)return true;
+    const bounds=figure.getBoundingClientRect(),card=article.getBoundingClientRect();
+    // The entire subject frame, including all four QoL corners, must fit.
+    return bounds.left>=card.left+2 && bounds.right<=card.right-2;
+  }
+  function scoreTextFits(view,layout) {
+    if(!layout.scores||!view.scoreStrip)return true;
+    const strip=view.scoreStrip;
+    const ink=document.createRange();
+    for(const cell of strip.children){
+      if(cell.tagName!=='DT'&&cell.tagName!=='DD')continue;
+      const box=cell.getBoundingClientRect();
+      ink.selectNodeContents(cell);
+      const content=ink.getBoundingClientRect();
+      const verticalAllowance=Math.max(1,(layout.scoreRowHeight/2-box.height)/2+.75);
+      if(content.width&&(
+        content.left<box.left-.75||content.right>box.right+.75||
+        content.top<box.top-verticalAllowance||
+        content.bottom>box.bottom+verticalAllowance))return false;
+    }
+    return true;
+  }
+  function verifyPaintedCandidate(article,view,proposal) {
+    const hero=view.hero;
+    clearBBoxRendering(article,hero);
+    const layout={...proposal};
+    apply(article,view,layout);
+    if(layout.flow){
+      const heroBox=hero.getBoundingClientRect();
+      const lane=hero.querySelector('.yofi-hero-art-lane').getBoundingClientRect();
+      const description=hero.querySelector('.yofi-hero-copy').getBoundingClientRect();
+      const figure=hero.querySelector('.yofi-hero-art-lane .square-image > figure').getBoundingClientRect();
+      const subject=lane.top+layout.artTopGap+layout.imageHeight;
+      if(!heroBox.width||lane.right>heroBox.right+1||
+         (hero.scrollWidth-hero.clientWidth)>2 ||
+         subject>heroBox.bottom+2 || !scoreTextFits(view,layout))return null;
+      renderSubjectBBox(article,hero,layout);
+      if(!sparkleExpansionFits(article,hero,layout)){
+        clearBBoxRendering(article,hero);
+        return null;
+      }
+      const biologyOnLeft=layout.bioMode==='flow-left-inline'||
+        layout.bioMode==='flow-left-stack';
+      layout.leftBottom=(biologyOnLeft?
+        view.biologies.getBoundingClientRect().bottom:
+        description.bottom)-heroBox.top;
+      layout.subjectBottom=subject-heroBox.top;
+      const biologyBottom=layout.bioMode==='flow-right-stack'?
+        view.biologies.getBoundingClientRect().bottom-heroBox.top:null;
+      if(biologyBottom!==null && biologyBottom>heroBox.height+2)return null;
+      layout.rightBottom=biologyBottom;
+      // Once description text continues below a right float, there is NO
+      // independent shorter column. Measure the single flow's actual bottom
+      // instead of penalizing the natural full-width continuation.
+      layout.wrapsBelowArt=layout.bioMode==='full-inline' &&
+        description.bottom>subject+2;
+      layout.bottomError=layout.wrapsBelowArt?0:
+        Math.abs(layout.leftBottom-(biologyBottom??layout.subjectBottom));
+      layout.artUnderfill=layout.wrapsBelowArt||biologyBottom!==null?0:
+        Math.max(0,layout.leftBottom-layout.subjectBottom);
+      layout.internalUnusedArea=layout.wrapsBelowArt?0:biologyBottom!==null?
+        Math.max(0,heroBox.height-Math.max(layout.leftBottom,biologyBottom))*layout.copyWidth/
+          Math.max(1,heroBox.width):
+        Math.max(0,subject-description.bottom)*layout.copyWidth/
+          Math.max(1,heroBox.width);
+      layout.totalFootprint=heroBox.height+proposal.totalFootprint-proposal.heroHeight;
+      layout.physicalAdjustment=0;
+      return layout;
+    }
+    const px=x=>x.toFixed(2)+'px';
+    const hasRight=layout.tiles||layout.abilities;
+    // Reconcile measured native text only by changing *component dimensions*.
+    // No offset, justify-content:space-between, or margin may conceal a gap.
+    for(let attempt=0;attempt<3;attempt++){
+      let endpoints=physicalEndpoints(hero,view,layout);
+      if(hasRight&&endpoints.right!==null&&
+         Math.abs(endpoints.left-endpoints.right)>BOTTOM_EPSILON&&layout.scores){
+        const delta=layout.scoreSide==='left'?
+          endpoints.right-endpoints.left:endpoints.left-endpoints.right;
+        const scoreWidth=layout.scoreSide==='right'?layout.rightWidth:layout.copyWidth;
+        const range=scoreScaleBounds(hero.getBoundingClientRect().width,scoreWidth);
+        const corrected=clampGeometry(layout.scoreRowHeight+delta/(layout.scoreBands||2),
+          range.rowMin,range.rowMax);
+        if(Math.abs(corrected-layout.scoreRowHeight)>.25){
+          layout.scoreRowHeight=corrected;
+          layout.scoreFontSize=scoreDimensions(scoreWidth,corrected,
+            hero.getBoundingClientRect().width,layout.scoreBands||2).fontSize;
+          hero.style.setProperty('--lab3-score-row-height',px(corrected));
+          hero.style.setProperty('--lab3-score-font-size',px(layout.scoreFontSize));
+          endpoints=physicalEndpoints(hero,view,layout);
+        }
+      }
+      // Measured flex distribution may correct the shorter stacked side;
+      // do not treat an intrinsic-content height difference as automatic
+      // failure while its last component can still reach the common bottom.
+      if(hasRight&&Math.abs(endpoints.left-endpoints.right)>BOTTOM_EPSILON&&
+         !layout.distributeLeft&&!layout.distributeRight)break;
+      const target=hasRight?Math.max(endpoints.left,endpoints.right):endpoints.left;
+      const wanted=target-endpoints.artTop-layout.artTopGap;
+      const subjectSlug=subjectBBoxFor(article,hero.querySelector('.yofi-hero-art-lane img'))?.slug;
+      const artBound=artLimits(usablePanelHeight(article),
+        hero.getBoundingClientRect().width,
+        layout.imageWidth/layout.imageHeight,subjectSlug,article.getBoundingClientRect().width);
+      const upper=Math.min(artBound.max,
+        layout.laneWidth/(layout.imageWidth/layout.imageHeight));
+      const min=proposal.promotion==='000'?Math.min(90,proposal.imageHeight):artBound.min;
+      if(wanted<min-.75)break;
+      const capped=Math.min(wanted,upper);
+      layout.imageHeight=capped;
+      layout.imageWidth=capped*(proposal.imageWidth/proposal.imageHeight);
+      layout.rowHeight=target;
+      layout.heroHeight=target+(layout.bioMode==='full-inline'?TILE_GAP+layout.bioHeight:0);
+      hero.style.setProperty('--lab3-art-height',px(capped));
+      hero.style.setProperty('--lab3-art-width',px(layout.imageWidth));
+      hero.style.setProperty('--lab3-row-height',px(layout.rowHeight));
+      hero.style.setProperty('--lab3-hero-height',px(layout.heroHeight));
+      endpoints=physicalEndpoints(hero,view,layout);
+      const columnError=hasRight&&endpoints.right!=null?
+        Math.abs(endpoints.left-endpoints.right):0;
+      const artUnderfill=Math.max(0,target-(endpoints.artTop+layout.artTopGap+layout.imageHeight));
+      if(columnError<=BOTTOM_EPSILON &&
+         (artUnderfill<=BOTTOM_EPSILON||layout.imageHeight>=upper-.75)){
+        const top=hero.getBoundingClientRect().top;
+        const rightNode=view.side.getBoundingClientRect();
+        const artLane=hero.querySelector('.yofi-hero-art-lane').getBoundingClientRect();
+        // A visible overflow is not fixed by clipping or reducing text size.
+        if(artLane.right>hero.getBoundingClientRect().right+1 ||
+           rightNode.right>hero.getBoundingClientRect().right+1)break;
+        renderSubjectBBox(article,hero,layout);
+        if(!sparkleExpansionFits(article,hero,layout))break;
+        const painted=physicalEndpoints(hero,view,layout);
+        const sideErr=hasRight&&painted.right!=null?
+          Math.abs(painted.left-painted.right):0;
+        const paintedArtGap=Math.max(0,target-painted.subject);
+        if(sideErr>BOTTOM_EPSILON||
+           (paintedArtGap>BOTTOM_EPSILON&&layout.imageHeight<upper-.75)||
+           !scoreTextFits(view,layout))break;
+        layout.leftBottom=painted.left;
+        layout.rightBottom=painted.right;
+        layout.subjectBottom=painted.subject;
+        layout.bottomError=painted.spread;
+        layout.artUnderfill=Math.max(0,target-painted.subject);
+        // Retain measured unused area; zero was incorrectly treating
+        // physical bottom alignment as complete useful-space occupancy.
+        layout.internalUnusedArea=proposal.internalUnusedArea;
+        layout.leftSlack=proposal.leftSlack;
+        layout.rightSlack=proposal.rightSlack;
+        layout.totalFootprint=proposal.totalFootprint+
+          layout.heroHeight-proposal.heroHeight;
+        layout.physicalAdjustment=Math.max(
+          Math.abs(layout.imageHeight-proposal.imageHeight),
+          Math.abs(layout.scoreRowHeight-proposal.scoreRowHeight));
+        return layout;
+      }
+    }
+    clearBBoxRendering(article,hero);
+    return null;
+  }
+  function informationVisibility(article) {
+    const scrollable=article.querySelector(':scope > .scrollable');
+    if(!scrollable)return {moveRows:0,otherRows:0,scrollHeight:Infinity};
+    const root=scrollable.getBoundingClientRect();
+    const limit=scrollable.clientHeight;
+    const offset=scrollable.scrollTop;
+    const contentPos=node=>{
+      const r=node.getBoundingClientRect();
+      return {top:r.top-root.top+offset,bottom:r.bottom-root.top+offset};
+    };
+    const rows=new Set();let moveItems=0;
+    for(const item of scrollable.querySelectorAll('section.moves li')){
+      const r=contentPos(item);
+      if(r.top>=-.5&&r.bottom<=limit+.5){
+        rows.add(Math.round(r.top/3)*3);
+        moveItems++;
+      }
+    }
+    let other=0;
+    for(const node of scrollable.querySelectorAll(
+        'section.abilities .ability, section.evolution p, section.evolution h3,'+
+        'section.moves h2, section.notes p')){
+      const r=contentPos(node);
+      if(r.top>=-.5&&r.bottom<=limit+.5)other++;
+    }
+    return {moveRows:rows.size,moveItems,otherRows:other,
+      scrollHeight:scrollable.scrollHeight};
+  }
+  // Clone the *render-ready* native card once, into a hidden nonflow sibling.
+  // This preserves original CSS inheritance and actual text wrap, while
+  // avoiding 50-150 live-card mutations/reflows during every navigation.
+  // All candidate DOM measurements happen before any visible candidate is
+  // committed. Reading getBoundingClientRect forces layout, NOT a GUI paint.
+  function candidateMeasurementStage(article,view) {
+    const main=article.parentNode;
+    const realScroll=article.querySelector(':scope > .scrollable');
+    if(!main||!realScroll)return null;
+    const cardRect=article.getBoundingClientRect();
+    if(!(cardRect.width>0))return null;
+    const shadow=article.cloneNode(true);
+    shadow.setAttribute('data-yofi-layout-probe','');
+    shadow.removeAttribute('id');
+    shadow.querySelectorAll('[id]').forEach(el=>el.removeAttribute('id'));
+    shadow.style.cssText='position:fixed!important;left:-100000px!important;top:0!important;'+
+      `width:${cardRect.width}px!important;height:${cardRect.height}px!important;`+
+      'max-width:none!important;max-height:none!important;visibility:hidden!important;'+
+      'pointer-events:none!important;overflow:hidden!important;contain:layout style paint!important;';
+    const shadowScroll=shadow.querySelector(':scope > .scrollable');
+    if(shadowScroll){
+      shadowScroll.style.setProperty('height',realScroll.clientHeight+'px','important');
+      shadowScroll.style.setProperty('max-height',realScroll.clientHeight+'px','important');
+    }
+    main.append(shadow);
+    try {
+      const hero=shadow.querySelector('.yofi-species-hero');
+      const q=selector=>hero?.querySelector(selector);
+      const v={hero,left:q(':scope > .lab3-left-extra'),
+        biologies:q('.lab3-biologies'),gender:q('.lab3-gender'),
+        genderBody:q('.lab3-gender > .lab3-copy-facts'),egg:q('.lab3-egg'),
+        side:q(':scope > .lab3-right'),vitals:q('.lab3-vitals'),
+        scoreStrip:shadow.querySelector('dl.yofi-scores-strip'),
+        scoreBanner:shadow.querySelector('.yofi-scores-banner'),
+        abilities:shadow.querySelector('section.abilities'),abilitiesHome:null};
+      const flow=q('.yofi-hero-flow');
+      const description=q('.yofi-hero-copy');
+      const info=q('.yofi-hero-art-lane');
+      const gender=q('.lab3-gender .yofi-hero-gender');
+      const right=q('.lab3-egg .yofi-hero-facts-right');
+      if(!hero||!v.left||!v.side||!v.biologies||!v.gender||!v.egg||
+         !v.vitals||!v.scoreStrip||!v.scoreBanner||!flow||!description||!info||
+         !gender||!right){shadow.remove();return null;}
+      const foundation={hero,flow,description,info,gender,right,
+        facts:q('.yofi-hero-facts:not(.lab3-copy-facts)'),modeSignature:''};
+      speciesHeroStates.set(hero,foundation);
+      views.set(hero,v);
+      if(v.abilities?.closest('.lab3-right')) {
+        const home=document.createComment('measure: restore abilities');
+        const next=shadowScroll?.querySelector('section.evolution, section.moves');
+        if(next)next.before(home);
+        else shadowScroll?.append(home);
+        v.abilitiesHome=home;
+      }
+      // The shadow starts as a clone of the *currently selected* card. Strip
+      // every previous hero placement so its verification outcome depends only
+      // on source content and the current panel, not resize history.
+      restore(shadow,v);
+      // TM row count participates in page scroll-height comparison. A cloned
+      // grid can carry a previous width's explicit track/row settings; fit
+      // it synchronously to this shadow's current content width before any
+      // candidate can inherit that stale downstream height.
+      if(!document.documentElement.classList.contains('yofi-type-theme')){
+        for(const ul of shadow.querySelectorAll('section.moves dd ul'))
+          if(isSpeciesTMList(ul))fitSpeciesTMColumns(ul,false);
+      }
+      return {article:shadow,view:v,close:()=>shadow.remove()};
+    }catch(error){shadow.remove();throw error;}
+  }
+  function acceptStage(article,view,selection) {
+    const hero=view.hero;
+    if(selection.cached){
+      apply(article,view,selection.layout);
+      renderSubjectBBox(article,hero,selection.layout);
+      return selection.layout;
+    }
     const memo=geometryMemo.get(hero);
-    const identity=memo?.identity||'';
-    const old=resizeMemory.get(hero);
-    const width=layout.copyWidth+layout.laneWidth+layout.rightWidth+
-      layout.gap*(layout.tiles?2:1);
-    const same=old&&old.identity===identity&&width>=old.width-.5&&
-      old.promotion===layout.promotion;
-    resizeMemory.set(hero,{
-      identity,width,promotion:layout.promotion,
-      peakImageHeight:same?Math.max(old.peakImageHeight,layout.imageHeight):layout.imageHeight,
-      footprint:layout.totalFootprint,
-      layout:{promotion:layout.promotion,bioMode:layout.bioMode,cols:layout.cols}
+    const verified=[];
+    const verificationStart=performance.now();
+    let measured=0;
+    const stage=candidateMeasurementStage(article,view);
+    if(!stage){
+      // A missing temporary measurement environment is a failure to verify,
+      // not permission to repaint every candidate on the live page.
+      restore(article,view);
+      if(memo){memo.layout=null;memo.failure='candidate measurement stage unavailable';}
+      return null;
+    }
+    try{
+      for(const proposal of selection.alternatives||[]){
+        const result=verifyPaintedCandidate(stage.article,stage.view,proposal);
+        measured++;
+        if(!result)continue;
+        verified.push({layout:result,visibility:{
+          scrollHeight:stage.article.querySelector(':scope > .scrollable')?.scrollHeight||Infinity
+        }});
+      }
+    }finally{stage.close();}
+    if(memo){memo.verifiedPromotions=verified.reduce((count,v)=>{const k=v.layout.promotion;count[k]=(count[k]||0)+1;return count;},{});
+      memo.verifiedBands={single:verified.filter(v=>v.layout.scores&&v.layout.scoreBands===1).length,double:verified.filter(v=>v.layout.scores&&v.layout.scoreBands===2).length};
+      memo.verificationMs=performance.now()-verificationStart;
+      memo.measuredCandidates=measured;
+      memo.physicallyValidCandidates=verified.length;
+      memo.liveCandidateCommits=0;}
+    if(!verified.length){
+      restore(article,view);
+      if(memo){memo.layout=null;memo.failure='no physically aligned composition';}
+      return null;
+    }
+    // Make selection after exact layout verification, not Move-row counting.
+    // First drop layouts Pareto-dominated in promotion, artwork, measured
+    // unused area and real scroll height. Scroll is comparative only.
+    const imageRatio=(verified[0]?.layout?.imageWidth||1)/
+      (verified[0]?.layout?.imageHeight||1);
+    const artFloor=artLimits(usablePanelHeight(article),
+      hero.getBoundingClientRect().width,imageRatio,
+      subjectBBoxFor(article,hero.querySelector('.yofi-hero-art-lane img'))?.slug,article.getBoundingClientRect().width).min;
+    const artCompliant=verified.filter(v=>v.layout.imageHeight>=artFloor-.75);
+    const initiallyEligible=artCompliant.length?artCompliant:verified;
+    const guideForChosen=artLimits(usablePanelHeight(article),
+      hero.getBoundingClientRect().width,imageRatio,
+      subjectBBoxFor(article,hero.querySelector('.yofi-hero-art-lane img'))?.slug,article.getBoundingClientRect().width);
+    const areaEligible=guideForChosen.compact&&guideForChosen.contourCoverage!==null?
+      initiallyEligible.filter(v=>{
+        const h=v.layout.imageHeight;
+        return h>=guideForChosen.min-.75&&h<=guideForChosen.max+.75;
+      }):initiallyEligible;
+    const eligible=areaEligible.length?areaEligible:initiallyEligible;
+    const scored=eligible.map(item=>{
+      const g=item.layout;
+      const promoted=(g.tiles?1:0)+(g.scores?1:0)+(g.abilities?1:0);
+      const areaWaste=(g.internalUnusedArea||0)+(g.excessArtworkWidth||0)*.45;
+      return {...item,promoted,areaWaste};
     });
+    const pareto=scored.filter(a=>!scored.some(b=>b!==a&&
+      b.promoted>=a.promoted &&
+      b.layout.bottomError<=a.layout.bottomError+1 &&
+      b.areaWaste<=a.areaWaste+3 &&
+      b.visibility.scrollHeight<=a.visibility.scrollHeight+8 &&
+      b.layout.imageHeight>=a.layout.imageHeight-7 &&
+      (b.promoted>a.promoted||b.areaWaste<a.areaWaste-3||
+        b.visibility.scrollHeight<a.visibility.scrollHeight-8||
+        b.layout.imageHeight>a.layout.imageHeight+7)));
+    const available=geometryMemo.get(hero)?.available||hero.clientWidth;
+    // A 3-component promotion is strongly preferred when the wider card
+    // really accommodates it without excessive waste, but is never forced.
+    const subjectSlug=subjectBBoxFor(article,hero.querySelector('.yofi-hero-art-lane img'))?.slug;
+    const promotionWeight=available>=1010?105:available>=770?72:available<550?125:55;
+    const compared=(pareto.length?pareto:scored).sort((a,b)=>{
+      const rank=x=>{
+        const g=x.layout;
+        const anchor=artLimits(usablePanelHeight(article),available,
+          g.imageWidth/Math.max(1,g.imageHeight),subjectSlug,article.getBoundingClientRect().width);
+        // Anchor actual bbox AREA. A broad butterfly and a tall bear need
+        // not have equal heights; their rectangles should be comparable.
+        const actualArea=Math.max(1,g.imageWidth*g.imageHeight);
+        const artPenalty=anchor.areaWeight*
+          artAreaDeviation(actualArea,anchor)*54+
+          (1-anchor.areaWeight)*Math.max(0,190-g.imageHeight)*.28;
+        const wastePenalty=x.areaWaste*.44+
+          (g.leftSlack+g.rightSlack)*.08+
+          (g.artUnderfill||0)*2.8;
+        return -x.promoted*promotionWeight+g.visualCost*.4+
+          wastePenalty+g.bottomError*2.5+
+          x.visibility.scrollHeight*.14+artPenalty;
+      };
+      return rank(a)-rank(b)||
+        b.promoted-a.promoted||
+        a.layout.totalFootprint-b.layout.totalFootprint||
+        candidateIdentity(a.layout).localeCompare(candidateIdentity(b.layout));
+    });
+    // Exactly ONE attempted live commit in the common case. If its physical
+    // measurements disagree with the source-faithful sandbox, try the next
+    // independently verified candidate synchronously before display.
+    for(const candidate of compared){
+      const committed=verifyPaintedCandidate(article,view,candidate.layout);
+      if(memo)memo.liveCandidateCommits++;
+      if(!committed)continue;
+      renderSubjectBBox(article,hero,committed);
+      if(memo){
+        memo.layout=committed;memo.failure=null;
+        memo.actualFootprint=article.querySelector('.scrollable')?.scrollHeight||null;
+        const visible=informationVisibility(article);
+        memo.visibleMoves=visible.moveRows;
+        memo.visibleMoveItems=visible.moveItems;
+        memo.visibleOther=visible.otherRows;
+      }
+      return committed;
+    }
+    restore(article,view);
+    if(memo){memo.layout=null;memo.failure='sandbox/live geometry disagreed';}
+    return null;
   }
 
     const SPECIES_TM_CSS = `
+    /* Light/Dark: permit the existing TM grid to shrink with the card. */
+    html:not(.yofi-type-theme) .page > main article > .scrollable section.moves > dl > dd {
+      min-width: 0 !important;
+    }
     /* Light/Dark column geometry only. Type theme owns its natural-width,
        row-major pill wrapping and does not run this column fitter. */
     html:not(.yofi-type-theme) .page > main article > .scrollable section.moves dd ul[data-yofi-species-tm-columns].yofi-species-tm-grid {
@@ -3315,7 +4606,7 @@ article.yofi-scores-layout section.moves > dl + dl {
   function setTmTrackStyle(node,name,value){
     if(node.style.getPropertyValue(name)!==value)node.style.setProperty(name,value);
   }
-  function fitSpeciesTMColumns(ul) {
+  function fitSpeciesTMColumns(ul, observe=true) {
     const links=[...ul.querySelectorAll(':scope > li > a[href]')];
     if(!links.length || !tmGridCanvas)return;
     const bounds=ul.getBoundingClientRect();
@@ -3373,7 +4664,7 @@ article.yofi-scores-layout section.moves > dl + dl {
     setTmTrackStyle(ul,'--yofi-species-tm-gap',gap.toFixed(2)+'px');
     tmGridMemo.set(ul,{signature,width:bounds.width,columns:chosen.columns,rows:chosen.rows,
       trackWidths:chosen.tracks,usedWidth:chosen.used});
-    if(tmResizeObserver&&!tmGridSeen.has(ul)){tmGridSeen.add(ul);tmResizeObserver.observe(ul);}
+    if(observe&&tmResizeObserver&&!tmGridSeen.has(ul)){tmGridSeen.add(ul);tmResizeObserver.observe(ul);}
   }
   function installSpeciesTMColumns() {
     if(!isSpeciesRoot())return;
@@ -3987,7 +5278,7 @@ article.yofi-scores-layout section.moves > dl + dl {
         const above=(id==='R'||id==='S')&&(key==='weak'||key==='resist');
         // One complete badge fits at minimum. Preferred width accommodates
         // ALL badges on one row, regardless of species or badge count.
-        // The real fit/wrap decision is made after the actual grid is painted.
+        // The real fit/wrap decision uses synchronous rendered-element geometry.
         const one=cell,whole=badges*cell+(badges-1)*gap;
         return {min:above?Math.max(label,one):label+labelGap+one,
           pref:above?Math.max(label,whole):label+labelGap+whole};}
@@ -4204,7 +5495,7 @@ article.yofi-scores-layout section.moves > dl + dl {
       };
       if(!apply(tracks))return false;
       // Optimise actual combined visual height, including badge row counts.
-      // No allocation is certified until the painted DOM passes hard fit.
+      // No allocation is certified until the DOM geometry passes hard fit.
       tracks=adaptiveOptimizeRowSpace(node,active,needs,tracks,data,id,ctx,font,bold,apply);
       // A third (outer) track containing an effectiveness pair behaves
       // optically as two columns. Trial the quarter-width four-track plan;
@@ -4617,29 +5908,6 @@ article.yofi-scores-layout section.moves > dl + dl {
   }
 
 
-  function arrangeHiddenAbilityTags(article){
-    // Native source: AbilityPoolInfo.svelte renders
-    // <p class="no-margin"><Tag>Hidden</Tag></p><div class="ability">…</div>.
-    // The Tag.svelte font is relative to its P parent; moving it inside
-    // .ability changes its font size. Only group the TWO ORIGINAL SIBLINGS.
-    // Do not alter the original Tag element or its classes/styles.
-    for(const section of article.querySelectorAll('section.abilities')){
-      for(const item of [...section.children]){
-        if(!(item instanceof HTMLParagraphElement)||!item.classList.contains('no-margin'))continue;
-        if(item.closest('.yofi-native-hidden-pair'))continue;
-        const tag=item.querySelector(':scope > .tag');
-        if(!tag||tag.textContent.trim()!=='Hidden')continue;
-        const entry=item.nextElementSibling;
-        if(!entry||!entry.matches('div.ability')||!entry.querySelector('strong,b'))continue;
-        const wrapper=document.createElement('div');
-        wrapper.className='yofi-native-hidden-pair';
-        item.before(wrapper);
-        wrapper.append(item,entry);
-      }
-    }
-  }
-
-
   // Content-level description decoration belongs to QOL, never the layout
   // companion. This marks only the native opening phrase and keeps its class
   // stable whether the detail image is mobile, split or fullscreen.
@@ -4680,7 +5948,6 @@ article.yofi-scores-layout section.moves > dl + dl {
     // QOL's header controls, sex-symbol normalization and portrait control are
     // deliberately not invoked or recreated here.
     layoutSpeciesStats(page);
-    arrangeHiddenAbilityTags(article);
     decorateSpeciesDescriptionLead(article);
     syncSpeciesVitals(page);
     compactSpeciesDistances(page);
@@ -4703,6 +5970,7 @@ article.yofi-scores-layout section.moves > dl + dl {
       installCSS();
       installSpeciesContentCSS();
       installTMCSS();
+      installSpeciesTMColumns();
 
       const articles = visibleSpeciesArticles();
       for (const article of articles) {
@@ -4728,20 +5996,17 @@ article.yofi-scores-layout section.moves > dl + dl {
         const data = vitalData(article);
         const view = viewFor(hero);
         if (!locateCanonical(view, article)) { restore(article, view); continue; }
+        // Restore native ownership BEFORE capturing its typography. Otherwise
+        // the previous promoted width's computed Abilities font is reused as
+        // the next panel's native baseline, making the solver history-dependent.
+        restore(article,view);
         syncView(view, article, data);
-        const layout = chooseStage(article, hero, view);
-        if (layout?.native) {
-          restore(article, view);
-          const state = speciesHeroStates.get(hero);
-          if (state) selectHeroFactsMode(state);
-          renderSubjectBBox(article, hero, nativeSubjectLayout(article,hero,layout));
-          rememberNativeHero(hero);
-        } else if (layout) {
-          apply(article, view, layout);
-          renderSubjectBBox(article, hero, layout);
+        const selection = chooseStage(article,hero,view);
+        if (selection) {
+          acceptStage(article,view,selection);
         } else {
-          restore(article, view);
-          clearBBoxRendering(article, hero);
+          restore(article,view);
+          clearBBoxRendering(article,hero);
         }
       }
       installSpeciesTMColumns();
@@ -4777,7 +6042,66 @@ article.yofi-scores-layout section.moves > dl + dl {
       artLaneWidth: +(parseFloat(hero?.style.getPropertyValue('--lab3-lane-width')) || 0).toFixed(1),
       copyWidth: +(parseFloat(hero?.style.getPropertyValue('--lab3-copy-width')) || 0).toFixed(1),
       projectedAffectedHeight: +(geometryMemo.get(hero)?.layout?.totalFootprint || 0).toFixed(1),
+      scoreBands: geometryMemo.get(hero)?.layout?.scoreBands || null,
+      biologyHeight: geometryMemo.get(hero)?.layout?.bioHeight || 0,
+      geometryMs: +(geometryMemo.get(hero)?.geometryMs || 0).toFixed(1),
+      verificationMs: +(geometryMemo.get(hero)?.verificationMs || 0).toFixed(1),
+      scoreRowHeight: +(geometryMemo.get(hero)?.layout?.scoreRowHeight || 0).toFixed(1),
+      scoreFontSize: +(geometryMemo.get(hero)?.layout?.scoreFontSize || 0).toFixed(1),
+      scoreTopGap: +(geometryMemo.get(hero)?.layout?.scoreTopGap || 0).toFixed(1),
+      scoreHost: geometryMemo.get(hero)?.layout?.scoreSide || null,
+      evaluatedCandidates:geometryMemo.get(hero)?.candidateCount || 0,
+      measuredCandidates:geometryMemo.get(hero)?.measuredCandidates ?? null,
+      liveCandidateCommits:geometryMemo.get(hero)?.liveCandidateCommits ?? null,
+      physicallyValidCandidates:geometryMemo.get(hero)?.physicallyValidCandidates ?? null,
+      verifiedScoreBands:geometryMemo.get(hero)?.verifiedBands || null,
+      verifiedPromotions:geometryMemo.get(hero)?.verifiedPromotions || null,
+      selectionFailure:geometryMemo.get(hero)?.failure || null,
+      visibleMoveRows:geometryMemo.get(hero)?.visibleMoves ?? null,
+      visibleMoveItems:geometryMemo.get(hero)?.visibleMoveItems ?? null,
+      visibleOtherRows:geometryMemo.get(hero)?.visibleOther ?? null,
+      actualScrollHeight:geometryMemo.get(hero)?.actualFootprint ?? null,
+      leadingCandidates:geometryMemo.get(hero)?.ranked?.slice(0,5) || [],
       rightWidth: +(parseFloat(hero?.style.getPropertyValue('--lab3-side-width')) || 0).toFixed(1),
+      chosenGeometry:geometryMemo.get(hero)?.layout?{
+        leftBottom:geometryMemo.get(hero).layout.leftBottom,
+        rightBottom:geometryMemo.get(hero).layout.rightBottom,
+        subjectBottom:geometryMemo.get(hero).layout.subjectBottom,
+        bottomError:geometryMemo.get(hero).layout.bottomError,
+        internalUnusedArea:geometryMemo.get(hero).layout.internalUnusedArea,
+        leftDistribution:geometryMemo.get(hero).layout.distributeLeft,
+        rightDistribution:geometryMemo.get(hero).layout.distributeRight,
+        imageSlack:geometryMemo.get(hero).layout.artUnderfill,
+        copyPlateauWaste:geometryMemo.get(hero).layout.copyPlateauWaste,
+        rightSlack:geometryMemo.get(hero).layout.rightSlack,
+        physicalAdjustment:geometryMemo.get(hero).layout.physicalAdjustment || 0
+      }:null,
+      renderedBottoms:(() => {
+        if(!hero || !article?.classList.contains('lab3-active'))return null;
+        const root=hero.getBoundingClientRect();
+        const last=(selector)=>{
+          const container=hero.querySelector(selector);
+          return container?.lastElementChild?.getBoundingClientRect().bottom-root.top;
+        };
+        const art=hero.querySelector('.yofi-hero-art-lane .square-image figure');
+        const left=last(':scope > .lab3-left-extra');
+        const right=article.classList.contains('lab3-has-right')?
+          last(':scope > .lab3-right'):null;
+        const figure=art?.getBoundingClientRect();
+        const candidate=geometryMemo.get(hero)?.layout;
+        // The figure can include a credit. The visible subject ends at the
+        // top-anchored, measured painted rectangle, not the PNG canvas.
+        const lane=hero.querySelector('.yofi-hero-art-lane')?.getBoundingClientRect();
+        const subject=lane&&candidate?
+          lane.top-root.top+candidate.artTopGap+candidate.imageHeight:null;
+        const rowHeight=candidate?.rowHeight??root.height;
+        const measured=[left,right,subject].filter(Number.isFinite);
+        return {left,right,subject,rowHeight,hero:root.height,
+          spread:measured.length?Math.max(...measured)-Math.min(...measured):null,
+          leftOverhang:typeof left==='number'?left-rowHeight:null,
+          rightOverhang:typeof right==='number'?right-rowHeight:null,
+          imageUnderfill:typeof subject==='number'?rowHeight-subject:null};
+      })(),
       columnSlack: hero ? ['left','right'].map(side=>{
         const node=hero.querySelector(side==='left'?'.lab3-left-extra':'.lab3-right');
         return node ? Math.max(0,Math.round(node.getBoundingClientRect().height-Array.from(node.children).reduce((a,c)=>a+c.getBoundingClientRect().height,0))) : null;
@@ -4793,6 +6117,11 @@ article.yofi-scores-layout section.moves > dl + dl {
     };
   };
   window.__yofiHeroLayoutStatus = window.__yofiSpeciesCardStatus; // Backward-compatible diagnostics.
+  window.__yofiHeroLayoutCandidates = () => {
+    const article=visibleSpeciesArticles()[0];
+    const hero=article?.querySelector('.yofi-species-hero');
+    return geometryMemo.get(hero)?.ranked?.slice() || [];
+  };
   // Native source changes and card navigation invalidate geometry once per frame.
   // Changed species are prepared from native data before its next paint;
   // ordinary content and resize updates remain coalesced into one frame.
@@ -4804,6 +6133,11 @@ article.yofi-scores-layout section.moves > dl + dl {
     const meaningful = mutation => {
       const target = mutation.target.nodeType === 1
         ? mutation.target : mutation.target.parentElement;
+      if(target?.closest?.('[data-yofi-layout-probe]'))return false;
+      if(mutation.addedNodes?.length && [...mutation.addedNodes].every(n=>
+          n.nodeType!==1||n.matches?.('[data-yofi-layout-probe]')))return false;
+      if(mutation.removedNodes?.length && [...mutation.removedNodes].every(n=>
+          n.nodeType!==1||n.matches?.('[data-yofi-layout-probe]')))return false;
       const article = target?.closest?.(LIVE_CARD_SELECTOR);
       if (mutation.type === 'childList') {
         const nodes = [...mutation.addedNodes, ...mutation.removedNodes].filter(node => node.nodeType === 1);
@@ -4847,12 +6181,12 @@ article.yofi-scores-layout section.moves > dl + dl {
         const target = m.target.nodeType === 1 ? m.target : m.target.parentElement;
         if (m.attributeName === 'class')
           return target === root || target === document.body;
-        return ['data-p5ov-display','data-p5ov-kind','data-yofi-forced-sex'].includes(m.attributeName) &&
+        return ['data-p5ov-display','data-p5ov-kind','data-yofi-forced-sex','data-yofi-corner'].includes(m.attributeName) &&
           !!target?.closest?.(LIVE_CARD_SELECTOR)?.getClientRects().length;
       })) requestHeroTick();
     });
     tmWatch.observe(root, { subtree:true, attributes:true,
-      attributeFilter:['data-p5ov-display','data-p5ov-kind','data-yofi-forced-sex','class'] });
+      attributeFilter:['data-p5ov-display','data-p5ov-kind','data-yofi-forced-sex','data-yofi-corner','class'] });
     const invalidateSpeciesFonts = () => {
       conditionalScoreFontEpoch++;
       tmFontEpoch++;
