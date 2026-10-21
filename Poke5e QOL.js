@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         QOL [v0.13.4]
+// @name         QOL [v0.13.6]
 // @namespace    yofi.poke5e.qol.v01239
-// @version      0.13.4
+// @version      0.13.6
 // @description  Core navigation and controls; canonical universal Scarlet/Violet type palette; neighbor data warmup and decoded pre-paint portrait synchronization.
 // @match        https://poke5e.app/*
 // @run-at       document-start
@@ -559,10 +559,9 @@
       drag.moved = true;
       const w = button.offsetWidth || 28;
       const h = button.offsetHeight || 28;
-      const inset = 4;
-      const x = Math.max(inset, Math.min(drag.rect.width - w - inset,
+      const x = Math.max(0, Math.min(drag.rect.width - w,
         event.clientX - drag.rect.left - w / 2));
-      const y = Math.max(inset, Math.min(drag.rect.height - h - inset,
+      const y = Math.max(0, Math.min(drag.rect.height - h,
         event.clientY - drag.rect.top - h / 2));
       button.dataset.yofiDragging = "true";
       button.style.left = `${x}px`;
@@ -2540,7 +2539,7 @@
       box-sizing: border-box;
       width: 1.9em;
       height: 1.9em;
-      padding: .2em;
+      /* SVG fills the existing touch target; no inward icon padding. */
       margin: 0;
       color: rgba(128,128,128,.62);
       background: transparent;
@@ -2560,16 +2559,16 @@
       color: #111 !important;
     }
     article .square-image.yofi-portrait-control-host .yofi-portrait-sparkle[data-yofi-corner="tr"] {
-      top: 4px; right: 4px; bottom: auto; left: auto;
+      top: 0; right: 0; bottom: auto; left: auto;
     }
     article .square-image.yofi-portrait-control-host .yofi-portrait-sparkle[data-yofi-corner="tl"] {
-      top: 4px; left: 4px; bottom: auto; right: auto;
+      top: 0; left: 0; bottom: auto; right: auto;
     }
     article .square-image.yofi-portrait-control-host .yofi-portrait-sparkle[data-yofi-corner="br"] {
-      bottom: 4px; right: 4px; top: auto; left: auto;
+      bottom: 0; right: 0; top: auto; left: auto;
     }
     article .square-image.yofi-portrait-control-host .yofi-portrait-sparkle[data-yofi-corner="bl"] {
-      bottom: 4px; left: 4px; top: auto; right: auto;
+      bottom: 0; left: 0; top: auto; right: auto;
     }
     article .square-image.yofi-portrait-control-host .yofi-portrait-sparkle[data-yofi-dragging] {
       cursor: grabbing;
