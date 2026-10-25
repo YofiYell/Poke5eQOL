@@ -6,10 +6,24 @@ Status vocabulary: Discussing · Planned · Ready · In Progress · Implemented 
 
 These are working development candidates. Presence in GitHub, a higher version number, or successful syntax checks does not establish feature acceptance. Record design agreement, implementation evidence and user/device verification separately.
 
+Execution Queue — 2026-10-25
+
+This is the **current proposed order**, maintained at project checkpoints; it is not a requirement to finish every task in a stage before unrelated work. Each development outcome is investigated, implemented, tested and reviewed in a focused conversation. Feature acceptance remains specific to evidence and user feedback. Update this queue when prerequisites or priorities materially change rather than adding another dated execution plan.
+
+| Order | Outcome | Status | Completion / checkpoint gate |
+| --- | --- | --- | --- |
+| **1 — Next** | **Reusable Poké5e Chromium fixture** (`OPS-TEST-FIDELITY`) | Ready for reconstruction and validation | Rebuild from identified native/data/artwork and supplied fixture archives; prove native-only and overlay modes from clean extraction; report real coverage and mode limitations; package reproducible inputs, runner and evidence in a verified ZIP saved to Library. |
+| **2** | **Authored Vitals SVG fidelity and compact/promoted cells** (`HERO-ICON-FIDELITY`, `HERO-VITALS-CELLS`) | Planned; depends on trustworthy visual checks | Use the supplied SVGs (especially correct SR crop and uniform Level color); inspect readable rendered component studies; validate actual icon/value cells in compact and promoted forms without changing native data. |
+| **3** | **Movement, Senses and effectiveness icon/value consumers** (`STATS-01` and related icon entries) | Planned; reuse measured components | Establish compact cell dimensions, exact supplied glyph mappings, field semantics and real consumers; test relevant native values and responsive fit. |
+| **4** | **Constructive Species Card/Stats composition** (selector reconstruction and `STATS-01`) | Experimental work exists; replacement incomplete | Integrate measured components with artwork and text geometry, eligible promotions, biology last and populated-bottom alignment; targeted real-data navigation/resize checks, preserving accepted improvements. |
+| **5** | **Independent refinements and broader backlog** (Move/TM typography, theme, Fakémon metadata/custom moves, etc.) | Sequencing to be decided per dependency | Choose independently scoped outcomes from the workboard; investigate actual consumers, test affected behavior and record individual acceptance. |
+
+At a meaningful checkpoint, compare the user-confirmed working files with committed branch contents, review tested/untested behavior, update the relevant workboard IDs and this queue, and identify the next outcome. Do not equate a delivered version or GitHub commit with feature acceptance.
+
 
 Current reconciliation — 2026-10-24
 
-Stability: **Working / proposed documentation revision.** This local proposal reconciles all three supplied chat exports, their artifacts and the user's October 24 corrections; it has not been written to GitHub. The implementation records below remain evidence with their dates and scope, not new authorization or whole-file acceptance.
+Stability: **Working, reconciled documentation committed on the development branch.** The reconciliation of three supplied chat exports, their artifacts and the user's October 24 corrections was uploaded to `dev/artwork-geometry-2026-10-17` on October 25 (initial documentation commit `f8bebcf7`). Its requirements and evidence remain open to correction; publication of this workboard does not authorize code changes or establish whole-file feature acceptance. The implementation records below retain their original dates and scopes.
 
 * **Remote checkpoint inspected:** `YofiYell/Poke5eQOL`, `dev/artwork-geometry-2026-10-17`, commit `7d67409aad63f300325bc03f16dc058b2200c01c`. Remote Species Card is v0.2.22; the supplied v0.2.29 is a later local experiment. Supplied QoL v0.13.6 and Theme Overlay v0.3.50 match the remote development files. None of these facts establishes what is currently installed on the user's devices.
 * **Feature-level progress:** Preserve the user-observed bottom-alignment improvements, useful Crobat composition, larger sparkle after padding removal, Abilities-spacing improvement and Hidden-badge inline/gap refinements. The user now reports no recurrence of the vertical bounce or shiny-triggered layout switching after later deliveries. Preserve these observations, the historical oscillation correction, and the reviewed original-Pokémon backgroundType assignments/palette. Outstanding selector quality or icon work does not reopen unrelated fixes or imply file-wide acceptance.
